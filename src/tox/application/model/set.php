@@ -47,6 +47,8 @@ abstract class Set extends Tox\Assembly implements ICollection
 
     protected $_length;
 
+    protected $_totalLength;
+
     protected $_maxLength;
 
     protected $_orders;
@@ -104,7 +106,8 @@ abstract class Set extends Tox\Assembly implements ICollection
     {
         $this->_committing = FALSE;
         $this->_cursor =
-        $this->_length = -1;
+        $this->_length =
+        $this->_totalLength = -1;
         $this->_elements =
         $this->_index = array();
         $this->_stack = array('append' => array(),
@@ -128,7 +131,7 @@ abstract class Set extends Tox\Assembly implements ICollection
         }
         $this->_committing = FALSE;
         $this->_cursor =
-        $this->_length = -1;
+        $this->_totalLength = -1;
         $this->_dao = $dao;
         $this->_elements =
         $this->_filters =
@@ -180,7 +183,7 @@ abstract class Set extends Tox\Assembly implements ICollection
     public function count()
     {
         $this->valid();
-        return $this->_length;
+        return $this->_totalLength;
     }
 
     public function crop($offset, $length = 0)
@@ -206,6 +209,10 @@ abstract class Set extends Tox\Assembly implements ICollection
         if (!$this->valid())
         {
             return;
+        }
+        if (!$this->_cursor)
+        {
+            $this->load();
         }
         if (!$this->_elements[$this->_index[$this->_cursor]] instanceof Application\Model)
         {
@@ -431,6 +438,26 @@ abstract class Set extends Tox\Assembly implements ICollection
         return $this->_index[$this->_cursor];
     }
 
+    protected function load()
+    {
+        if (!$this->valid())
+        {
+            return self;
+        }
+        if (!$this->_length && 0 < $this->_totalLength)
+        {
+            $a_elements = call_user_func(array($this->_dao, 'listAndSortBy' . $s_func), $this->_filters, $this->_orders,
+                $this->_offset, $this->_totalLength
+            );
+            for ($ii = 0, $jj = count($a_elements); $ii < $jj; $ii++)
+            {
+                $this->_elements[$a_elements[$ii]['id']] = $a_elements[$ii];
+                $this->_index[] = $a_elements[$ii]['id'];
+            }
+        }
+        return self;
+    }
+
     public function next()
     {
         if ($this->valid())
@@ -492,38 +519,28 @@ abstract class Set extends Tox\Assembly implements ICollection
 
     public function rewind()
     {
-        if (-1 == $this->_length)
+        if (-1 == $this->_totalLength)
         {
             ksort($this->_filters);
             $s_func = implode('And', array_keys($this->_filters));
-            $i_length = call_user_func(array($this->_dao, 'countBy' . $s_func), $this->_filters) - $this->_offset;
+            $i_totalLength = call_user_func(array($this->_dao, 'countBy' . $s_func), $this->_filters) - $this->_offset;
             if ($this->_maxLength)
             {
-                $i_length = min($i_length, $this->_maxLength);
+                $i_totalLength = min($i_totalLength, $this->_maxLength);
             }
-            $this->_length = $i_length;
-            if ($this->_length)
-            {
-                $a_elements = call_user_func(array($this->_dao, 'listAndSortBy' . $s_func), $this->_filters, $this->_orders,
-                    $this->_offset, $this->_length
-                );
-                for ($ii = 0, $jj = count($a_elements); $ii < $jj; $ii++)
-                {
-                    $this->_elements[$a_elements[$ii]['id']] = $a_elements[$ii];
-                    $this->_index[] = $a_elements[$ii]['id'];
-                }
-            }
+            $this->_length = 0;
+            $this->_totalLength = $i_totalLength;
         }
         $this->_cursor = 0;
     }
 
     public function valid()
     {
-        if (-1 == $this->_length)
+        if (-1 == $this->_totalLength)
         {
             $this->rewind();
         }
-        return -1 < $this->_cursor && $this->_cursor < $this->_length;
+        return -1 < $this->_cursor && $this->_cursor < $this->_totalLength;
     }
 }
 
