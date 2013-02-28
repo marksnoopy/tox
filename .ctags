@@ -1,0 +1,7 @@
+-f .tags
+-h .php
+--exclude=.*
+--langmap=PHP:.php
+--languages=PHP
+--recurse=yes
+--verbose=no
