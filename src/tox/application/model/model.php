@@ -676,15 +676,22 @@ abstract class Model extends Tox\Assembly implements Model\IEntity
      */
     public static function setUp($id, IDao $dao = NULL)
     {
-        if (isset(static::$_instances[get_called_class()][(string) $id]))
+        $s_type = get_called_class();
+        $id = (string) $id;
+        if (isset(static::$_instances[$s_type][$id]))
         {
-            return static::$_instances[get_called_class()][(string) $id];
+            return static::$_instances[$s_type][$id];
         }
         if (NULL === $dao)
         {
             $dao = static::getDefaultDao();
         }
-        $o_entity = static::manufactor($dao->read((string) $id), $dao);
+        $a_props = $dao->read($id);
+        if (!is_array($a_props))
+        {
+            throw new NonExistantEntityException(array('id' => $id, 'type' => $s_type));
+        }
+        $o_entity = static::manufactor($a_props, $dao);
         return $o_entity;
     }
 
