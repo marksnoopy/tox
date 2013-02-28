@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- vi:se fenc=utf-8 ff=unix tw=80 ai si sw=2 et ts=2 sts=2: -->
+<phpdoc>
+  <title>Tox</title>
+  <parser>
+    <encoding>UTF-8</encoding>
+    <target>share/doc/sdk</target>
+    <default-package-name>tox.core</default-package-name>
+    <markers>
+      <item>DEBUG</item>
+      <item>FIXME</item>
+      <item>TODO</item>
+      <item>TRACE</item>
+    </markers>
+    <extensions>
+      <extension>php</extension>
+    </extensions>
+    <visibility>public,protected</visibility>
+  </parser>
+  <transformer>
+    <target>share/doc/sdk</target>
+  </transformer>
+  <files>
+    <directory>src</directory>
+  </files>
+</phpdoc>

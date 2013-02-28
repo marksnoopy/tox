@@ -1,6 +1,7 @@
 -f .tags
 -h .php
 --exclude=.*
+--exclude=share/
 --langmap=PHP:.php
 --languages=PHP
 --recurse=yes
