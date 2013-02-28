@@ -1,6 +1,6 @@
 <?php
 /**
- * Registers the package.
+ * Processes the bootstrap of `tox.core' on importing.
  *
  * This file is part of Tox.
  *
@@ -17,10 +17,10 @@
  * You should have received a copy of the GNU General Public License
  * along with Tox.  If not, see <http://www.gnu.org/licenses/>.
  *
- * @package   Tox
+ * @package   tox.core
  * @author    Snakevil Zen <zsnakevil@gmail.com>
- * @copyright © 2012 szen.in
- * @license   http://www.gnu.org/licenses/gpl.html
+ * @copyright © 2012-2013 SZen.in
+ * @license   GNU General Public License, version 3
  */
 
 if ('@bootstrap.php' == basename(__FILE__))
@@ -28,8 +28,8 @@ if ('@bootstrap.php' == basename(__FILE__))
     require_once __DIR__ . '/assembly.php';
     require_once __DIR__ . '/classmanager.php';
     require_once __DIR__ . '/packagemanager.php';
-    require_once __DIR__ . '/tox.php';
-    Tox::registerNamespace('Tox\\Core', __DIR__);
+    require_once __DIR__ . '/runtime.php';
+    Tox::import('Tox\\Core', __DIR__);
 }
 else
 {
@@ -38,16 +38,14 @@ else
     require_once('phar://tox.core/classmanager.php');
     require_once('phar://tox.core/packagemanager.php');
     require_once('phar://tox.core/tox.php');
-    Tox::registerNamespace('Tox\\Core', __FILE__);
+    Tox::import('Tox\\Core', __FILE__);
 }
 
 Tox::setUp();
 
-Tox::treatClassAs('Tox\\ISingleton', 'Tox\\Core\\ISingleton');
+Tox::alias('Tox\\Core\\ISingleton', 'Tox\\ISingleton');
 
-Tox::treatClassAs('Tox\\Exception', 'Tox\\Core\\Exception');
-Tox::treatClassAs('Tox\\PropertyReadDeniedException', 'Tox\\Core\\PropertyReadDeniedException');
-Tox::treatClassAs('Tox\\PropertyWriteDeniedException', 'Tox\\Core\\PropertyWriteDeniedException');
+Tox::alias('Tox\\Core\\Exception', 'Tox\\Exception');
 
 __HALT_COMPILER();
 
