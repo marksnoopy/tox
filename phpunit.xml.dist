@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- vi:se ft=xml fenc=utf-8 ff=unix tw=80 ai si sw=2 et ts=2 sts=2: -->
+<phpunit xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:noNamespaceSchemaLocation="http://phpunit.de/phpunit.xsd"
+         cacheTokens="true"
+         processIsolation="true"
+         stopOnError="true"
+         stopOnFailure="true"
+         stopOnSkipped="true"
+         strict="true"
+>
+  <php>
+    <ini name="display_errors" value="off"/>
+    <ini name="xdebug.collect_includes" value="off"/>
+    <ini name="xdebug.collect_params" value="0"/>
+    <ini name="xdebug.collect_return" value="off"/>
+    <ini name="xdebug.collect_vars" value="off"/>
+    <ini name="xdebug.collect_assignments" value="off"/>
+    <ini name="xdebug.show_exception_trace" value="off"/>
+  </php>
+</phpunit>
