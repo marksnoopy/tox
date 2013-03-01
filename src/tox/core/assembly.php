@@ -1,8 +1,6 @@
 <?php
 /**
- * Provides behaviors to all derived classes components.
- *
- * This class cannot be instantiated.
+ * Defines the root class of all components to provide essential behaviors.
  *
  * This file is part of Tox.
  *
@@ -19,88 +17,162 @@
  * You should have received a copy of the GNU General Public License
  * along with Tox.  If not, see <http://www.gnu.org/licenses/>.
  *
- * @package   Tox\Web
- * @author    Snakevil Zen <zsnakevil@gmail.com>
- * @copyright © 2012 szen.in
- * @license   http://www.gnu.org/licenses/gpl.html
+ * @copyright © 2012-2013 SZen.in
+ * @license   GNU General Public License, version 3
  */
 
-namespace Tox;
+namespace Tox\Core;
 
 use ReflectionClass;
 use ReflectionException;
-use stdClass;
 
+class_alias('Tox\\Core\\Assembly', 'Tox\\Assembly');
+
+/**
+ * Represents as the root class of all components to provide essential
+ * behaviors.
+ *
+ * THIS CLASS CANNOT BE INSTANTIATED.
+ *
+ * @package   tox.core
+ * @author    Snakevil Zen <zsnakevil@gmail.com>
+ */
 abstract class Assembly
 {
-    protected static $__properties;
+    /**
+     * Represents a magic property is untouchable.
+     *
+     * NOTICE: This constant is declared for compatibility, but SHOULD NOT be
+     * used.
+     *
+     * @internal
+     */
+    const _TOX_PROPERTY_DENIED = '';
 
+    /**
+     * Represents a magic property is read only.
+     *
+     * @internal
+     */
+    const _TOX_PROPERTY_READONLY = 'r';
+
+    /**
+     * Represents a magic property is write only.
+     *
+     * @internal
+     */
+    const _TOX_PROPERTY_WRITEONLY = 'w';
+
+    /**
+     * Represents a magic property is both readable and writable.
+     *
+     * @internal
+     */
+    const _TOX_PROPERTY_PUBLIC = '*';
+
+    /**
+     * Stores detected magic readable and writable properties for each derived
+     * component.
+     *
+     * @var array
+     *
+     * @internal
+     */
+    protected static $_tox_properties = array();
+
+    /**
+     * Be invoked on retrieving a magic property.
+     *
+     * 2 conditions are required to create a readable magic property:
+     *
+     * * An invisible property with the same name;
+     *
+     * * An invisible getter method of which name starts with '__get' and ends
+     *   with the property name.
+     *
+     * @param  string $prop Name of a magic property.
+     * @return mixed        Value of that magic property.
+     */
     public function __get($prop)
     {
         $prop = (string) $prop;
-        list($a_props) = array_values($this->__getProperties());
-        if (!isset($a_props[$prop]))
-        {
+        $a_props = $this->_tox_getMagicProps();
+        if (!isset($a_props[$prop]) ||
+            self::_TOX_PROPERTY_READONLY != $a_props[$prop] && self::_TOX_PROPERTY_PUBLIC != $a_props[$prop]
+        ) {
             throw new PropertyReadDeniedException(array('object' => $this, 'property' => $prop));
         }
         return call_user_func(array($this, '__get' . $prop));
     }
 
-    final protected function __getProperties()
+    /**
+     * Retrieves the magic properties of the class type.
+     *
+     * @return array
+     */
+    final protected function _tox_getMagicProps()
     {
-        if (!isset(static::$__properties[get_class($this)]))
-        {
-            if (!is_array(static::$__properties))
-            {
-                static::$__properties = array();
-            }
-            static::$__properties[get_class($this)] = array('readable' => array(), 'writable' => array());
+        $s_class = get_class($this);
+        if (!isset(self::$_tox_properties[$s_class])) {
+            self::$_tox_properties[$s_class] = array();
             $o_rclass = new ReflectionClass($this);
-            foreach ($o_rclass->getProperties() as $o_rprop)
-            {
-                if (!$o_rprop->isDefault() || $o_rprop->isPublic() || $o_rprop->isStatic())
-                {
+            foreach ($o_rclass->getProperties() as $o_rprop) {
+                if (!$o_rprop->isDefault() || $o_rprop->isPublic() || $o_rprop->isStatic()) {
                     continue;
                 }
-                try
-                {
+                try {
                     $o_rfunc = $o_rclass->getMethod('__get' . $o_rprop->name);
-                    if (!$o_rfunc->isPublic() && !$o_rfunc->isStatic())
-                    {
-                        static::$__properties[get_class($this)]['readable'][$o_rprop->name] = $o_rprop->name;
+                    if (!$o_rfunc->isPublic() && !$o_rfunc->isStatic()) {
+                        self::$_tox_properties[$s_class][$o_rprop->name] = self::_TOX_PROPERTY_READONLY;
                     }
+                } catch (ReflectionException $ex) {
                 }
-                catch (ReflectionException $ex)
-                {
-                }
-                try
-                {
+                try {
                     $o_rfunc = $o_rclass->getMethod('__set' . $o_rprop->name);
-                    if (!$o_rfunc->isPublic() && !$o_rfunc->isStatic())
-                    {
-                        static::$__properties[get_class($this)]['writable'][$o_rprop->name] = $o_rprop->name;
+                    if (!$o_rfunc->isPublic() && !$o_rfunc->isStatic()) {
+                        self::$_tox_properties[$s_class][$o_rprop->name] =
+                            isset(self::$_tox_properties[$s_class][$o_rprop->name]) ?
+                            self::_TOX_PROPERTY_PUBLIC :
+                            self::_TOX_PROPERTY_WRITEONLY;
                     }
-                }
-                catch (ReflectionException $ex)
-                {
+                } catch (ReflectionException $ex) {
                 }
             }
         }
-        return static::$__properties[get_class($this)];
+        return self::$_tox_properties[$s_class];
     }
 
+    /**
+     * Be invoked on setting a magic property.
+     *
+     * 2 conditions are required to create a writable magic property:
+     *
+     * * An invisible property with the same name;
+     *
+     * * An invisible setter method of which name starts with '__set' and ends
+     *   with the property name.
+     *
+     * @param  string $prop  Name of a magic property.
+     * @param  mixed  $value The new value.
+     * @return void
+     */
     public function __set($prop, $value)
     {
         $prop = (string) $prop;
-        //list(, $a_props) = $this->__getProperties();
-        list($a_props) = array_values($this->__getProperties());
-        if (!isset($a_props[$prop]))
-        {
+        $a_props = $this->_tox_getMagicProps();
+        if (!isset($a_props[$prop])
+            || self::_TOX_PROPERTY_WRITEONLY != $a_props[$prop] && self::_TOX_PROPERTY_PUBLIC != $a_props[$prop]
+        ) {
             throw new PropertyWriteDeniedException(array('object' => $this, 'property' => $prop));
         }
         call_user_func(array($this, '__set' . $prop), $value);
     }
 
+    /**
+     * Be invoked on string type casting.
+     *
+     * @return string
+     */
     public function __toString()
     {
         return get_class($this);
