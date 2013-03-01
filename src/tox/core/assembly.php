@@ -32,7 +32,7 @@ class_alias('Tox\\Core\\Assembly', 'Tox\\Assembly');
  * Represents as the root class of all components to provide essential
  * behaviors.
  *
- * THIS CLASS CANNOT BE INSTANTIATED.
+ * **THIS CLASS CANNOT BE INSTANTIATED.**
  *
  * @package   tox.core
  * @author    Snakevil Zen <zsnakevil@gmail.com>
@@ -85,30 +85,50 @@ abstract class Assembly
      *
      * 2 conditions are required to create a readable magic property:
      *
-     * * An invisible property with the same name;
+     * * An protected property with the same name;
      *
-     * * An invisible getter method of which name starts with '__get' and ends
+     * * An protected getter method of which name starts with '__get' and ends
      *   with the property name.
+     *
+     * For example,
+     *
+     *     protected $foo;
+     *
+     *     protected function __getFoo() {
+     *         // codes here ...
+     *     }
      *
      * @param  string $prop Name of a magic property.
      * @return mixed        Value of that magic property.
      */
     public function __get($prop)
     {
-        $prop = (string) $prop;
-        $a_props = $this->_tox_getMagicProps();
-        if (!isset($a_props[$prop]) ||
-            self::_TOX_PROPERTY_READONLY != $a_props[$prop] && self::_TOX_PROPERTY_PUBLIC != $a_props[$prop]
-        ) {
+        if (!$this->_tox_isMagicPropReadable($prop)) {
             throw new PropertyReadDeniedException(array('object' => $this, 'property' => $prop));
         }
         return call_user_func(array($this, '__get' . $prop));
     }
 
     /**
+     * Checks whether there is such a readable magic property.
+     *
+     * @internal
+     *
+     * @param  string $prop Name of a magic property
+     * @return bool
+     */
+    protected function _tox_isMagicPropReadable($prop)
+    {
+        $prop = (string) $prop;
+        $a_props = $this->_tox_getMagicProps();
+        return isset($a_props[$prop]) &&
+            (self::_TOX_PROPERTY_READONLY == $a_props[$prop] || self::_TOX_PROPERTY_PUBLIC == $a_props[$prop]);
+    }
+
+    /**
      * Retrieves the magic properties of the class type.
      *
-     * THIS METHOD CANNOT BE OVERRIDDEN.
+     * **THIS METHOD CANNOT BE OVERRIDDEN.**
      *
      * @internal
      *
@@ -121,19 +141,21 @@ abstract class Assembly
             self::$_tox_properties[$s_class] = array();
             $o_rclass = new ReflectionClass($this);
             foreach ($o_rclass->getProperties() as $o_rprop) {
-                if (!$o_rprop->isDefault() || $o_rprop->isPublic() || $o_rprop->isStatic()) {
+                if (!$o_rprop->isDefault() || !$o_rprop->isProtected() || $o_rprop->isStatic() ||
+                    0 === strpos($o_rprop->name, '_')
+                ) {
                     continue;
                 }
                 try {
                     $o_rfunc = $o_rclass->getMethod('__get' . $o_rprop->name);
-                    if (!$o_rfunc->isPublic() && !$o_rfunc->isStatic()) {
+                    if ($o_rfunc->isProtected() && !$o_rfunc->isStatic()) {
                         self::$_tox_properties[$s_class][$o_rprop->name] = self::_TOX_PROPERTY_READONLY;
                     }
                 } catch (ReflectionException $ex) {
                 }
                 try {
                     $o_rfunc = $o_rclass->getMethod('__set' . $o_rprop->name);
-                    if (!$o_rfunc->isPublic() && !$o_rfunc->isStatic()) {
+                    if ($o_rfunc->isProtected() && !$o_rfunc->isStatic()) {
                         self::$_tox_properties[$s_class][$o_rprop->name] =
                             isset(self::$_tox_properties[$s_class][$o_rprop->name]) ?
                             self::_TOX_PROPERTY_PUBLIC :
@@ -151,10 +173,18 @@ abstract class Assembly
      *
      * 2 conditions are required to create a writable magic property:
      *
-     * * An invisible property with the same name;
+     * * An protected property with the same name;
      *
-     * * An invisible setter method of which name starts with '__set' and ends
+     * * An protected setter method of which name starts with '__set' and ends
      *   with the property name.
+     *
+     * For example,
+     *
+     *     protected $foo;
+     *
+     *     protected function __setFoo($value) {
+     *         // codes here ...
+     *     }
      *
      * @param  string $prop  Name of a magic property.
      * @param  mixed  $value The new value.
@@ -162,14 +192,26 @@ abstract class Assembly
      */
     public function __set($prop, $value)
     {
-        $prop = (string) $prop;
-        $a_props = $this->_tox_getMagicProps();
-        if (!isset($a_props[$prop])
-            || self::_TOX_PROPERTY_WRITEONLY != $a_props[$prop] && self::_TOX_PROPERTY_PUBLIC != $a_props[$prop]
-        ) {
+        if (!$this->_tox_isMagicPropWritable($prop)) {
             throw new PropertyWriteDeniedException(array('object' => $this, 'property' => $prop));
         }
         call_user_func(array($this, '__set' . $prop), $value);
+    }
+
+    /**
+     * Checks whether there is such a writable magic property.
+     *
+     * @internal
+     *
+     * @param  string $prop Name of a magic property
+     * @return bool
+     */
+    protected function _tox_isMagicPropWritable($prop)
+    {
+        $prop = (string) $prop;
+        $a_props = $this->_tox_getMagicProps();
+        return isset($a_props[$prop]) &&
+            (self::_TOX_PROPERTY_WRITEONLY == $a_props[$prop] || self::_TOX_PROPERTY_PUBLIC == $a_props[$prop]);
     }
 
     /**
