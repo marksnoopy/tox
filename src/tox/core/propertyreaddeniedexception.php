@@ -1,6 +1,6 @@
 <?php
 /**
- * Raises on trying to retrieve the value of a non-existant property.
+ * Defines an exception for retrieving a non-existant property.
  *
  * This file is part of Tox.
  *
@@ -17,19 +17,36 @@
  * You should have received a copy of the GNU General Public License
  * along with Tox.  If not, see <http://www.gnu.org/licenses/>.
  *
- * @package   Tox\Web
- * @author    Snakevil Zen <zsnakevil@gmail.com>
- * @copyright © 2012 szen.in
- * @license   http://www.gnu.org/licenses/gpl.html
+ * @copyright © 2012-2013 SZen.in
+ * @license   GNU General Public License, version 3
  */
 
-namespace Tox;
+namespace Tox\Core;
 
-class PropertyReadDeniedException extends Exception
+/**
+ * Be raised on retrieving a non-existant property.
+ *
+ * **THIS CLASS CANNOT BE INHERITED.**
+ *
+ * @package tox.core
+ * @author  Snakevil Zen <zsnakevil@gmail.com>
+ */
+final class PropertyReadDeniedException extends Exception
 {
+    /**
+     * {@inheritdoc}
+     *
+     * > Defined as `0x80000001`.
+     */
     const CODE = 0x80000001;
 
-    protected static $TEMPLATE = 'property \'%property$s\' does not exist in the object \'%object$s\'';
+    /**
+     * {@inheritdoc}
+     *
+     * > Defined as `property '%property$s' does not exist in the object
+     * > '%object$s'`.
+     */
+    const MESSAGE = 'property \'%property$s\' does not exist in the object \'%object$s\'';
 }
 
-// vi:se ft=php fenc=utf-8 ff=unix ts=4 sts=4 et sw=4 fen fdm=indent fdl=1 tw=120:
+// vi:ft=php fenc=utf-8 ff=unix ts=4 sts=4 et sw=4 fen fdm=indent fdl=1 tw=120

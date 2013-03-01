@@ -31,10 +31,12 @@ class_alias('Tox\\Core\\Runtime', 'Tox');
 /**
  * Provides the APIs to control applications runtime environments.
  *
- * THIS CLASS CAN BE NEITHER INHERITED NOR INSTANTIATED.
+ * **THIS CLASS CAN BE NEITHER INHERITED NOR INSTANTIATED.**
  *
- * @package   tox.core
- * @author    Snakevil Zen <zsnakevil@gmail.com>
+ * __*ALIAS*__ as `Tox`.
+ *
+ * @package tox.core
+ * @author  Snakevil Zen <zsnakevil@gmail.com>
  */
 final class Runtime
 {

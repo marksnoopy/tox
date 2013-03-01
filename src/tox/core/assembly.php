@@ -34,8 +34,10 @@ class_alias('Tox\\Core\\Assembly', 'Tox\\Assembly');
  *
  * **THIS CLASS CANNOT BE INSTANTIATED.**
  *
- * @package   tox.core
- * @author    Snakevil Zen <zsnakevil@gmail.com>
+ * __*ALIAS*__ as `Tox\Assembly`.
+ *
+ * @package tox.core
+ * @author  Snakevil Zen <zsnakevil@gmail.com>
  */
 abstract class Assembly
 {
@@ -225,4 +227,4 @@ abstract class Assembly
     }
 }
 
-// vi:se ft=php fenc=utf-8 ff=unix ts=4 sts=4 et sw=4 fen fdm=indent fdl=1 tw=120:
+// vi:ft=php fenc=utf-8 ff=unix ts=4 sts=4 et sw=4 fen fdm=indent fdl=1 tw=120

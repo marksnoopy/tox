@@ -34,6 +34,8 @@ class_alias('Tox\\Core\\Exception', 'Tox\\Exception');
  *
  * **THIS CLASS CANNOT BE INSTANTIATED.**
  *
+ * __*ALIAS*__ as `Tox\Exception`.
+ *
  * @package   tox.core
  * @author    Snakevil Zen <zsnakevil@gmail.com>
  */
@@ -127,4 +129,4 @@ abstract class Exception extends PHPException
     }
 }
 
-// vi:se ft=php fenc=utf-8 ff=unix ts=4 sts=4 et sw=4 fen fdm=indent fdl=1 tw=120:
+// vi:ft=php fenc=utf-8 ff=unix ts=4 sts=4 et sw=4 fen fdm=indent fdl=1 tw=120

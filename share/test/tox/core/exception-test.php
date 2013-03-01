@@ -150,4 +150,4 @@ class MockException extends Exception
     const MESSAGE = 'bar %bar$32.8f, foo %foo$032s';
 }
 
-/* vi:se fenc=utf-8 ff=unix tw=120 ai si sw=4 et ts=4 sts=4: */
+// vi:ft=php fenc=utf-8 ff=unix ts=4 sts=4 et sw=4 fen fdm=indent fdl=1 tw=120
