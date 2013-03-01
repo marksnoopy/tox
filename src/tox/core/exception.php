@@ -1,8 +1,7 @@
 <?php
 /**
- * Provides behaviors to all derived exceptions.
- *
- * This class cannot be instantiated.
+ * Defines the root exception for all derived ones to provide essential
+ * behaviors.
  *
  * This file is part of Tox.
  *
@@ -19,65 +18,112 @@
  * You should have received a copy of the GNU General Public License
  * along with Tox.  If not, see <http://www.gnu.org/licenses/>.
  *
- * @package   Tox\Web
- * @author    Snakevil Zen <zsnakevil@gmail.com>
- * @copyright © 2012 szen.in
- * @license   http://www.gnu.org/licenses/gpl.html
+ * @copyright © 2012-2013 SZen.in
+ * @license   GNU General Public License, version 3
  */
 
-namespace Tox;
+namespace Tox\Core;
 
-use Exception as Ex;
+use Exception as PHPException;
 
-abstract class Exception extends Ex
+class_alias('Tox\\Core\\Exception', 'Tox\\Exception');
+
+/**
+ * Represents as the root exception for all derived ones to provide essential
+ * behaviors.
+ *
+ * **THIS CLASS CANNOT BE INSTANTIATED.**
+ *
+ * @package   tox.core
+ * @author    Snakevil Zen <zsnakevil@gmail.com>
+ */
+abstract class Exception extends PHPException
 {
+    /**
+     * Presents the index code of the exception type in the RUNTIME COMPLETE
+     * EXCEPTIONS SHEET.
+     *
+     * @var int
+     */
     const CODE = 0x80000000;
 
-    protected static $TEMPLATE = 'unknown exception';
+    /**
+     * Presents the original standard message of the exception type.
+     *
+     * @var string
+     */
+    const MESSAGE = 'unknown exception';
 
+    /**
+     * Stores the context metas information.
+     *
+     * @var mixed[]
+     */
     protected $context;
 
-    final public function __construct($context = array(), Ex $prevEx = NULL)
+    /**
+     * CONSTRUCT FUNCTION
+     *
+     * **THIS METHOD CANNOT BE OVERRIDDEN.**
+     *
+     * @param array        $context OPTIONAL. Context metas information when the
+     *                              exception raising.
+     * @param PHPException $prevEx  Previous exception to be linked.
+     */
+    final public function __construct($context = array(), PHPException $prevEx = NULL)
     {
-        if ($context instanceof Ex)
-        {
+        if ($context instanceof PHPException) {
             $prevEx = $context;
             $context = array();
-        }
-        else
-        {
-            settype($context, 'array');
+        } else {
+            $context = (array) $context;
         }
         $this->context = $context;
-        $s_msg = static::$TEMPLATE;
-        if (!empty($context))
-        {
-            $a_holders = array();
-            preg_match_all('@%([^\$]+)\$@', static::$TEMPLATE, $a_holders);
-            $a_values = array();
-            for ($ii = 0, $jj = count($a_holders[0]); $ii < $jj; $ii++)
-            {
-                if (!array_key_exists($a_holders[1][$ii], $context))
-                {
-                    $s_msg = "context '{$a_holders[1][$ii]}' missing";
-                    break;
-                }
-                $a_values[] = $context[$a_holders[1][$ii]];
-                $a_holders[1][$ii] = '%' . (1 + $ii) . '$';
-            }
-            $s_msg = vsprintf(str_replace($a_holders[0], $a_holders[1], static::$TEMPLATE), $a_values);
-        }
-        parent::__construct(ucfirst($s_msg) . '.', static::CODE & 0x0fffffff, $prevEx);
+        parent::__construct($this->figureReason(), static::CODE & 0x0fffffff, $prevEx);
     }
 
+    /**
+     * Figures the instantiated reason out for the raising exception.
+     *
+     * **THIS METHOD CANNOT BE OVERRIDDEN.**
+     *
+     * @return string
+     */
+    final protected function figureReason()
+    {
+        $a_phases = $a_values = array();
+        preg_match_all('@%([^\\$]+)\\$@', static::MESSAGE, $a_phases);
+        for ($ii = 0, $jj = count($a_phases[1]); $ii < $jj; $ii++) {
+            $a_values[] = array_key_exists($a_phases[1][$ii], $this->context) ?
+                $this->context[$a_phases[1][$ii]] :
+                null;
+            $a_phases[1][$ii] = '%' . (1 + $ii) . '$';
+        }
+        return ucfirst(vsprintf(str_replace($a_phases[0], $a_phases[1], static::MESSAGE), $a_values)) . '.';
+    }
+
+    /**
+     * Retrieves the context metas information.
+     *
+     * **THIS METHOD CANNOT BE OVERRIDDEN.**
+     *
+     * @return mixed[]
+     */
     final public function getContext()
     {
         return $this->context;
     }
 
+    /**
+     * Be invoked on string type casting.
+     *
+     * **THIS METHOD CANNOT BE OVERRIDDEN.**
+     *
+     * @return string
+     */
     final public function __toString()
     {
-        return sprintf('0x%08X', static::CODE) . ': ' . $this->message;
+        return sprintf('0x%08X: %s', static::CODE, $this->getMessage());
     }
 }
 
