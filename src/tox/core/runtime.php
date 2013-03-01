@@ -41,27 +41,27 @@ final class Runtime
     /**
      * Stores the instance of the classes manager of framework runtime.
      *
-     * @var ClassManager
-     *
      * @internal
+     *
+     * @var ClassManager
      */
     private $classManager;
 
     /**
      * Stores the instance of current APIs provider.
      *
-     * @var Runtime
-     *
      * @internal
+     *
+     * @var Runtime
      */
     private static $instance;
 
     /**
      * Stores the instance of the packages manager of framework runtime.
      *
-     * @var PackageManager
-     *
      * @internal
+     *
+     * @var PackageManager
      */
     private $packageManager;
 
@@ -77,10 +77,10 @@ final class Runtime
     /**
      * AUTOLOADs the required class or interface.
      *
+     * @internal
+     *
      * @param  string $class Name of specified class or interface.
      * @return void
-     *
-     * @internal
      */
     public function load($class)
     {
@@ -99,11 +99,11 @@ final class Runtime
     /**
      * Imports a new namespace to the path of eithor a directory or a PHar file.
      *
+     * @api
+     *
      * @param  string $namespace Namespace to be imported.
      * @param  string $path      The corresponding path.
      * @return void
-     *
-     * @api
      */
     public static function import($namespace, $path)
     {
@@ -121,13 +121,13 @@ final class Runtime
      * @deprecated Remained for forward compatibility. Would be removed in some
      *             future version.
      *
+     * @api
+     *
      * @param  string $namespace Namespace to be imported.
      * @param  string $path      The corresponding path.
      * @return void
      *
      * @see Runtime::import()
-     *
-     * @api
      */
     public static function registerNamespace($namespace, $path)
     {
@@ -137,9 +137,9 @@ final class Runtime
     /**
      * Sets the framework runtime environment up.
      *
-     * @return void
-     *
      * @api
+     *
+     * @return void
      */
     public static function setUp()
     {
@@ -153,11 +153,11 @@ final class Runtime
     /**
      * Aliases either a class or an interface to another.
      *
+     * @api
+     *
      * @param  string $class Name of either a class or an interface.
      * @param  string $alias New alias name.
      * @return void
-     *
-     * @api
      */
     public static function alias($class, $alias)
     {
@@ -175,13 +175,13 @@ final class Runtime
      * @deprecated Remained for forward compatibility. Would be removed in some
      *             future version.
      *
+     * @api
+     *
      * @param  string $class   Name of either a class or an interface.
      * @param  string $classAs New alias name.
      * @return void
      *
      * @see Runtime::alias()
-     *
-     * @api
      */
     public static function treatClassAs($class, $classAs)
     {

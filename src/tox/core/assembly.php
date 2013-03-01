@@ -74,9 +74,9 @@ abstract class Assembly
      * Stores detected magic readable and writable properties for each derived
      * component.
      *
-     * @var array
-     *
      * @internal
+     *
+     * @var array
      */
     protected static $_tox_properties = array();
 
@@ -107,6 +107,10 @@ abstract class Assembly
 
     /**
      * Retrieves the magic properties of the class type.
+     *
+     * THIS METHOD CANNOT BE OVERRIDDEN.
+     *
+     * @internal
      *
      * @return array
      */
