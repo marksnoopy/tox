@@ -47,7 +47,7 @@ final class Runtime
      *
      * @var ClassManager
      */
-    private $classManager;
+    private $cman;
 
     /**
      * Stores the instance of current APIs provider.
@@ -65,15 +65,15 @@ final class Runtime
      *
      * @var PackageManager
      */
-    private $packageManager;
+    private $pman;
 
     /**
      * CONSTRUCT FUNCTION
      */
     private function __construct()
     {
-        $this->classManager = new ClassManager;
-        $this->packageManager = new PackageManager;
+        $this->cman = new ClassManager;
+        $this->pman = new PackageManager;
     }
 
     /**
@@ -87,14 +87,14 @@ final class Runtime
     public function load($class)
     {
         settype($class, 'string');
-        $s_class = $this->classManager->transform($class);
-        $p_class = $this->packageManager->locateClass($s_class);
+        $s_class = $this->cman->transform($class);
+        $p_class = $this->pman->locateClass($s_class);
         if (!is_string($p_class)) {
             return;
         }
         require_once($p_class);
         if (class_exists($class, false)) {
-            $this->classManager->register($class, $p_class);
+            $this->cman->register($class, $p_class);
         }
     }
 
@@ -111,7 +111,7 @@ final class Runtime
     {
         static::setUp();
         try {
-            static::$instance->packageManager->registerPackage(str_replace('\\', '.', strtolower($namespace)), $path);
+            static::$instance->pman->registerPackage(str_replace('\\', '.', strtolower($namespace)), $path);
         } catch (Exception $ex) {
             trigger_error('Tox: ' . $ex->getMessage(), E_USER_ERROR);
         }
@@ -165,7 +165,7 @@ final class Runtime
     {
         static::setUp();
         try {
-            static::$instance->classManager->treatAs($class, $alias);
+            static::$instance->cman->alias($class, $alias);
         } catch (Exception $ex) {
             trigger_error('Tox: ' . $ex->getMessage(), E_USER_ERROR);
         }

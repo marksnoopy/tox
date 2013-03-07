@@ -30,6 +30,7 @@ require_once __DIR__ . '/../../../../src/tox/core/classmanager.php';
 
 use Tox\Core\ClassManager;
 
+require_once __DIR__ . '/../../../../src/tox/core/exception.php';
 require_once __DIR__ . '/../../../../src/tox/core/existantclasstoaliasexception.php';
 
 /**

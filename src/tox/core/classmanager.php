@@ -1,6 +1,6 @@
 <?php
 /**
- * Represents as a runtime classes manager.
+ * Defines the runtime classes manager.
  *
  * This file is part of Tox.
  *
@@ -17,70 +17,103 @@
  * You should have received a copy of the GNU General Public License
  * along with Tox.  If not, see <http://www.gnu.org/licenses/>.
  *
- * @package    Tox
- * @subpackage Tox\Core
- * @author     Snakevil Zen <zsnakevil@gmail.com>
- * @copyright  © 2012 szen.in
- * @license    http://www.gnu.org/licenses/gpl.html
+ * @copyright © 2012-2013 SZen.in
+ * @license   GNU General Public License, version 3
  */
 
 namespace Tox\Core;
 
 use Tox;
 
+/**
+ * Represents as the runtime classes manager.
+ *
+ * @package tox.core
+ * @author  Snakevil Zen <zsnakevil@gmail.com>
+ */
 class ClassManager extends Tox\Assembly
 {
-    protected $classAs;
+    /**
+     * Stores the aliases.
+     *
+     * @internal
+     *
+     * @var string[]
+     */
+    protected $aliases;
 
+    /**
+     * Stores loaded classes locations.
+     *
+     * @internal
+     *
+     * @var string[]
+     */
     protected $loaded;
 
+    /**
+     * CONSTRUCT FUNCTION
+     */
     public function __construct()
     {
-        $this->classAs =
+        $this->aliases =
         $this->loaded = array();
     }
 
-    public function transform($class)
+    /**
+     * Transforms an alias to a real class.
+     *
+     * @param  string $alias Alias to be transformed.
+     * @return string
+     */
+    public function transform($alias)
     {
-        settype($class, 'string');
-        if (array_key_exists($class, $this->loaded))
-        {
-            return $class;
+        $alias = (string) $alias;
+        if (!array_key_exists($alias, $this->loaded) && array_key_exists($alias, $this->aliases)) {
+            return $this->aliases[$alias];
         }
-        if (array_key_exists($class, $this->classAs))
-        {
-            return $this->classAs[$class];
-        }
-        return $class;
+        return $alias;
     }
 
-    public function treatAs($class, $classAs)
+    /**
+     * Aliases a class.
+     *
+     * @param  string       $class An original class.
+     * @param  string       $alias The Alias.
+     * @return ClassManager
+     */
+    public function alias($class, $alias)
     {
-        settype($class, 'string');
-        settype($classAs, 'string');
-        if (array_key_exists($class, $this->loaded))
-        {
-            return $this;
+        if (class_exists($alias, false)) {
+            throw new ExistantClassToAliasException(array('class' => $alias));
         }
-        if (array_key_exists($classAs, $this->loaded))
-        {
-            return $this;
+        if (array_key_exists($class, $this->aliases)) {
+            $class = $this->aliases[$class];
         }
-        if (array_key_exists($class, $this->classAs))
-        {
-            return $this;
-        }
-        $this->classAs[$class] = $classAs;
+        $this->aliases[$alias] = $class;
         return $this;
     }
 
+    /**
+     * Registers the definition location of a loaded real class.
+     *
+     * @param  string       $class A loaded real class.
+     * @param  string       $path  The path of definition file
+     * @return ClassManager
+     */
     public function register($class, $path)
     {
-        settype($class, 'string');
-        settype($path, 'string');
-        if (!array_key_exists($class, $this->loaded))
-        {
-            $this->loaded[$class] = $path;
+        $class = (string) $class;
+        $path = (string) $path;
+        if (array_key_exists($class, $this->loaded)) {
+            return $this;
+        }
+        $this->loaded[$class] = $path;
+        foreach ($this->aliases as $s_alias => $s_class) {
+            if ($class == $s_class) {
+                $this->loaded[$s_alias] = '';
+                class_alias($class, $s_alias);
+            }
         }
         return $this;
     }
