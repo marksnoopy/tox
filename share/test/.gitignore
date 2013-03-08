@@ -2,4 +2,8 @@
 !.gitignore
 !tox/
 !tox/*/
+!tox/*/*/
+!tox/*/*/*/
+!tox/*/*/*/*/
+!tox/*/*/*/*/*/
 !*-test.php
