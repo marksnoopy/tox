@@ -1,6 +1,6 @@
 <?php
 /**
- *
+ * Defines the essential behaviors of views.
  *
  * This file is part of Tox.
  *
@@ -17,17 +17,45 @@
  * You should have received a copy of the GNU General Public License
  * along with Tox.  If not, see <http://www.gnu.org/licenses/>.
  *
- * @package   Tox\Application
- * @author    Snakevil Zen <zsnakevil@gmail.com>
- * @copyright © 2012 szen.in
- * @license   http://www.gnu.org/licenses/gpl.html
+ * @copyright © 2012-2013 SZen.in
+ * @license   GNU General Public License, version 3
  */
 
 namespace Tox\Application\View;
 
-interface IView
+use ArrayAccess;
+
+/**
+ * Announces the essential behaviors of views.
+ *
+ * __*ALIAS*__ as `Tox\Application\IView`.
+ *
+ * @package tox.application.view
+ * @author  Snakevil Zen <zsnakevil@gmail.com>
+ */
+interface IView extends ArrayAccess
 {
+    /**
+     * Exports all metas as an array.
+     *
+     * @return array
+     */
+    public function export();
+
+    /**
+     * Imports a set of metas from an array.
+     *
+     * @param  array $metas Metas fields.
+     * @return IView
+     */
+    public function import($metas);
+
+    /**
+     * Renders metas data.
+     *
+     * @return string
+     */
     public function render();
 }
 
-// vi:se ft=php fenc=utf-8 ff=unix ts=4 sts=4 et sw=4 fen fdm=indent fdl=1 tw=120:
+// vi:ft=php fenc=utf-8 ff=unix ts=4 sts=4 et sw=4 fen fdm=indent fdl=1 tw=120
