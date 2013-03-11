@@ -9,6 +9,15 @@
          stopOnSkipped="true"
          strict="true"
 >
+  <testsuites>
+    <testsuite name="Tox">
+      <directory suffix="-test.php">share/test</directory>
+    </testsuite>
+  </testsuites>
+  <logging>
+    <log type="testdox-text" target="share/doc/report/testdox.log"/>
+    <log type="coverage-text" target="share/doc/report/coverage.log"/>
+  </logging>
   <php>
     <ini name="display_errors" value="off"/>
     <ini name="xdebug.collect_includes" value="off"/>

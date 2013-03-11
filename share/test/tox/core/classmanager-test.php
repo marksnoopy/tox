@@ -21,14 +21,12 @@
  * @license   GNU General Public License, version 3
  */
 
-namespace ToxTest\Core;
+namespace Tox\Core;
 
 use PHPUnit_Framework_TestCase;
 
 require_once __DIR__ . '/../../../../src/tox/core/assembly.php';
 require_once __DIR__ . '/../../../../src/tox/core/classmanager.php';
-
-use Tox\Core\ClassManager;
 
 require_once __DIR__ . '/../../../../src/tox/core/exception.php';
 require_once __DIR__ . '/../../../../src/tox/core/existantclasstoaliasexception.php';
@@ -38,7 +36,7 @@ require_once __DIR__ . '/../../../../src/tox/core/existantclasstoaliasexception.
  *
  * @internal
  *
- * @package toxtest.core
+ * @package tox.core
  * @author  Snakevil Zen <zsnakevil@gmail.com>
  */
 class ClassManagerTest extends PHPUnit_Framework_TestCase
@@ -46,7 +44,7 @@ class ClassManagerTest extends PHPUnit_Framework_TestCase
     /**
      * Stores the target instance.
      *
-     * @var Tox\Core\ClassManager
+     * @var ClassManager
      */
     protected $cman;
 

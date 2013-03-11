@@ -21,15 +21,13 @@
  * @license   GNU General Public License, version 3
  */
 
-namespace ToxTest\Core;
-
-use Exception as PHPException;
+namespace Tox\Core;
 
 use PHPUnit_Framework_TestCase;
 
 require_once __DIR__ . '/../../../../src/tox/core/exception.php';
 
-use Tox\Core\Exception;
+use Exception as PHPException;
 
 /**
  * Tests Tox\Core\Exception.
@@ -42,9 +40,9 @@ use Tox\Core\Exception;
 class ExceptionTest extends PHPUnit_Framework_TestCase
 {
     /**
-     * Stores the MockException instance to be test.
+     * Stores the ExceptionMock instance to be test.
      *
-     * @var MockException
+     * @var ExceptionMock
      */
     protected $ex;
 
@@ -72,7 +70,7 @@ class ExceptionTest extends PHPUnit_Framework_TestCase
             'bar' => microtime(TRUE)
         );
         $this->pex = new PHPException;
-        $this->ex = new MockException($this->ctx, $this->pex);
+        $this->ex = new ExceptionMock($this->ctx, $this->pex);
     }
 
     /**
@@ -101,7 +99,7 @@ class ExceptionTest extends PHPUnit_Framework_TestCase
     public function testLinkedExceptionKept()
     {
         $this->assertInstanceOf('Exception', $this->ex->getPrevious());
-        $o_ex = new MockException($this->pex);
+        $o_ex = new ExceptionMock($this->pex);
         $this->assertSame($this->pex, $o_ex->getPrevious());
     }
 
@@ -130,10 +128,10 @@ class ExceptionTest extends PHPUnit_Framework_TestCase
  *
  * @internal
  *
- * @package ToxTest\Core
+ * @package Tox\Core
  * @author  Snakevil Zen <zsnakevil@gmail.com>
  */
-class MockException extends Exception
+class ExceptionMock extends Exception
 {
     /**
      * Represents the code of this type of exceptions.

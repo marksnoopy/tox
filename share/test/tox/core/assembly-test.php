@@ -21,15 +21,13 @@
  * @license   GNU General Public License, version 3
  */
 
-namespace ToxTest\Core;
+namespace Tox\Core;
 
 use Exception;
 
 use PHPUnit_Framework_TestCase;
 
 require_once __DIR__ . '/../../../../src/tox/core/assembly.php';
-
-use Tox\Core\Assembly;
 
 require_once __DIR__ . '/../../../../src/tox/core/exception.php';
 require_once __DIR__ . '/../../../../src/tox/core/propertyreaddeniedexception.php';
@@ -40,7 +38,7 @@ require_once __DIR__ . '/../../../../src/tox/core/propertywritedeniedexception.p
  *
  * @internal
  *
- * @package toxtest.core
+ * @package tox.core
  * @author  Snakevil Zen <zsnakevil@gmail.com>
  */
 class AssemblyTest extends PHPUnit_Framework_TestCase
@@ -49,7 +47,7 @@ class AssemblyTest extends PHPUnit_Framework_TestCase
     {
         try {
             $s_prop = md5(microtime());
-            $o_mock = $this->getMock('ToxTest\Core\MockAssemblyA',
+            $o_mock = $this->getMock('Tox\\Core\\AssemblyMockA',
                 array('_tox_isMagicPropReadable', '__get' . $s_prop)
             );
             $o_mock->expects($this->once())->method('_tox_isMagicPropReadable')
@@ -68,7 +66,7 @@ class AssemblyTest extends PHPUnit_Framework_TestCase
     public function testRegularPairOfPropAndGetterWouldWorkFine()
     {
         try {
-            $o_obj = new MockAssemblyA;
+            $o_obj = new AssemblyMockA;
             $this->assertNull($o_obj->ok);
         } catch (Exception $ex) {
             $this->fail();
@@ -81,7 +79,7 @@ class AssemblyTest extends PHPUnit_Framework_TestCase
      */
     public function testPropertyMustBeDeclaredForGetterMechanism()
     {
-        $o_obj = new MockAssemblyA;
+        $o_obj = new AssemblyMockA;
         $o_obj->noProp;
     }
 
@@ -91,7 +89,7 @@ class AssemblyTest extends PHPUnit_Framework_TestCase
      */
     public function testGetterMustBeDeclaredForGetterMechanism()
     {
-        $o_obj = new MockAssemblyA;
+        $o_obj = new AssemblyMockA;
         $o_obj->noGetter;
     }
 
@@ -101,7 +99,7 @@ class AssemblyTest extends PHPUnit_Framework_TestCase
      */
     public function testInternalPropWhichLeadingWithUnderlineAgainstGetterMechanism()
     {
-        $o_obj = new MockAssemblyA;
+        $o_obj = new AssemblyMockA;
         $o_obj->_inProp;
     }
 
@@ -111,7 +109,7 @@ class AssemblyTest extends PHPUnit_Framework_TestCase
      */
     public function testPrivatePropAgainstGetterMechanism()
     {
-        $o_obj = new MockAssemblyA;
+        $o_obj = new AssemblyMockA;
         $o_obj->privProp;
     }
 
@@ -121,7 +119,7 @@ class AssemblyTest extends PHPUnit_Framework_TestCase
      */
     public function testPublicGetterAgainstGetterMechanism()
     {
-        $o_obj = new MockAssemblyA;
+        $o_obj = new AssemblyMockA;
         $o_obj->pubGetter;
     }
 
@@ -130,7 +128,7 @@ class AssemblyTest extends PHPUnit_Framework_TestCase
         try {
             $s_prop = md5(microtime());
             $f_value = microtime(TRUE);
-            $o_mock = $this->getMock('ToxTest\Core\MockAssemblyA', array('_tox_isMagicPropWritable', '__set' . $s_prop));
+            $o_mock = $this->getMock('Tox\\Core\\AssemblyMockA', array('_tox_isMagicPropWritable', '__set' . $s_prop));
             $o_mock->expects($this->once())->method('_tox_isMagicPropWritable')
                 ->with($this->equalTo($s_prop))
                 ->will($this->returnValue(TRUE));
@@ -150,7 +148,7 @@ class AssemblyTest extends PHPUnit_Framework_TestCase
     {
         try {
             $f_value = microtime(TRUE);
-            $o_obj = new MockAssemblyA;
+            $o_obj = new AssemblyMockA;
             $o_obj->ok = $f_value;
             $this->assertEquals($f_value, $o_obj->ok);
         } catch (Exception $ex) {
@@ -164,7 +162,7 @@ class AssemblyTest extends PHPUnit_Framework_TestCase
      */
     public function testPropertyMustBeDeclaredForSetterMechanism()
     {
-        $o_obj = new MockAssemblyA;
+        $o_obj = new AssemblyMockA;
         $o_obj->noProp = 1;
     }
 
@@ -174,7 +172,7 @@ class AssemblyTest extends PHPUnit_Framework_TestCase
      */
     public function testSetterMustBeDeclaredForSetterMechanism()
     {
-        $o_obj = new MockAssemblyA;
+        $o_obj = new AssemblyMockA;
         $o_obj->noSetter = 1;
     }
 
@@ -184,7 +182,7 @@ class AssemblyTest extends PHPUnit_Framework_TestCase
      */
     public function testInternalPropWhichLeadingWithUnderlineAgainstSetterMechanism()
     {
-        $o_obj = new MockAssemblyA;
+        $o_obj = new AssemblyMockA;
         $o_obj->_inProp = 1;
     }
 
@@ -194,7 +192,7 @@ class AssemblyTest extends PHPUnit_Framework_TestCase
      */
     public function testPrivatePropAgainstSetterMechanism()
     {
-        $o_obj = new MockAssemblyA;
+        $o_obj = new AssemblyMockA;
         $o_obj->privProp = 1;
     }
 
@@ -204,7 +202,7 @@ class AssemblyTest extends PHPUnit_Framework_TestCase
      */
     public function testPublicSetterAgainstSetterMechanism()
     {
-        $o_obj = new MockAssemblyA;
+        $o_obj = new AssemblyMockA;
         $o_obj->pubSetter = 1;
     }
 
@@ -215,8 +213,8 @@ class AssemblyTest extends PHPUnit_Framework_TestCase
     {
         try {
             $f_value = microtime(TRUE);
-            $o_obj1 = new MockAssemblyA;
-            $o_obj2 = new MockAssemblyB;
+            $o_obj1 = new AssemblyMockA;
+            $o_obj2 = new AssemblyMockB;
             $o_obj1->ok = $f_value;
             $o_obj2->foo = $f_value;
             $this->assertEquals($f_value, $o_obj1->ok);
@@ -232,12 +230,12 @@ class AssemblyTest extends PHPUnit_Framework_TestCase
  *
  * @internal
  *
- * @package Tox\Core
+ * @package tox.core
  * @author  Snakevil Zen <zsnakevil@gmail.com>
  *
  * @property mixed $ok
  */
-class MockAssemblyA extends Assembly
+class AssemblyMockA extends Assembly
 {
     /**
      * Retrieves and sets some value.
@@ -393,12 +391,12 @@ class MockAssemblyA extends Assembly
  *
  * @internal
  *
- * @package Tox\Core
+ * @package tox.core
  * @author  Snakevil Zen <zsnakevil@gmail.com>
  *
  * @property NULL $foo
  */
-class MockAssemblyB extends Assembly
+class AssemblyMockB extends Assembly
 {
     /**
      * Retrieves and sets some value.

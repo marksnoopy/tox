@@ -21,7 +21,7 @@
  * @license   GNU General Public License, version 3
  */
 
-namespace ToxTest\Application\View;
+namespace Tox\Application\View;
 
 use PHPUnit_Framework_TestCase;
 
@@ -30,8 +30,6 @@ require_once __DIR__ . '/../../../../../src/tox/application/view/iview.php';
 require_once __DIR__ . '/../../../../../src/tox/application/view/view.php';
 require_once __DIR__ . '/../../../../../src/tox/application/view/istreamingview.php';
 require_once __DIR__ . '/../../../../../src/tox/application/view/streamingview.php';
-
-use Tox\Application\View\StreamingView;
 
 require_once __DIR__ . '/../../../../../src/tox/application/ioutput.php';
 
@@ -42,7 +40,7 @@ use Tox\Application\IOutput;
  *
  * @internal
  *
- * @package toxtest.application.view
+ * @package tox.application.view
  * @author  Snakevil Zen <zsnakevil@gmail.com>
  */
 class StreamingViewTest extends PHPUnit_Framework_TestCase
