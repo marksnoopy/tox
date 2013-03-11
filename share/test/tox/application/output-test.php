@@ -38,6 +38,8 @@ require_once __DIR__ . '/../../../../src/tox/application/view/istreamingview.php
 require_once __DIR__ . '/../../../../src/tox/application/view/view.php';
 require_once __DIR__ . '/../../../../src/tox/application/view/streamingview.php';
 
+use Exception as PHPException;
+
 /**
  * Tests Tox\Application\Output.
  *
@@ -101,14 +103,21 @@ class OutputTest extends PHPUnit_Framework_TestCase
 
     public function testWritingAgainstAnyOtherViewExceptStreamingView()
     {
+        $o_out = $this->getMockForAbstractClass('Tox\\Application\\Output');
+        $o_out->view = $this->getMock('Tox\\Application\\View\\IView');
         try {
-            $o_out = $this->getMockForAbstractClass('Tox\\Application\\Output');
-            $o_out->view = $this->getMock('Tox\\Application\\View\\IView');
             $o_out->write('foo');
-        } catch (StreamingViewExpectedException $e) {
+        } catch (StreamingViewExpectedException $ex) {
+        } catch (PHPException $ex) {
+            $this->fail();
         }
         $o_out->view = $this->getMock('Tox\\Application\\View\\IStreamingView');
-        $o_out->write('bar');
+        try {
+            $o_out->write('foo');
+        } catch (PHPException $ex) {
+            $this->fail();
+        }
+        $this->assertTrue(true);
     }
 
     /**
@@ -152,11 +161,16 @@ class OutputTest extends PHPUnit_Framework_TestCase
         try {
             $o_out->enableStreaming();
         } catch (StreamingViewExpectedException $e) {
+        } catch (PHPException $ex) {
+            $this->fail();
         }
         try {
             $o_out->disableStreaming();
         } catch (StreamingViewExpectedException $e) {
+        } catch (PHPException $ex) {
+            $this->fail();
         }
+        $this->assertTrue(true);
     }
 
     /**
