@@ -51,7 +51,7 @@ abstract class View extends Core\Assembly implements IView
      *
      * @param array $metas OPTIONAL. Initial set of metas.
      */
-    final public function __construct($metas = array())
+    public function __construct($metas = array())
     {
         if (!is_array($metas)) {
             $metas = array($metas);
