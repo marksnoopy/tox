@@ -29,6 +29,10 @@ require_once __DIR__ . '/../../../../src/tox/core/assembly.php';
 require_once __DIR__ . '/../../../../src/tox/application/ioutput.php';
 require_once __DIR__ . '/../../../../src/tox/application/output.php';
 
+require_once __DIR__ . '/../../../../src/tox/core/exception.php';
+require_once __DIR__ . '/../../../../src/tox/application/closedoutputexception.php';
+require_once __DIR__ . '/../../../../src/tox/application/streamingviewexpectedexception.php';
+
 require_once __DIR__ . '/../../../../src/tox/application/view/iview.php';
 require_once __DIR__ . '/../../../../src/tox/application/view/istreamingview.php';
 require_once __DIR__ . '/../../../../src/tox/application/view/view.php';
@@ -176,14 +180,16 @@ class OutputTest extends PHPUnit_Framework_TestCase
     public function testPreAndPostOutputingOnStreaming()
     {
         $o_out = $this->getMockForAbstractClass('Tox\\Application\\Output')->enableStreaming();
-        $o_out->expects($this->extactly(9))->method('preOutput');
-        $o_out->expects($this->extactly(9))->method('postOutput');
+        $o_out->expects($this->exactly(9))->method('preOutput');
+        $o_out->expects($this->exactly(9))->method('postOutput');
         $a_lobs = range(1, 9);
         shuffle($a_lobs);
         ob_start();
         foreach ($a_lobs as $ii) {
             $o_out->write($ii);
         }
-    }}
+        ob_end_clean();
+    }
+}
 
 // vi:ft=php fenc=utf-8 ff=unix ts=4 sts=4 et sw=4 fen fdm=indent fdl=1 tw=120
