@@ -3,6 +3,7 @@
 <phpunit xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:noNamespaceSchemaLocation="http://phpunit.de/phpunit.xsd"
          cacheTokens="true"
+         colors="true"
          processIsolation="true"
          stopOnError="true"
          stopOnFailure="true"
@@ -20,6 +21,7 @@
   </logging>
   <php>
     <ini name="display_errors" value="off"/>
+    <ini name="date.timezone" value="Asia/Shanghai"/>
     <ini name="xdebug.collect_includes" value="off"/>
     <ini name="xdebug.collect_params" value="0"/>
     <ini name="xdebug.collect_return" value="off"/>

@@ -23,7 +23,7 @@
 
 namespace Tox\Core;
 
-use Exception;
+use Exception as PHPException;
 
 use PHPUnit_Framework_TestCase;
 
@@ -219,7 +219,7 @@ class AssemblyTest extends PHPUnit_Framework_TestCase
             $o_obj2->foo = $f_value;
             $this->assertEquals($f_value, $o_obj1->ok);
             $this->assertNull($o_obj2->foo);
-        } catch (Exception $ex) {
+        } catch (PHPException $ex) {
             $this->fail();
         }
     }
