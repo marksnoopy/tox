@@ -69,6 +69,27 @@ abstract class Output extends Tox\Assembly implements Application\IOutput
     protected $closed;
 
     /**
+     * Stores the scheduled outputting tasks.
+     *
+     * @var ITask[]
+     */
+    protected $tasks;
+
+    /**
+     * Stores the rendering result of the binded view.
+     *
+     * @var string
+     */
+    protected $buffer;
+
+    /**
+     * Stores the outputting status.
+     *
+     * @var bool
+     */
+    protected $outputting;
+
+    /**
      * CONSTRUCT FUNCTION
      *
      * @internal
@@ -76,7 +97,10 @@ abstract class Output extends Tox\Assembly implements Application\IOutput
     public function __construct()
     {
         $this->closed =
-        $this->streaming = false;
+        $this->streaming =
+        $this->outputting = false;
+        $this->tasks = array();
+        $this->buffer = '';
     }
 
     /**
@@ -112,6 +136,40 @@ abstract class Output extends Tox\Assembly implements Application\IOutput
     }
 
     /**
+     * Be invoked on retrieving the rendering result of the binded view.
+     *
+     * **THIS METHOD CANNOT BE OVERRIDDEN.**
+     *
+     * @internal
+     *
+     * @return string
+     */
+    final protected function __getBuffer()
+    {
+        return $this->buffer;
+    }
+
+    /**
+     * Be invoked on changing the outputting buffer manually.
+     *
+     * **THIS METHOD CANNOT BE OVERRIDDEN.**
+     *
+     * @internal
+     *
+     * @param  string $blob New blob for outputting.
+     * @return void
+     *
+     * @throws BufferReadonlyException If setting while not outputting.
+     */
+    final protected function __setBuffer($blob)
+    {
+        if (!$this->outputting) {
+            throw new BufferReadonlyException;
+        }
+        $this->buffer = (string) $blob;
+    }
+
+    /**
      * {@inheritdoc}
      *
      * **THIS METHOD CANNOT BE OVERRIDDEN.**
@@ -124,9 +182,10 @@ abstract class Output extends Tox\Assembly implements Application\IOutput
             return $this;
         }
         $this->closed = true;
-        $this->preOutput();
-        print($this->__getView()->render());
-        $this->postOutput();
+        $this->outputting = true;
+        $this->buffer = $this->__getView()->render();
+        print($this->preOutput()->buffer);
+        $this->postOutput()->outputting = false;
         return $this;
     }
 
@@ -181,9 +240,10 @@ abstract class Output extends Tox\Assembly implements Application\IOutput
         if ($this->closed || !$this->streaming) {
             return $this;
         }
-        $this->preOutput();
-        print($this->__getView()->render());
-        $this->postOutput();
+        $this->outputting = true;
+        $this->buffer = $this->__getView()->render();
+        print($this->preOutput()->buffer);
+        $this->postOutput()->outputting = false;
         return $this;
     }
 
@@ -240,18 +300,50 @@ abstract class Output extends Tox\Assembly implements Application\IOutput
     /**
      * Be invoked before any blob being outputed.
      *
-     * **THIS METHOD MUST BE IMPLEMENTED.**
+     * **THIS METHOD CANNOT BE OVERRIDDEN.**
      *
-     * @return void
+     * @return self
      */
-    abstract protected function preOutput();
+    final protected function preOutput()
+    {
+        if (!$this->outputting) {
+            return $this;
+        }
+        for ($ii = 0, $jj = count($this->tasks); $ii < $jj; $ii++) {
+            $this->tasks[$ii]->preOutput();
+        }
+        return $this;
+    }
 
     /**
      * Be invoked after any blob being outputed.
      *
-     * **THIS METHOD MUST BE IMPLEMENTED.**
+     * **THIS METHOD CANNOT BE OVERRIDDEN.**
      *
-     * @return void
+     * @return self
      */
-    abstract protected function postOutput();
+    final protected function postOutput()
+    {
+        if (!$this->outputting) {
+            return $this;
+        }
+        for ($ii = count($this->tasks) - 1; 0 <= $ii; $ii--) {
+            $this->tasks[$ii]->postOutput();
+        }
+        return $this;
+    }
+
+    /**
+     * {@inheritdoc}
+     *
+     * **THIS METHOD CANNOT BE OVERRIDDEN.**
+     *
+     * @param  ITask $task The task to be processed on outputting.
+     * @return self
+     */
+    final public function addTask(ITask $task)
+    {
+        $this->tasks[] = $task;
+        return $this;
+    }
 }

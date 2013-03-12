@@ -31,14 +31,18 @@ require_once __DIR__ . '/../../../../../src/tox/application/output/output.php';
 
 require_once __DIR__ . '/../../../../../src/tox/core/exception.php';
 require_once __DIR__ . '/../../../../../src/tox/application/output/closedoutputexception.php';
+require_once __DIR__ . '/../../../../../src/tox/application/output/bufferreadonlyexception.php';
 require_once __DIR__ . '/../../../../../src/tox/application/output/streamingviewexpectedexception.php';
 
 require_once __DIR__ . '/../../../../../src/tox/application/iview.php';
 require_once __DIR__ . '/../../../../../src/tox/application/view/istreamingview.php';
 require_once __DIR__ . '/../../../../../src/tox/application/view/view.php';
 require_once __DIR__ . '/../../../../../src/tox/application/view/streamingview.php';
+require_once __DIR__ . '/../../../../../src/tox/application/output/itask.php';
 
 use Exception as PHPException;
+
+use Tox\Application;
 
 /**
  * Tests Tox\Application\Output.
@@ -91,14 +95,36 @@ class OutputTest extends PHPUnit_Framework_TestCase
     }
 
     /**
+     * @expectedException Tox\Application\Output\BufferReadonlyException
+     */
+    public function testBufferAccessableOnOutputingOnly()
+    {
+        $this->getMockForAbstractClass('Tox\\Application\\Output\\Output')->buffer = 'foo';
+    }
+
+    /**
      * @depends testOutputingOnceWithAnyTimesWritings
      */
     public function testPreAndPostOutputing()
     {
         $o_out = $this->getMockForAbstractClass('Tox\\Application\\Output\\Output');
-        $o_out->expects($this->once())->method('preOutput');
-        $o_out->expects($this->once())->method('postOutput');
-        $o_out->close();
+        $o_task1 = new TaskMock($o_out);
+        $o_task1->name = microtime();
+        $o_task2 = new TaskMock($o_out);
+        $o_task2->name = microtime();
+        $this->assertSame($o_out, $o_out->addTask($o_task1));
+        TaskMock::$log = array();
+        ob_start();
+        $o_out->addTask($o_task2)->close();
+        ob_end_clean();
+        $this->assertEquals(array(
+                $o_task1->name . '::preOutput()',
+                $o_task2->name . '::preOutput()',
+                $o_task2->name . '::postOutput()',
+                $o_task1->name . '::postOutput()'
+            ),
+            TaskMock::$log
+        );
     }
 
     public function testWritingAgainstAnyOtherViewExceptStreamingView()
@@ -193,16 +219,53 @@ class OutputTest extends PHPUnit_Framework_TestCase
      */
     public function testPreAndPostOutputingOnStreaming()
     {
-        $o_out = $this->getMockForAbstractClass('Tox\\Application\\Output\\Output')->enableStreaming();
-        $o_out->expects($this->exactly(9))->method('preOutput');
-        $o_out->expects($this->exactly(9))->method('postOutput');
-        $a_lobs = range(1, 9);
-        shuffle($a_lobs);
+        $o_out = $this->getMockForAbstractClass('Tox\\Application\\Output\\Output');
+        $o_task1 = new TaskMock($o_out);
+        $o_task1->name = md5('foo' . microtime());
+        $o_task2 = new TaskMock($o_out);
+        $o_task2->name = md5('bar' . microtime());
+        $o_out->addTask($o_task1)->addTask($o_task2)->enableStreaming();
+        TaskMock::$log = array();
         ob_start();
-        foreach ($a_lobs as $ii) {
-            $o_out->write($ii);
-        }
+        $o_out->write('foo')->write('bar');
         ob_end_clean();
+        $this->assertEquals(array(
+                $o_task1->name . '::preOutput()',
+                $o_task2->name . '::preOutput()',
+                $o_task2->name . '::postOutput()',
+                $o_task1->name . '::postOutput()',
+                $o_task1->name . '::preOutput()',
+                $o_task2->name . '::preOutput()',
+                $o_task2->name . '::postOutput()',
+                $o_task1->name . '::postOutput()'
+            ),
+            TaskMock::$log
+        );
+    }
+}
+
+class TaskMock implements ITask
+{
+    public static $log = array();
+
+    public $name;
+
+    protected $output;
+
+    public function __construct(Application\IOutput $output)
+    {
+        $this->output = $output;
+    }
+
+    public function preOutput()
+    {
+        self::$log[] = $this->name . '::preOutput()';
+        $this->output->buffer = microtime();
+    }
+
+    public function postOutput()
+    {
+        self::$log[] = $this->name . '::postOutput()';
     }
 }
 

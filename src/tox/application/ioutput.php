@@ -34,37 +34,37 @@ interface IOutput
     /**
      * Closes and stops further outputing blobs.
      *
-     * @return IOutput
+     * @return self
      */
     public function close();
 
     /**
      * Outputs a blob.
      *
-     * @param  string  $blob New blob to be outputed.
-     * @return IOutput
+     * @param  string $blob New blob to be outputed.
+     * @return self
      */
     public function write($blob);
 
     /**
      * Outputs a blob and then closes.
      *
-     * @param  string  $blob New blob to be outputed.
-     * @return IOutput
+     * @param  string $blob New blob to be outputed.
+     * @return self
      */
     public function writeClose($blob);
 
     /**
      * Be invoked on streaming new blobs.
      *
-     * @return IOutput
+     * @return self
      */
     public function notifyStreaming();
 
     /**
      * Enables interactive streaming mode to output buffering blobs immediately.
      *
-     * @return IOutput
+     * @return self
      */
     public function enableStreaming();
 
@@ -72,7 +72,7 @@ interface IOutput
      * Disables interactive streaming mode to output all buffering blobs once at
      * last.
      *
-     * @return IOutput
+     * @return self
      */
     public function disableStreaming();
 
@@ -82,6 +82,14 @@ interface IOutput
      * @return bool
      */
     public function isStreaming();
+
+    /**
+     * Adds an outputting task.
+     *
+     * @param  Output\ITask $task New outputting task.
+     * @return self
+     */
+    public function addTask(Output\ITask $task);
 }
 
 // vi:ft=php fenc=utf-8 ff=unix ts=4 sts=4 et sw=4 fen fdm=indent fdl=1 tw=120
