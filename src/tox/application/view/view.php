@@ -24,6 +24,7 @@
 namespace Tox\Application\View;
 
 use Tox\Core;
+use Tox\Application;
 
 /**
  * Represents as the abstract view to provide essential behaviors.
@@ -35,7 +36,7 @@ use Tox\Core;
  * @package tox.application.view
  * @author  Snakevil Zen <zsnakevil@gmail.com>
  */
-abstract class View extends Core\Assembly implements IView
+abstract class View extends Core\Assembly implements Application\IView
 {
     /**
      * Stores the metas.

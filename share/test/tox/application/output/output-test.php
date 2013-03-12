@@ -21,22 +21,22 @@
  * @license   GNU General Public License, version 3
  */
 
-namespace Tox\Application;
+namespace Tox\Application\Output;
 
 use PHPUnit_Framework_TestCase;
 
-require_once __DIR__ . '/../../../../src/tox/core/assembly.php';
-require_once __DIR__ . '/../../../../src/tox/application/ioutput.php';
-require_once __DIR__ . '/../../../../src/tox/application/output.php';
+require_once __DIR__ . '/../../../../../src/tox/core/assembly.php';
+require_once __DIR__ . '/../../../../../src/tox/application/ioutput.php';
+require_once __DIR__ . '/../../../../../src/tox/application/output/output.php';
 
-require_once __DIR__ . '/../../../../src/tox/core/exception.php';
-require_once __DIR__ . '/../../../../src/tox/application/closedoutputexception.php';
-require_once __DIR__ . '/../../../../src/tox/application/streamingviewexpectedexception.php';
+require_once __DIR__ . '/../../../../../src/tox/core/exception.php';
+require_once __DIR__ . '/../../../../../src/tox/application/output/closedoutputexception.php';
+require_once __DIR__ . '/../../../../../src/tox/application/output/streamingviewexpectedexception.php';
 
-require_once __DIR__ . '/../../../../src/tox/application/view/iview.php';
-require_once __DIR__ . '/../../../../src/tox/application/view/istreamingview.php';
-require_once __DIR__ . '/../../../../src/tox/application/view/view.php';
-require_once __DIR__ . '/../../../../src/tox/application/view/streamingview.php';
+require_once __DIR__ . '/../../../../../src/tox/application/iview.php';
+require_once __DIR__ . '/../../../../../src/tox/application/view/istreamingview.php';
+require_once __DIR__ . '/../../../../../src/tox/application/view/view.php';
+require_once __DIR__ . '/../../../../../src/tox/application/view/streamingview.php';
 
 use Exception as PHPException;
 
@@ -52,21 +52,21 @@ class OutputTest extends PHPUnit_Framework_TestCase
 {
     public function testOutputingOnceWithAnyTimesWritings()
     {
-        $o_out = $this->getMockForAbstractClass('Tox\\Application\\Output');
+        $o_out = $this->getMockForAbstractClass('Tox\\Application\\Output\\Output');
         ob_start();
         $o1 = $o_out->write('foo');
         $o2 = $o_out->close();
         ob_end_clean();
         $this->assertSame($o_out, $o1);
         $this->assertSame($o_out, $o2);
-        $o_out = $this->getMockForAbstractClass('Tox\\Application\\Output');
+        $o_out = $this->getMockForAbstractClass('Tox\\Application\\Output\\Output');
         ob_start();
         $o1 = $o_out->writeClose('bar');
         ob_end_clean();
         $this->assertSame($o_out, $o1);
         $a_lobs = range(1, 9);
         shuffle($a_lobs);
-        $o_out = $this->getMockForAbstractClass('Tox\\Application\\Output');
+        $o_out = $this->getMockForAbstractClass('Tox\\Application\\Output\\Output');
         ob_start();
         foreach ($a_lobs as $ii) {
             $o_out->write($ii);
@@ -81,12 +81,12 @@ class OutputTest extends PHPUnit_Framework_TestCase
 
     /**
      * @depends testOutputingOnceWithAnyTimesWritings
-     * @expectedException Tox\Application\ClosedOutputException
+     * @expectedException Tox\Application\Output\ClosedOutputException
      */
     public function testOutputFrozenAfterClose()
     {
         ob_start();
-        $this->getMockForAbstractClass('Tox\\Application\\Output')->close()->write('foo');
+        $this->getMockForAbstractClass('Tox\\Application\\Output\\Output')->close()->write('foo');
         ob_end_clean();
     }
 
@@ -95,7 +95,7 @@ class OutputTest extends PHPUnit_Framework_TestCase
      */
     public function testPreAndPostOutputing()
     {
-        $o_out = $this->getMockForAbstractClass('Tox\\Application\\Output');
+        $o_out = $this->getMockForAbstractClass('Tox\\Application\\Output\\Output');
         $o_out->expects($this->once())->method('preOutput');
         $o_out->expects($this->once())->method('postOutput');
         $o_out->close();
@@ -103,8 +103,8 @@ class OutputTest extends PHPUnit_Framework_TestCase
 
     public function testWritingAgainstAnyOtherViewExceptStreamingView()
     {
-        $o_out = $this->getMockForAbstractClass('Tox\\Application\\Output');
-        $o_out->view = $this->getMock('Tox\\Application\\View\\IView');
+        $o_out = $this->getMockForAbstractClass('Tox\\Application\\Output\\Output');
+        $o_out->view = $this->getMock('Tox\\Application\\IView');
         try {
             $o_out->write('foo');
         } catch (StreamingViewExpectedException $ex) {
@@ -125,8 +125,8 @@ class OutputTest extends PHPUnit_Framework_TestCase
      */
     public function testOutputingWithAnyOtherView()
     {
-        $o_out = $this->getMockForAbstractClass('Tox\\Application\\Output');
-        $o_out->view = $this->getMock('Tox\\Application\\View\\IView');
+        $o_out = $this->getMockForAbstractClass('Tox\\Application\\Output\\Output');
+        $o_out->view = $this->getMock('Tox\\Application\\IView');
         $o_out->view->expects($this->once())->method('render');
         ob_start();
         $o_out->close();
@@ -135,7 +135,7 @@ class OutputTest extends PHPUnit_Framework_TestCase
 
     public function testStreamingDisabledAtFirst()
     {
-        $o_out = $this->getMockForAbstractClass('Tox\\Application\\Output');
+        $o_out = $this->getMockForAbstractClass('Tox\\Application\\Output\\Output');
         $this->assertFalse($o_out->isStreaming());
     }
 
@@ -144,7 +144,7 @@ class OutputTest extends PHPUnit_Framework_TestCase
      */
     public function testEnablingAndDisablingStreaming()
     {
-        $o_out = $this->getMockForAbstractClass('Tox\\Application\\Output');
+        $o_out = $this->getMockForAbstractClass('Tox\\Application\\Output\\Output');
         $this->assertSame($o_out, $o_out->enableStreaming());
         $this->assertTrue($o_out->isStreaming());
         $this->assertSame($o_out, $o_out->disableStreaming());
@@ -156,8 +156,8 @@ class OutputTest extends PHPUnit_Framework_TestCase
      */
     public function testStreamingModeAgainstAnyOtherViewExceptStreamingView()
     {
-        $o_out = $this->getMockForAbstractClass('Tox\\Application\\Output');
-        $o_out->view = $this->getMock('Tox\\Application\\View\\IView');
+        $o_out = $this->getMockForAbstractClass('Tox\\Application\\Output\\Output');
+        $o_out->view = $this->getMock('Tox\\Application\\IView');
         try {
             $o_out->enableStreaming();
         } catch (StreamingViewExpectedException $e) {
@@ -178,7 +178,7 @@ class OutputTest extends PHPUnit_Framework_TestCase
      */
     public function testOutputingImmediatelyOnStreaming()
     {
-        $o_out = $this->getMockForAbstractClass('Tox\\Application\\Output')->enableStreaming();
+        $o_out = $this->getMockForAbstractClass('Tox\\Application\\Output\\Output')->enableStreaming();
         $a_lobs = range(1, 9);
         shuffle($a_lobs);
         foreach ($a_lobs as $ii) {
@@ -193,7 +193,7 @@ class OutputTest extends PHPUnit_Framework_TestCase
      */
     public function testPreAndPostOutputingOnStreaming()
     {
-        $o_out = $this->getMockForAbstractClass('Tox\\Application\\Output')->enableStreaming();
+        $o_out = $this->getMockForAbstractClass('Tox\\Application\\Output\\Output')->enableStreaming();
         $o_out->expects($this->exactly(9))->method('preOutput');
         $o_out->expects($this->exactly(9))->method('postOutput');
         $a_lobs = range(1, 9);

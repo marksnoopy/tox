@@ -23,8 +23,9 @@
  * @license   GNU General Public License, version 3
  */
 
-Tox::alias('Tox\\Application\\View\\IView', 'Tox\\Application\\IView');
 Tox::alias('Tox\\Application\\View\\View', 'Tox\\Application\\View');
+
+Tox::alias('Tox\\Application\\Output\\Output', 'Tox\\Application\\Output');
 
 __HALT_COMPILER();
 

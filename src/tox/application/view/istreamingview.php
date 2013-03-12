@@ -31,7 +31,7 @@ use Tox\Application;
  * @package tox.application.view
  * @author  Snakevil Zen <zsnakevil@gmail.com>
  */
-interface IStreamingView extends IView
+interface IStreamingView extends Application\IView
 {
     /**
      * CONSTRUCT FUNCTION

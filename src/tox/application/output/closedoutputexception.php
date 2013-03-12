@@ -1,7 +1,6 @@
 <?php
 /**
- * Defines an exception for buffering new blob to any other view without
- * streaming supporting.
+ * Defines an exception for writing to the closed output.
  *
  * This file is part of Tox.
  *
@@ -22,34 +21,33 @@
  * @license   GNU General Public License, version 3
  */
 
-namespace Tox\Application;
+namespace Tox\Application\Output;
 
 use Tox\Core;
 
 /**
- * Be raised on buffering new blob to any other view without streaming
- * supporting.
+ * Be raised on writing to the closed output.
  *
  * **THIS CLASS CANNOT BE INHERITED.**
  *
- * @package tox.application
+ * @package tox.application.output
  * @author  Snakevil Zen <zsnakevil@gmail.com>
  */
-final class StreamingViewExpectedException extends Core\Exception
+final class ClosedOutputException extends Core\Exception
 {
     /**
      * {@inheritdoc}
      *
-     * > Defined as `0x80010002`.
+     * > Defined as `0x80010201`.
      */
-    const CODE = 0x80010002;
+    const CODE = 0x80010201;
 
     /**
      * {@inheritdoc}
      *
-     * > Defined as `binded view of the output does not support streaming`.
+     * > Defined as `output is already closed`.
      */
-    const MESSAGE = 'binded view of the output does not support streaming';
+    const MESSAGE = 'output is already closed';
 }
 
 // vi:ft=php fenc=utf-8 ff=unix ts=4 sts=4 et sw=4 fen fdm=indent fdl=1 tw=120

@@ -21,21 +21,25 @@
  * @license   GNU General Public License, version 3
  */
 
-namespace Tox\Application;
+namespace Tox\Application\Output;
 
 use Tox;
+use Tox\Application;
+use Tox\Application\View;
 
 /**
  * Represents as the abstract output of applications.
  *
  * **THIS CLASS CANNOT BE INSTANTIATED.**
  *
+ * __*ALIAS*__ as `Tox\Application\Output`.
+ *
  * @property View\IView $view Retrieves and Sets the binded view.
  *
- * @package tox.application
+ * @package tox.application.output
  * @author  Snakevil Zen <zsnakevil@gmail.com>
  */
-abstract class Output extends Tox\Assembly implements IOutput
+abstract class Output extends Tox\Assembly implements Application\IOutput
 {
     /**
      * Stores the binded view.
@@ -82,7 +86,7 @@ abstract class Output extends Tox\Assembly implements IOutput
      *
      * @internal
      *
-     * @return View\IView
+     * @return Application\IView
      */
     final protected function __getView()
     {
@@ -99,10 +103,10 @@ abstract class Output extends Tox\Assembly implements IOutput
      *
      * @internal
      *
-     * @param  View\IView $view New binded view.
+     * @param  Application\IView $view New binded view.
      * @return void
      */
-    final protected function __setView(View\IView $view)
+    final protected function __setView(Application\IView $view)
     {
         $this->view = $view;
     }

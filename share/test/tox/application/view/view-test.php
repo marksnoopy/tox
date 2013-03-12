@@ -26,7 +26,7 @@ namespace Tox\Application\View;
 use PHPUnit_Framework_TestCase;
 
 require_once __DIR__ . '/../../../../../src/tox/core/assembly.php';
-require_once __DIR__ . '/../../../../../src/tox/application/view/iview.php';
+require_once __DIR__ . '/../../../../../src/tox/application/iview.php';
 require_once __DIR__ . '/../../../../../src/tox/application/view/view.php';
 
 use stdClass;

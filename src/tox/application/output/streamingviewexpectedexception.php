@@ -1,6 +1,7 @@
 <?php
 /**
- * Defines the essential behaviors of views.
+ * Defines an exception for buffering new blob to any other view without
+ * streaming supporting.
  *
  * This file is part of Tox.
  *
@@ -21,41 +22,34 @@
  * @license   GNU General Public License, version 3
  */
 
-namespace Tox\Application\View;
+namespace Tox\Application\Output;
 
-use ArrayAccess;
+use Tox\Core;
 
 /**
- * Announces the essential behaviors of views.
+ * Be raised on buffering new blob to any other view without streaming
+ * supporting.
  *
- * __*ALIAS*__ as `Tox\Application\IView`.
+ * **THIS CLASS CANNOT BE INHERITED.**
  *
- * @package tox.application.view
+ * @package tox.application.output
  * @author  Snakevil Zen <zsnakevil@gmail.com>
  */
-interface IView extends ArrayAccess
+final class StreamingViewExpectedException extends Core\Exception
 {
     /**
-     * Exports all metas as an array.
+     * {@inheritdoc}
      *
-     * @return array
+     * > Defined as `0x80010202`.
      */
-    public function export();
+    const CODE = 0x80010202;
 
     /**
-     * Imports a set of metas from an array.
+     * {@inheritdoc}
      *
-     * @param  array $metas Metas fields.
-     * @return IView
+     * > Defined as `binded view of the output does not support streaming`.
      */
-    public function import($metas);
-
-    /**
-     * Renders metas data.
-     *
-     * @return string
-     */
-    public function render();
+    const MESSAGE = 'binded view of the output does not support streaming';
 }
 
 // vi:ft=php fenc=utf-8 ff=unix ts=4 sts=4 et sw=4 fen fdm=indent fdl=1 tw=120

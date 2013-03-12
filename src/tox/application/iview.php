@@ -1,6 +1,6 @@
 <?php
 /**
- * Defines an exception for writing to the closed output.
+ * Defines the essential behaviors of views.
  *
  * This file is part of Tox.
  *
@@ -23,31 +23,39 @@
 
 namespace Tox\Application;
 
-use Tox\Core;
+use ArrayAccess;
 
 /**
- * Be raised on writing to the closed output.
+ * Announces the essential behaviors of views.
  *
- * **THIS CLASS CANNOT BE INHERITED.**
+ * __*ALIAS*__ as `Tox\Application\IView`.
  *
- * @package tox.application
+ * @package tox.application.view
  * @author  Snakevil Zen <zsnakevil@gmail.com>
  */
-final class ClosedOutputException extends Core\Exception
+interface IView extends ArrayAccess
 {
     /**
-     * {@inheritdoc}
+     * Exports all metas as an array.
      *
-     * > Defined as `0x80010001`.
+     * @return array
      */
-    const CODE = 0x80010001;
+    public function export();
 
     /**
-     * {@inheritdoc}
+     * Imports a set of metas from an array.
      *
-     * > Defined as `output is already closed`.
+     * @param  array $metas Metas fields.
+     * @return IView
      */
-    const MESSAGE = 'output is already closed';
+    public function import($metas);
+
+    /**
+     * Renders metas data.
+     *
+     * @return string
+     */
+    public function render();
 }
 
 // vi:ft=php fenc=utf-8 ff=unix ts=4 sts=4 et sw=4 fen fdm=indent fdl=1 tw=120
