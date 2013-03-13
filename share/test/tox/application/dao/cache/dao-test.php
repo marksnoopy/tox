@@ -42,7 +42,7 @@ use stdClass;
  *
  * @internal
  *
- * @package tox.application.dao
+ * @package tox.application.dao.cache
  * @author  Trainxy Ho <trainxy@gmail.com>
  */
 class DaoTest extends PHPUnit_Framework_TestCase
