@@ -40,35 +40,35 @@ abstract class Dao extends Tox\Assembly implements Tox\Application\IDao
 {
 
     /**
-     * Represents a data domain.
+     * Store a data domain.
      *
      * @var string
      */
     protected static $domain;
 
     /**
-     * Represents the uniq instance in whole process.
+     * Store the uniq instance in whole process.
      *
      * @var Tox\Application\Dao\Cache\Dao
      */
     protected static $instance;
 
     /**
-     * Represents a default dao.
+     * Store an instance of default dao.
      *
      * @var Tox\Application\Dao
      */
     protected $dao;
 
     /**
-     * Represents a kv data driver.
+     * Store an instance of  kv data driver.
      *
      * @var Tox\Data\IKV
      */
     protected $cache;
 
     /**
-     * Represents a cache alive time (ms).
+     * Store a cache alive time (ms).
      *
      * @var Tox\Data\IKV
      */
@@ -78,7 +78,7 @@ abstract class Dao extends Tox\Assembly implements Tox\Application\IDao
      * CONSTRUCT FUNCTION
      *
      * @param  Tox\Application\Dao  $dao    Instance of a default dao
-     * @param  Tox\Data\IKV         $cache  instance of a kv data driver
+     * @param  Tox\Data\IKV         $cache  Instance of a kv data driver
      */
     public function __construct(Tox\Application\Dao $dao, Data\IKV $cache)
     {
@@ -87,7 +87,7 @@ abstract class Dao extends Tox\Assembly implements Tox\Application\IDao
     }
 
     /**
-     * Define abstract function to ask child class realizes.
+     * Retrieve the default dao when class isn't set.
      */
     abstract protected static function getDefaultDao();
 
@@ -115,7 +115,8 @@ abstract class Dao extends Tox\Assembly implements Tox\Application\IDao
     }
 
     /**
-     * This class not surppose the operation, will be transmit to default dao.
+     * Bind source to dao.
+     * This class not surppose the operation, will be transmitted to default dao.
      *
      * @param  Tox\Data\ISource $domain     Instance of source.
      * @return NULL
@@ -189,12 +190,13 @@ abstract class Dao extends Tox\Assembly implements Tox\Application\IDao
     }
 
     /**
-     * This class not surppose the operation, will be transmit to default dao.
+     * Amount of the collection of data with assigned conditions, orders, offset and length.
+     * This class not surppose the operation, will be transmitted to default dao.
      *
      * @param  array    $where      Conditions of a model set.
      * @param  int      $offset     Position which set cursor begins.
      * @param  int      $length     Length of data get.
-     * @return NULL
+     * @return int
      */
     public function countBy($where = array(), $offset = 0, $length = 0)
     {
@@ -202,12 +204,14 @@ abstract class Dao extends Tox\Assembly implements Tox\Application\IDao
     }
 
     /**
-     * This class not surppose the operation, will be transmit to default dao.
+     * Get a part of the collection of data with assigned conditions, orders, offset and length.
+     * This class not surppose the operation, will be transmitted to default dao.
      *
      * @param  array    $where      Conditions of a model set.
      * @param  array    $orderBy    Orders of a model set.
      * @param  int      $offset     Position which set cursor begins.
      * @param  int      $length     Length of data get.
+     * @return mixed[]
      */
     public function listAndSortBy($where = array(), $orderBy = array(), $offset = 0, $length = 0)
     {
