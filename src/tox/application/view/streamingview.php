@@ -31,7 +31,7 @@ use Tox\Application;
  * @package tox.application.view
  * @author  Snakevil Zen <zsnakevil@gmail.com>
  */
-class StreamingView extends View implements IStreamingView
+class StreamingView extends View implements Application\IStreamingView
 {
     /**
      * Stores the buffered streaming blobs.

@@ -89,7 +89,7 @@ interface IOutput
      * @param  Output\ITask $task New outputting task.
      * @return self
      */
-    public function addTask(Output\ITask $task);
+    public function addTask(IOutputTask $task);
 }
 
 // vi:ft=php fenc=utf-8 ff=unix ts=4 sts=4 et sw=4 fen fdm=indent fdl=1 tw=120

@@ -208,7 +208,7 @@ abstract class Output extends Tox\Assembly implements Application\IOutput
         if ($this->closed) {
             throw new ClosedOutputException;
         }
-        if (!$this->__getView() instanceof View\IStreamingView) {
+        if (!$this->__getView() instanceof Application\IStreamingView) {
             throw new StreamingViewExpectedException;
         }
         $this->__getView()->append($blob);
@@ -259,7 +259,7 @@ abstract class Output extends Tox\Assembly implements Application\IOutput
      */
     final public function enableStreaming()
     {
-        if (!$this->__getView() instanceof View\IStreamingView) {
+        if (!$this->__getView() instanceof Application\IStreamingView) {
             throw new StreamingViewExpectedException;
         }
         $this->streaming = true;
@@ -278,7 +278,7 @@ abstract class Output extends Tox\Assembly implements Application\IOutput
      */
     final public function disableStreaming()
     {
-        if (!$this->__getView() instanceof View\IStreamingView) {
+        if (!$this->__getView() instanceof Application\IStreamingView) {
             throw new StreamingViewExpectedException;
         }
         $this->streaming = false;
@@ -338,10 +338,11 @@ abstract class Output extends Tox\Assembly implements Application\IOutput
      *
      * **THIS METHOD CANNOT BE OVERRIDDEN.**
      *
-     * @param  ITask $task The task to be processed on outputting.
+     * @param  Application\IOutputTask $task The task to be processed on
+     *                                       outputting.
      * @return self
      */
-    final public function addTask(ITask $task)
+    final public function addTask(Application\IOutputTask $task)
     {
         $this->tasks[] = $task;
         return $this;

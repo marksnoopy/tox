@@ -28,10 +28,11 @@ use PHPUnit_Framework_TestCase;
 require_once __DIR__ . '/../../../../../src/tox/core/assembly.php';
 require_once __DIR__ . '/../../../../../src/tox/application/iview.php';
 require_once __DIR__ . '/../../../../../src/tox/application/view/view.php';
-require_once __DIR__ . '/../../../../../src/tox/application/view/istreamingview.php';
+require_once __DIR__ . '/../../../../../src/tox/application/istreamingview.php';
 require_once __DIR__ . '/../../../../../src/tox/application/view/streamingview.php';
 
 require_once __DIR__ . '/../../../../../src/tox/application/ioutput.php';
+require_once __DIR__ . '/../../../../../src/tox/application/ioutputtask.php';
 
 use Tox\Application\IOutput;
 

@@ -21,24 +21,22 @@
  * @license   GNU General Public License, version 3
  */
 
-namespace Tox\Application\Output;
-
-use Tox\Application;
+namespace Tox\Application;
 
 /**
  * Announces the standard of behaviors of tasks for outputing.
  *
- * @package tox.application.output
+ * @package tox.application
  * @author  Snakevil Zen <zsnakevil@gmail.com>
  */
-interface ITask
+interface IOutputTask
 {
     /**
      * CONSTRUCT FUNCTION
      *
-     * @param Application\IOutput $output The output which to be used for.
+     * @param IOutput $output The output which to be used for.
      */
-    public function __construct(Application\IOutput $output);
+    public function __construct(IOutput $output);
 
     /**
      * Be invoked before outputing.

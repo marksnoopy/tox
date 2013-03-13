@@ -21,24 +21,22 @@
  * @license   GNU General Public License, version 3
  */
 
-namespace Tox\Application\View;
-
-use Tox\Application;
+namespace Tox\Application;
 
 /**
  * Announces the behaviors of interactive streaming views.
  *
- * @package tox.application.view
+ * @package tox.application
  * @author  Snakevil Zen <zsnakevil@gmail.com>
  */
-interface IStreamingView extends Application\IView
+interface IStreamingView extends IView
 {
     /**
      * CONSTRUCT FUNCTION
      *
-     * @param Application\IOutput $output The corresponding output component.
+     * @param IOutput $output The corresponding output component.
      */
-    public function __construct(Application\IOutput $output);
+    public function __construct(IOutput $output);
 
     /**
      * Appends a new blob for streaming.

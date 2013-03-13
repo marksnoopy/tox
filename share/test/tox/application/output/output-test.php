@@ -35,10 +35,10 @@ require_once __DIR__ . '/../../../../../src/tox/application/output/bufferreadonl
 require_once __DIR__ . '/../../../../../src/tox/application/output/streamingviewexpectedexception.php';
 
 require_once __DIR__ . '/../../../../../src/tox/application/iview.php';
-require_once __DIR__ . '/../../../../../src/tox/application/view/istreamingview.php';
+require_once __DIR__ . '/../../../../../src/tox/application/istreamingview.php';
 require_once __DIR__ . '/../../../../../src/tox/application/view/view.php';
 require_once __DIR__ . '/../../../../../src/tox/application/view/streamingview.php';
-require_once __DIR__ . '/../../../../../src/tox/application/output/itask.php';
+require_once __DIR__ . '/../../../../../src/tox/application/ioutputtask.php';
 
 use Exception as PHPException;
 
@@ -49,7 +49,7 @@ use Tox\Application;
  *
  * @internal
  *
- * @package tox.application
+ * @package tox.application.output
  * @author  Snakevil Zen <zsnakevil@gmail.com>
  */
 class OutputTest extends PHPUnit_Framework_TestCase
@@ -137,7 +137,7 @@ class OutputTest extends PHPUnit_Framework_TestCase
         } catch (PHPException $ex) {
             $this->fail();
         }
-        $o_out->view = $this->getMock('Tox\\Application\\View\\IStreamingView');
+        $o_out->view = $this->getMock('Tox\\Application\\IStreamingView');
         try {
             $o_out->write('foo');
         } catch (PHPException $ex) {
@@ -244,25 +244,65 @@ class OutputTest extends PHPUnit_Framework_TestCase
     }
 }
 
-class TaskMock implements ITask
+/**
+ * Represents as a task for mocking test.
+ *
+ * @internal
+ *
+ * @package tox.application.output
+ * @author  Snakevil Zen <zsnakevil@gmail.com>
+ *
+ * @property mixed $ok
+ */
+class TaskMock implements Application\IOutputTask
 {
+    /**
+     * Retrieves or sets the tracing logs.
+     *
+     * @var string[]
+     */
     public static $log = array();
 
+    /**
+     * Retrieves and sets the name of the instance.
+     *
+     * @var string
+     */
     public $name;
 
+    /**
+     * Stores the related output.
+     *
+     * @var Application\IOutput
+     */
     protected $output;
 
+    /**
+     * {@inheritdoc}
+     *
+     * @param Application\IOutput $output The output which to be used for.
+     */
     public function __construct(Application\IOutput $output)
     {
         $this->output = $output;
     }
 
+    /**
+     * {@inheritdoc}
+     *
+     * @return void
+     */
     public function preOutput()
     {
         self::$log[] = $this->name . '::preOutput()';
         $this->output->buffer = microtime();
     }
 
+    /**
+     * {@inheritdoc}
+     *
+     * @return void
+     */
     public function postOutput()
     {
         self::$log[] = $this->name . '::postOutput()';
