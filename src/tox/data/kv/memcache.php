@@ -53,6 +53,17 @@ class Memcache extends KV
     private $_servers;
 
     /**
+     * Constructor.
+     * 
+     */
+    public function __construct()
+    {
+        if (null === $this->useMemcached) {
+            $this->useMemcached = true;
+        }
+    }
+
+    /**
      * It creates the memcache instance and adds memcache servers.
      * 
      * @return void 
