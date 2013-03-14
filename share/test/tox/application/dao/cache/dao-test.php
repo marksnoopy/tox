@@ -81,10 +81,11 @@ class DaoTest extends PHPUnit_Framework_TestCase
         $o_mock_dao = $this->getMock('Tox\\Application\\Dao', array('update', 'create', 'delete'));
         $o_mock_dao->expects($this->once())
                    ->method('create')
-                   ->with($this->equalTo(array('aaa', 'bbb', 'ccc')));
+                   ->with($this->equalTo(array('title' => 'hello', 'description' => 'world')))
+                   ->will($this->returnValue('111'));
         $o_mock_dao->expects($this->once())
                    ->method('update')
-                   ->with($this->equalTo('111'), $this->equalTo(array('aaa', 'bbb', 'ccc')));
+                   ->with($this->equalTo('111'), $this->equalTo(array('id' => '111', 'title' => 'aaa', 'description' => 'bbb')));
         $o_mock_dao->expects($this->once())
                    ->method('delete')
                    ->with($this->equalTo('111'));
@@ -94,8 +95,8 @@ class DaoTest extends PHPUnit_Framework_TestCase
         $o_cache_dao = $this->getMockBuilder('Tox\\Application\\Dao\\Cache\\Dao')
                             ->setConstructorArgs(array($o_mock_dao, $o_mock_cache))
                             ->getMockForAbstractClass();
-        $o_cache_dao->create(array('aaa', 'bbb', 'ccc'));
-        $o_cache_dao->update('111', array('aaa', 'bbb', 'ccc'));
+        $o_cache_dao->create(array('title' => 'hello', 'description' => 'world'));
+        $o_cache_dao->update('111', array('id' => '111', 'title' => 'aaa', 'description' => 'bbb'));
         $o_cache_dao->delete('111');
     }
 
