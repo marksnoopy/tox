@@ -53,6 +53,11 @@ class Memcache extends KV
     private $_servers;
 
     /**
+     * Memcache default expire time
+     */
+    private $_expireTime;
+
+    /**
      * Constructor.
      * 
      */
@@ -60,6 +65,18 @@ class Memcache extends KV
     {
         if (null === $this->useMemcached) {
             $this->useMemcached = true;
+        }
+    }
+
+    /**
+     * Sets the memcache default expire time
+     * 
+     * @param type $expire
+     */
+    public function setExpireTime($expire)
+    {
+        if (null !== $expire) {
+            $this->_expireTime = $expire;
         }
     }
 
@@ -158,12 +175,15 @@ class Memcache extends KV
      * @return boolean         true if the value is successfully stored into 
      *                         cache, false otherwise.
      */
-    protected function setValue($key, $value, $expire)
+    protected function setValue($key, $value, $expire = 0)
     {
-        if ($expire > 0)
+        if ($expire > 0) {
             $expire+=time();
-        else
+        } else if (null !== $this->_expireTime) {
+            $expire = $this->_expireTime;
+        } else {
             $expire = 0;
+        }
 
         return $this->useMemcached ? $this->_cache->set($key, $value, $expire) : $this->_cache->set($key, $value, 0, $expire);
     }
