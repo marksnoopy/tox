@@ -138,11 +138,9 @@ abstract class Output extends Tox\Assembly implements Application\IOutput
     /**
      * {@inheritdoc}
      *
-     * **THIS METHOD CANNOT BE OVERRIDDEN.**
-     *
      * @return Application\IView
      */
-    final public function getView()
+    public function getView()
     {
         return $this->__getView();
     }
@@ -150,12 +148,10 @@ abstract class Output extends Tox\Assembly implements Application\IOutput
     /**
      * {@inheritdoc}
      *
-     * **THIS METHOD CANNOT BE OVERRIDDEN.**
-     *
      * @param  Application\IView $view New binded view.
      * @return self
      */
-    final public function setView(Application\IView $view)
+    public function setView(Application\IView $view)
     {
         $this->__setView($view);
         return $this;
@@ -198,11 +194,9 @@ abstract class Output extends Tox\Assembly implements Application\IOutput
     /**
      * {@inheritdoc}
      *
-     * **THIS METHOD CANNOT BE OVERRIDDEN.**
-     *
      * @return string
      */
-    final public function getBuffer()
+    public function getBuffer()
     {
         return $this->__getBuffer();
     }
@@ -210,14 +204,12 @@ abstract class Output extends Tox\Assembly implements Application\IOutput
     /**
      * {@inheritdoc}
      *
-     * **THIS METHOD CANNOT BE OVERRIDDEN.**
-     *
      * @param  string $blob New outputting buffer.
      * @return self
      *
      * @throws BufferReadonlyException If setting while not outputting.
      */
-    final public function setBuffer($blob)
+    public function setBuffer($blob)
     {
         $this->__setBuffer($blob);
         return $this;

@@ -1,6 +1,6 @@
 <?php
 /**
- *
+ * Defines the essential behaviors of web applications response.
  *
  * This file is part of Tox.
  *
@@ -17,18 +17,94 @@
  * You should have received a copy of the GNU General Public License
  * along with Tox.  If not, see <http://www.gnu.org/licenses/>.
  *
- * @package   Tox\Web
- * @author    Snakevil Zen <zsnakevil@gmail.com>
- * @copyright © 2012 szen.in
- * @license   http://www.gnu.org/licenses/gpl.html
+ * @copyright © 2012-2013 SZen.in
+ * @license   GNU General Public License, version 3
  */
 
 namespace Tox\Web;
 
-use Tox;
+use Tox\Application;
 
-interface IResponse extends Tox\Application\IOutput
+/**
+ * Announces the essential behaviors of web applications response.
+ *
+ * @package tox.web
+ * @author  Snakevil Zen <zsnakevil@gmail.com>
+ */
+interface IResponse extends Application\IOutput
 {
+    /**
+     * Adds an extra HTTP to be sent.
+     *
+     * @param  string      $field    Header field name.
+     * @param  string|int  $value    Header value.
+     * @param  boolean     $replaced OPTIONAL. Whether to replace any other
+     *                               existant headers with the same field name.
+     * @return self
+     */
+    public function addHeader($field, $value, $replaced = true);
+
+    /**
+     * Specifies a page cache object.
+     *
+     * @param  IPageCache $cache The page cache object attached to.
+     * @return self
+     */
+    public function cacheTo(IPageCache $cache);
+
+    /**
+     * Retrieves all set HTTP headers.
+     *
+     * @return array
+     */
+    public function getHeaders();
+
+    /**
+     * Overwrites the sent HTTP headers post-outputting.
+     *
+     * WARNING: Thie method is designed for tasks to *modify* the headers.
+     *
+     * @param  array $headers New HTTP headers.
+     * @return self
+     */
+    public function setHeaders(Array $headers);
+
+    /**
+     * Uses a customize page cache agent.
+     *
+     * @param  IPageCacheAgent $agent The agent to cache the page content.
+     * @return self
+     */
+    public function setPageCacheAgent(IPageCacheAgent $agent);
+
+    /**
+     * Uses a customize HTTP headers processor.
+     *
+     * @param  IHTTPHeadersProcessor $processor The processor to send headers.
+     * @return self
+     */
+    public function setHeadersProcessor(IHTTPHeadersProcessor $processor);
+
+    /**
+     * Redirects to another URL.
+     *
+     * NOTICE: All HTTP headers and outputting buffer previously added would be
+     * dropped.
+     *
+     * @param  string  $url         New target URL.
+     * @param  boolean $permanently OPTIONAL. Whether to do either 301 or 302
+     *                              redirect.
+     * @return self
+     */
+    public function redirect($url, $permanently = false);
+
+    /**
+     * Sets the HTTP status manually.
+     *
+     * @param  int $status Custom HTTP status code.
+     * @return self
+     */
+    public function setStatus($status);
 }
 
-// vi:se ft=php fenc=utf-8 ff=unix ts=4 sts=4 et sw=4 fen fdm=indent fdl=1 tw=120:
+// vi:ft=php fenc=utf-8 ff=unix ts=4 sts=4 et sw=4 fen fdm=indent fdl=1 tw=120

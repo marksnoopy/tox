@@ -1,6 +1,6 @@
 <?php
 /**
- *
+ * Defines the behaviors of pages caching objects for web applications.
  *
  * This file is part of Tox.
  *
@@ -17,29 +17,34 @@
  * You should have received a copy of the GNU General Public License
  * along with Tox.  If not, see <http://www.gnu.org/licenses/>.
  *
- * @package   Tox\Web
- * @author    Snakevil Zen <zsnakevil@gmail.com>
- * @copyright © 2012 szen.in
- * @license   http://www.gnu.org/licenses/gpl.html
+ * @copyright © 2012-2013 SZen.in
+ * @license   GNU General Public License, version 3
  */
 
 namespace Tox\Web;
 
-class Response implements IResponse
+/**
+ * Announces the behaviors of pages caching objects for web applications.
+ *
+ * @package tox.web
+ * @author  Snakevil Zen <zsnakevil@gmail.com>
+ */
+interface IPageCache
 {
-    public function close()
-    {
-    }
+    /**
+     * Puts the content in.
+     *
+     * @param  string $content Caching content.
+     * @return self
+     */
+    public function put($content);
 
-    public function write($blob)
-    {
-    }
-
-    public function writeClose($blob)
-    {
-        settype($blob, 'string');
-        echo $blob;
-    }
+    /**
+     * Be invoked on string type casting.
+     *
+     * @return string
+     */
+    public function __toString();
 }
 
-// vi:se ft=php fenc=utf-8 ff=unix ts=4 sts=4 et sw=4 fen fdm=indent fdl=1 tw=120:
+// vi:ft=php fenc=utf-8 ff=unix ts=4 sts=4 et sw=4 fen fdm=indent fdl=1 tw=120
