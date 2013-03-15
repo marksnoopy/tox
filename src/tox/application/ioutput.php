@@ -90,6 +90,38 @@ interface IOutput
      * @return self
      */
     public function addTask(IOutputTask $task);
+
+    /**
+     * Retrieves the outputting buffer.
+     *
+     * @return string
+     */
+    public function getBuffer();
+
+    /**
+     * Overwrites the outputting buffer pre-outputting.
+     *
+     * WARNING: Thie method is designed for tasks to *modify* the buffer.
+     *
+     * @param  string $blob New outputting buffer.
+     * @return self
+     */
+    public function setBuffer($blob);
+
+    /**
+     * Retrieves the binded view.
+     *
+     * @return IView
+     */
+    public function getView();
+
+    /**
+     * Binds another view.
+     *
+     * @param  IView $view New view to be binded.
+     * @return self
+     */
+    public function setView(IView $view);
 }
 
 // vi:ft=php fenc=utf-8 ff=unix ts=4 sts=4 et sw=4 fen fdm=indent fdl=1 tw=120

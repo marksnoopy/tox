@@ -136,6 +136,32 @@ abstract class Output extends Tox\Assembly implements Application\IOutput
     }
 
     /**
+     * {@inheritdoc}
+     *
+     * **THIS METHOD CANNOT BE OVERRIDDEN.**
+     *
+     * @return Application\IView
+     */
+    final public function getView()
+    {
+        return $this->__getView();
+    }
+
+    /**
+     * {@inheritdoc}
+     *
+     * **THIS METHOD CANNOT BE OVERRIDDEN.**
+     *
+     * @param  Application\IView $view New binded view.
+     * @return self
+     */
+    final public function setView(Application\IView $view)
+    {
+        $this->__setView($view);
+        return $this;
+    }
+
+    /**
      * Be invoked on retrieving the rendering result of the binded view.
      *
      * **THIS METHOD CANNOT BE OVERRIDDEN.**
@@ -174,6 +200,34 @@ abstract class Output extends Tox\Assembly implements Application\IOutput
      *
      * **THIS METHOD CANNOT BE OVERRIDDEN.**
      *
+     * @return string
+     */
+    final public function getBuffer()
+    {
+        return $this->__getBuffer();
+    }
+
+    /**
+     * {@inheritdoc}
+     *
+     * **THIS METHOD CANNOT BE OVERRIDDEN.**
+     *
+     * @param  string $blob New outputting buffer.
+     * @return self
+     *
+     * @throws BufferReadonlyException If setting while not outputting.
+     */
+    final public function setBuffer($blob)
+    {
+        $this->__setBuffer($blob);
+        return $this;
+    }
+
+    /**
+     * {@inheritdoc}
+     *
+     * **THIS METHOD CANNOT BE OVERRIDDEN.**
+     *
      * @return self
      */
     final public function close()
@@ -183,9 +237,12 @@ abstract class Output extends Tox\Assembly implements Application\IOutput
         }
         $this->closed = true;
         $this->outputting = true;
-        $this->buffer = $this->__getView()->render();
+        if (!$this->__getView() instanceof Application\IStreamingView) {
+            $this->buffer = $this->__getView()->render();
+        }
         print($this->preOutput()->buffer);
-        $this->postOutput()->outputting = false;
+        $this->postOutput()->buffer = '';
+        $this->outputting = false;
         return $this;
     }
 
@@ -237,13 +294,17 @@ abstract class Output extends Tox\Assembly implements Application\IOutput
      */
     final public function notifyStreaming()
     {
-        if ($this->closed || !$this->streaming) {
+        if ($this->closed) {
+            return $this;
+        }
+        $this->buffer .= $this->__getView()->render();
+        if (!$this->streaming) {
             return $this;
         }
         $this->outputting = true;
-        $this->buffer = $this->__getView()->render();
         print($this->preOutput()->buffer);
-        $this->postOutput()->outputting = false;
+        $this->postOutput()->buffer = '';
+        $this->outputting = false;
         return $this;
     }
 
