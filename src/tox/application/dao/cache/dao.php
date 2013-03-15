@@ -40,35 +40,35 @@ abstract class Dao extends Tox\Assembly implements Tox\Application\IDao
 {
 
     /**
-     * Store a data domain.
+     * stores a data domain.
      *
      * @var string
      */
     protected static $domain;
 
     /**
-     * Store the uniq instance in whole process.
+     * stores the uniq instance in whole process.
      *
      * @var Tox\Application\Dao\Cache\Dao
      */
     protected static $instance;
 
     /**
-     * Store an instance of default dao.
+     * stores an instance of default dao.
      *
      * @var Tox\Application\Dao
      */
     protected $dao;
 
     /**
-     * Store an instance of  kv data driver.
+     * stores an instance of  kv data driver.
      *
      * @var Tox\Data\IKV
      */
     protected $cache;
 
     /**
-     * Store a cache alive time (ms).
+     * stores a cache alive time (ms).
      *
      * @var Tox\Data\IKV
      */
@@ -95,7 +95,7 @@ abstract class Dao extends Tox\Assembly implements Tox\Application\IDao
      * Set cache expire value for each dao.
      *
      * @param   string      $expire Time value (ms).
-     * @return  NULL
+     * @return  void
      */
     protected function setExpire($expire)
     {
@@ -116,10 +116,11 @@ abstract class Dao extends Tox\Assembly implements Tox\Application\IDao
 
     /**
      * Bind source to dao.
+     *
      * This class not surppose the operation, will be transmitted to default dao.
      *
      * @param  Tox\Data\ISource $domain     Instance of source.
-     * @return NULL
+     * @return void
      */
     public static function bindDomain(Data\ISource $domain)
     {
@@ -130,13 +131,13 @@ abstract class Dao extends Tox\Assembly implements Tox\Application\IDao
      * Create physical data with default dao and set cache.
      *
      * @param  array    $fields     Data of an entity.
-     * @return NULL
+     * @return void
      */
     public function create($fields)
     {
-        $this->dao->create($fields);
+        $s_id = $this->dao->create($fields);
 
-        $s_key = $this->generateKey($fields);
+        $s_key = $this->generateKey($s_id);
         $this->cache->set($s_key, $fields, $this->expire);
     }
 
@@ -191,6 +192,7 @@ abstract class Dao extends Tox\Assembly implements Tox\Application\IDao
 
     /**
      * Amount of the collection of data with assigned conditions, orders, offset and length.
+     *
      * This class not surppose the operation, will be transmitted to default dao.
      *
      * @param  array    $where      Conditions of a model set.
@@ -205,6 +207,7 @@ abstract class Dao extends Tox\Assembly implements Tox\Application\IDao
 
     /**
      * Get a part of the collection of data with assigned conditions, orders, offset and length.
+     *
      * This class not surppose the operation, will be transmitted to default dao.
      *
      * @param  array    $where      Conditions of a model set.
