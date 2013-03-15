@@ -11,8 +11,20 @@
          strict="true"
 >
   <testsuites>
-    <testsuite name="Tox">
+    <testsuite name="tox">
       <directory suffix="-test.php">share/test</directory>
+    </testsuite>
+    <testsuite name="tox.core">
+      <directory suffix="-test.php">share/test/tox/core</directory>
+    </testsuite>
+    <testsuite name="tox.application">
+      <directory suffix="-test.php">share/test/tox/application</directory>
+    </testsuite>
+    <testsuite name="tox.web">
+      <directory suffix="-test.php">share/test/tox/web</directory>
+    </testsuite>
+    <testsuite name="tox.data.kv">
+      <directory suffix="-test.php">share/test/tox/data/kv</directory>
     </testsuite>
   </testsuites>
   <logging>
