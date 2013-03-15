@@ -79,7 +79,7 @@ class StreamingView extends View implements Application\IStreamingView
      */
     public function render()
     {
-        $s_blob = implode(PHP_EOL, $this->buffer);
+        $s_blob = implode('', $this->buffer);
         $this->buffer = array();
         return $s_blob;
     }

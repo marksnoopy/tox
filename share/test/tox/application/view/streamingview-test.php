@@ -59,7 +59,7 @@ class StreamingViewTest extends PHPUnit_Framework_TestCase
         $a_blobs = range(1, 99);
         shuffle($a_blobs);
         $o_stream = new StreamingView($this->getMock('Tox\\Application\\IOutput'));
-        $s_blob = implode(PHP_EOL, $a_blobs);
+        $s_blob = implode('', $a_blobs);
         foreach ($a_blobs as $ii) {
             $o_stream->append($ii);
         }
