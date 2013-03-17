@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Defines the memcache data source.
  *
@@ -29,8 +30,8 @@ namespace Tox\Data\KV;
  * @package tox.data.kv
  * @author  Qiang Fu <fuqiang007enter@gmail.com>
  */
-class Memcache extends KV
-{
+class Memcache extends KV {
+
     /**
      * Choices of Memcache or Memcached .
      * 
@@ -53,14 +54,38 @@ class Memcache extends KV
     private $_servers;
 
     /**
+     * Memcache default expire time
+     */
+    public $expireTime;
+
+    /**
      * Constructor.
      * 
      */
-    public function __construct()
-    {
+    public function __construct() {
         if (null === $this->useMemcached) {
             $this->useMemcached = true;
         }
+    }
+
+    /**
+     * Sets the memcache default expire time
+     * 
+     * @param type $expire
+     */
+    public function setExpireTime($expire) {
+        if (null !== $expire) {
+            $this->expireTime = $expire;
+        }
+    }
+
+    /**
+     * Gets the memcache default expire time
+     * 
+     * @param type $expire
+     */
+    public function getExpireTime() {
+        return $this->expireTime;
     }
 
     /**
@@ -68,8 +93,7 @@ class Memcache extends KV
      * 
      * @return void 
      */
-    public function init()
-    {
+    public function init() {
         $servers = $this->getServers();
         $cache = $this->getMemCache();
         if (count($servers)) {
@@ -89,8 +113,7 @@ class Memcache extends KV
      * 
      * @return Memcache|Memcached 
      */
-    public function getMemCache()
-    {
+    public function getMemCache() {
         if ($this->_cache !== null)
             return $this->_cache;
         else {
@@ -103,8 +126,7 @@ class Memcache extends KV
      * 
      * @return array 
      */
-    public function getServers()
-    {
+    public function getServers() {
         return $this->_servers;
     }
 
@@ -114,8 +136,7 @@ class Memcache extends KV
      * @param array $config memcache server configurations value.
      * @return void 
      */
-    public function setServers($config)
-    {
+    public function setServers($config) {
         if ($config['useMemcached'] === true) {
             $memcacheConfig = $config['memcached'];
         } else {
@@ -132,8 +153,7 @@ class Memcache extends KV
      * @param  string $key a unique key identifying the cached value.
      * @return string 
      */
-    protected function getValue($key)
-    {
+    protected function getValue($key) {
         return $this->_cache->get($key);
     }
 
@@ -143,8 +163,7 @@ class Memcache extends KV
      * @param  array $keys a list of keys identifying the cached values.
      * @return array 
      */
-    protected function getValues($keys)
-    {
+    protected function getValues($keys) {
         return $this->useMemcached ? $this->_cache->getMulti($keys) : $this->_cache->get($keys);
     }
 
@@ -158,13 +177,14 @@ class Memcache extends KV
      * @return boolean         true if the value is successfully stored into 
      *                         cache, false otherwise.
      */
-    protected function setValue($key, $value, $expire)
-    {
-        if ($expire > 0)
+    protected function setValue($key, $value, $expire = 0) {
+        if ($expire > 0) {
             $expire+=time();
-        else
+        } else if (null !== $this->expireTime) {
+            $expire = $this->expireTime;
+        } else {
             $expire = 0;
-
+        }
         return $this->useMemcached ? $this->_cache->set($key, $value, $expire) : $this->_cache->set($key, $value, 0, $expire);
     }
 
@@ -178,8 +198,7 @@ class Memcache extends KV
      * @return boolean         true if the value is successfully stored into 
      *                         cache, false otherwise
      */
-    protected function addValue($key, $value, $expire)
-    {
+    protected function addValue($key, $value, $expire) {
         if ($expire > 0)
             $expire+=time();
         else
@@ -194,8 +213,7 @@ class Memcache extends KV
      * @param  string $key the key of the value to be deleted.
      * @return boolean     if no error happens during deletion.
      */
-    protected function deleteValue($key)
-    {
+    protected function deleteValue($key) {
         return $this->_cache->delete($key, 0);
     }
 
@@ -204,8 +222,7 @@ class Memcache extends KV
      * 
      * @return boolean whether the flush operation was successful.
      */
-    protected function clearValues()
-    {
+    protected function clearValues() {
         return $this->_cache->flush();
     }
 

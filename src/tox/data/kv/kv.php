@@ -93,10 +93,21 @@ abstract class KV extends Tox\Core\Assembly implements Tox\Data\IKV
      * @return boolean         true if the value is successfully stored into
      *                         cache, false otherwise.
      */
-    public function set($key, $val, $expire)
+    public function set($key, $val, $expire = 0)
     {
         $val = serialize(array($val));
         return $this->setValue($this->generateUniqueKey($key), $val, $expire);
+    }
+
+    /**
+     * Deletes a value with the specified key from cache.
+     * 
+     * @param  string  $id the key of the value to be deleted.
+     * @return boolean     if no error happens during deletion.
+     */
+    public function delete($key)
+    {
+        return $this->deleteValue($this->generateUniqueKey($key));
     }
 
     /**
@@ -110,7 +121,7 @@ abstract class KV extends Tox\Core\Assembly implements Tox\Data\IKV
      *                         will expire. 0 means never expire.
      * @return void
      */
-    abstract protected function setValue($key, $val, $expire);
+    abstract protected function setValue($key, $val, $expire = 0);
     
     /**
      * Retrieves a value from the specific type of cache with a specified key.
@@ -121,6 +132,14 @@ abstract class KV extends Tox\Core\Assembly implements Tox\Data\IKV
      * @return mixed
      */
     abstract protected function getValue($key);
+    
+    /**
+     * Deletes a value with the specified key from cache
+     * 
+     * @param  string $key the key of the value to be deleted
+     * @return boolean     if no error happens during deletion
+     */
+    abstract protected function deleteValue($key);
     
     /**
      * Deletes all values from cache.

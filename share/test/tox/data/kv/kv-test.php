@@ -42,45 +42,155 @@ use Tox;
  */
 class KvTest extends PHPUnit_Framework_TestCase
 {
-    public function testSetting()
+    /**
+     * @dataProvider dataProvider
+     */
+    public function testSetting($key, $value, $expire, $prefixString, $expectResult, $result)
     {
-        $key = 'key';
-        $value = 'sss';
-        $expire = 500;
         $o_mockKv = $this->getMockBuilder('Tox\\Data\\Kv\\kv')
                 //     ->disableOriginalConstructor()
                 ->setMethods(array('setValue'))
                 ->getMockForAbstractClass();
 
-        //$o_mockKv = $this->getMockForAbstractClass('Tox\\Data\\Kv\\kv')
         $o_mockKv->expects($this->once())
                 ->method('setValue')
-                ->with($this->equalTo(md5('memcached' . $key)), $this->equalTo(serialize(array($value))), $this->equalTo($expire))
-                ->will($this->returnValue(TRUE));
+                ->with($this->equalTo(md5($prefixString . $key)), $this->equalTo(serialize(array($value))), $this->equalTo($expire))
+                ->will($this->returnValue($expectResult));
 
-        $o_mockKv->set($key, $value, $expire);
+        $this->assertEquals($result, $o_mockKv->set($key, $value, $expire));
     }
 
-    public function testGetting()
+    /**
+     * @dataProvider dataProvider
+     * @depends testSetting
+     */
+    public function testGetting($key, $value, $expire, $prefixString, $expectResult, $result)
     {
-        $key = 'key';
 
         $o_mockKv = $this->getMockBuilder('Tox\\Data\\Kv\\kv')
-                //     ->disableOriginalConstructor()
                 ->setMethods(array('getValue'))
                 ->getMockForAbstractClass();
 
-        //$o_mockKv = $this->getMockForAbstractClass('Tox\\Data\\Kv\\kv')
         $o_mockKv->expects($this->once())
                 ->method('getValue')
-                ->with($this->equalTo(md5('memcached' . $key)))
-                ->will($this->returnValue(serialize(array('555'))));
+                ->with($this->equalTo(md5($prefixString . $key)))
+                ->will($this->returnValue(serialize(array($value))));
 
-        $o_mockKv->get($key);
+        $this->assertEquals($value, $o_mockKv->get($key));
     }
-    
+
     // todo
-    
+
+    public function dataProvider()
+    {
+        return array(
+            array('key1', 'sss', 500, 'memcached', TRUE, TRUE),
+            array('key2', 'valuetest', 500, 'memcached', TRUE, TRUE),
+            array('key3', 'valuetest22', 500, 'memcached', FALSE, FALSE),
+        );
+    }
+
+    public function testConstruct()
+    {
+        $o_mockKv = $this->getMockBuilder('Tox\\Data\\Kv\\kv')
+                ->getMockForAbstractClass();
+
+        //   $o_mockKv->__construct();
+
+        $this->assertEquals('memcached', $o_mockKv->keyPrefix);
+    }
+
+    /**
+     * @dataProvider dataProviderOffset
+     */
+    public function testoffsetSet($key, $value, $expire, $prefixString, $expectResult)
+    {
+        $o_mockKv = new Subkv();
+
+        $o_mockKv[$key] = $value;
+        $this->assertEquals($value, $o_mockKv[$key]);
+    }
+
+    /**
+     * @dataProvider dataProviderOffset
+     */
+    public function testoffsetSet2($key, $value, $expire, $prefixString, $expectResult)
+    {
+
+        $o_mockKv = $this->getMockBuilder('Tox\\Data\\Kv\\kv')
+                ->getMockForAbstractClass();
+        $o_mockKv->expects($this->any())
+                ->method('setValue')
+                ->with($this->equalTo(md5($prefixString . $key)), $this->equalTo(serialize(array($value))), $this->equalTo($expire))
+        ;
+
+        $o_mockKv[$key] = $value;
+    }
+
+    /**
+     * @dataProvider dataProviderOffset
+     */
+    public function testoffsetGet($key, $value, $expire, $prefixString, $expectResult)
+    {
+
+        $o_mockKv = $this->getMockBuilder('Tox\\Data\\Kv\\kv')
+                ->getMockForAbstractClass();
+        $o_mockKv->expects($this->once())
+                ->method('getValue')
+                ->with($this->equalTo(md5($prefixString . $key)))
+                ->will($this->returnValue(serialize(array($value))));
+        $this->assertEquals($value, $o_mockKv[$key]);
+    }
+
+    /**
+     * @dataProvider dataProviderOffset
+     */
+    public function testoffsetUnset($key, $value, $expire, $prefixString, $expectResult)
+    {
+
+        $o_mockKv = $this->getMockBuilder('Tox\\Data\\Kv\\kv')
+                ->getMockForAbstractClass();
+        $o_mockKv->expects($this->once())
+                ->method('deleteValue')
+                ->with($this->equalTo(md5($prefixString . $key)))
+                ->will($this->returnValue(TRUE));
+        unset($o_mockKv[$key]);
+    }
+
+    public function dataProviderOffset()
+    {
+        return array(
+            array('key1', 'sss', 0, 'memcached', TRUE),
+            array('key2', 'valuetest', 0, 'memcached', TRUE),
+            array('key3', 'valuetest22', 0, 'memcached', TRUE),
+        );
+    }
+
+}
+
+class Subkv extends KV\KV
+{
+    private $container = array();
+
+    protected function getValue($key)
+    {
+        return isset($this->container[$key]) ? $this->container[$key] : null;
+    }
+
+    protected function setValue($key, $val, $expire = 0)
+    {
+        if (is_null($key)) {
+            $this->container[] = $val;
+        } else {
+            $this->container[$key] = $val;
+        }
+    }
+
+    protected function deleteValue($key)
+    {
+        unset($this->container[$key]);
+    }
+
 }
 
 // vi:ft=php fenc=utf-8 ff=unix ts=4 sts=4 et sw=4 fen fdm=indent fdl=1 tw=120

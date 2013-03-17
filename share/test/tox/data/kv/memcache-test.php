@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Defines the test case for Tox\Data\Kv\Memcache.
  *
@@ -52,9 +53,11 @@ class MemcacheTest extends PHPUnit_Framework_TestCase {
         $o_memcache->setServers($config);
 
         $a_config = $o_memcache->getServers();
+
         $this->assertEquals('127.0.0.1', $a_config[0]->host);
         $this->assertEquals('11211', $a_config[0]->port);
-        $this->assertEquals('soft', $a_config[0]->type);
+        $this->assertEquals('127.0.0.1', $a_config[1]->host);
+        $this->assertEquals('11212', $a_config[1]->port);
     }
 
     /**
@@ -62,14 +65,29 @@ class MemcacheTest extends PHPUnit_Framework_TestCase {
      * @depends testServerConfigset
      */
     public function testGet($config) {
-        $mem = new Tox\Data\Kv\Memcache();
-
-        $mem->setServers($config);
-        $mem->init();
+        $o_mem = new SubMem();
 
         $s_key = 't';
-        $mem->set($s_key, 'sss', 500);
-        $this->assertEquals('sss', $mem->get($s_key));
+        $o_mem->set($s_key, 'sss', 500);
+        $this->assertEquals('sss', $o_mem->get($s_key));
+    }
+
+    public function testConstruct() {
+        $o_mem = new Tox\Data\Kv\Memcache();
+        $this->assertTrue($o_mem->useMemcached);
+    }
+
+    public function testExpireTime() {
+        $o_mem = new Tox\Data\Kv\Memcache();
+        $o_mem->expireTime = 555;
+        $this->assertEquals(555, $o_mem->expireTime);
+    }
+
+    public function configProvideExpireTime() {
+        return array(
+            array('key', 'ssss', 500, 500),
+            array('key', 'ssss', 0, 0),
+        );
     }
 
     public function configProvide() {
@@ -88,17 +106,37 @@ class MemcacheTest extends PHPUnit_Framework_TestCase {
                         array(
                             'host' => '127.0.0.1',
                             'port' => '11211',
-                            'type' => 'soft',
                         ),
                         array(
                             'host' => '127.0.0.1',
-                            'port' => '11211',
-                            'type' => 'game',
+                            'port' => '11212',
                         ),
                     )
                 )
             )
         );
+    }
+
+}
+
+class SubMem extends KV\Memcache {
+
+    private $container = array();
+
+    protected function getValue($key) {
+        return isset($this->container[$key]) ? $this->container[$key] : null;
+    }
+
+    protected function setValue($key, $val, $expire = 0) {
+        if (is_null($key)) {
+            $this->container[] = $val;
+        } else {
+            $this->container[$key] = $val;
+        }
+    }
+
+    protected function deleteValue($key) {
+        unset($this->container[$key]);
     }
 
 }

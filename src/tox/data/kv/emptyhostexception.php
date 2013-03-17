@@ -1,6 +1,6 @@
 <?php
 /**
- * Defines the Exception for Tox\Data\Kv\Memcache.
+ * Defines an exception for config the key-value paired data source manually.
  *
  * This file is part of Tox.
  *
@@ -26,7 +26,7 @@ namespace Tox\Data\KV;
 use Tox;
 
 /**
- * The exception when the host is Null.
+ * Be raised on setting the config when the host is Null.
  *
  * @package tox.data.kv
  * @author  Qiang Fu <fuqiang007enter@gmail.com>
