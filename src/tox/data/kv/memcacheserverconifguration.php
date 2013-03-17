@@ -44,57 +44,59 @@ class MemCacheServerConfiguration {
      * 
      * @var integer 
      */
-    public $port = 11211;
+    public $port;
 
     /**
      * Whether to use a persistent connection.
      * 
      * @var boolean 
      */
-    public $persistent = true;
+    public $persistent;
 
     /**
      * Probability of using this server among all servers.
      * 
      * @var integer 
      */
-    public $weight = 1;
+    public $weight;
 
     /**
      * value in seconds which will be used for connecting to the server.
      * 
      * @var integer 
      */
-    public $timeout = 15;
+    public $timeout;
 
     /**
      * How often a failed server will be retried (in seconds)
      * 
      * @var integer 
      */
-    public $retryInterval = 15;
+    public $retryInterval;
 
     /**
      * If the server should be flagged as online upon a failure.
      * 
      * @var boolean 
      */
-    public $status = true;
-
-    /**
-     * Value of value
-     * 
-     * @var type 
-     */
-    public $type = true;
+    public $status;
 
     /**
      * Constructor.
      * 
-     * @param array $config list of memcache server configurations.
-     * @throws KV\MemcacheConfigNotArrayException if the configuration is not an array
+     * @param  array $config list of memcache server configurations.
+     * @throws               KV\MemcacheConfigNotArrayException if the configuration is not an array
      */
     public function __construct($config) {
+
+        $this->persistent = true;
+        $this->port = 11211;
+        $this->weight = 1;
+        $this->timeout = 15;
+        $this->retryInterval = 15;
+        $this->status = true;
+
+
         if (is_array($config)) {
             foreach ($config as $key => $value)
                 $this->$key = $value;
