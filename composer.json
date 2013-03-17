@@ -1,0 +1,42 @@
+{
+  "name": "snakevil/tox",
+  "description": "An experimental PHP framework based on v5.3.0 or later.",
+  "keywords": [
+    "tox",
+    "php",
+    "framework"
+  ],
+  "homepage": "https://github.com/snakevil/tox",
+  "license": "GPL-3.0+",
+  "authors": [
+    {
+      "name": "Snakevil Zen",
+      "email": "zsnakevil@gmail.com",
+      "homepage": "https://szen.in",
+      "role": "leader"
+    },
+    {
+      "name": "Trainxy Ho",
+      "email": "trainxy@gmail.com",
+      "role": "developer"
+    },
+    {
+      "name": "Qiang Fu",
+      "email": "fuqiang007enter@gmail.com",
+      "role": "developer"
+    }
+  ],
+  "support": {
+    "issues": "https://github.com/snakevil/tox/issues",
+    "wiki": "https://github.com/snakevil/tox/wiki"
+  },
+  "require": {
+    "php": ">=5.3.0"
+  },
+  "require-dev": {
+    "mikey179/vfsStream": "~1.1.0"
+  },
+  "config": {
+    "vendor-dir": "include"
+  }
+}

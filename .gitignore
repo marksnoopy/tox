@@ -1,5 +1,7 @@
 .*
 !.ctags
 !.gitignore
+include/
 *.sublime-*
 *.xml
+composer.lock
