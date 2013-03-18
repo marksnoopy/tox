@@ -1,6 +1,6 @@
 <?php
 /**
- * Represents as a runtime packages manager.
+ * Defines the runtime packages manager.
  *
  * This file is part of Tox.
  *
@@ -17,366 +17,167 @@
  * You should have received a copy of the GNU General Public License
  * along with Tox.  If not, see <http://www.gnu.org/licenses/>.
  *
- * @package    Tox
- * @subpackage Tox\Core
- * @author     Snakevil Zen <zsnakevil@gmail.com>
- * @copyright  © 2012 szen.in
- * @license    http://www.gnu.org/licenses/gpl.html
+ * @copyright © 2012-2013 SZen.in
+ * @license   GNU General Public License, version 3
  */
 
 namespace Tox\Core;
 
-use Exception;
-
-use Tox;
-
-class PackageManager extends Tox\Assembly
+/**
+ * Represents as the runtime packages manager.
+ *
+ * @package tox.core
+ * @author  Snakevil Zen <zsnakevil@gmail.com>
+ */
+class PackageManager extends Assembly
 {
-    protected $conjecturalPackages;
-
+    /**
+     * Stores the registered and probed packages.
+     *
+     * @internal
+     *
+     * @var array[]
+     */
     protected $packages;
 
-    protected $phars;
-
-    protected $roots;
-
-    protected function addPackage($package, $path, $from = '')
-    {
-        if (!$package)
-        {
-            return $this->addRoot($path, $from);
-        }
-        if ($this->hasPackage($package))
-        {
-            if ($from)
-            {
-                return $this;
-            }
-            if (!$this->isConjectural($package))
-            {
-                trigger_error("Tox: package '$package' already registered.", E_USER_ERROR);
-            }
-            $this->dropPackage($package);
-        }
-        if (is_file($path))
-        {
-            try
-            {
-                Phar::loadPhar($path, $package);
-                $this->phars[$package] = $path;
-                $this->packages[$package] = "phar://$package";
-            }
-            catch (Exception $ex)
-            {
-                trigger_error("Tox: invalid Phar '$path'.", E_USER_ERROR);
-            }
-        }
-        else
-        {
-            $this->packages[$package] = $path;
-        }
-        if ($from)
-        {
-            $this->conjecturalPackages[$package] = $from;
-        }
-        else
-        {
-            $this->bootstrap($package)->scanSubPackages($package);
-        }
-        return $this->findParentPackage($package);
-    }
-
-    protected function addRoot($path, $from)
-    {
-        if (!in_array($path, $this->roots))
-        {
-            $this->roots[$from] = $path;
-        }
-        return $this;
-    }
-
-    protected function bootstrap($package)
-    {
-        if (array_key_exists($package, $this->phars))
-        {
-            require_once($this->packages[$package] . '/');
-        }
-        else
-        {
-            $p_bs = $this->packages[$package] . '/@bootstrap.php';
-            if (is_file($p_bs))
-            {
-                if (!is_readable($p_bs))
-                {
-                    trigger_error("Tox: package '$package' bootstrap access denied.", E_USER_ERROR);
-                }
-                require_once($this->packages[$package] . '/@bootstrap.php');
-            }
-        }
-        return $this;
-    }
-
-    protected function compactPath($path)
-    {
-        if (!strlen($path))
-        {
-            return '';
-        }
-        if (preg_match('@^[a-z]+://@i', $path))
-        {
-            trigger_error("Tox: illegal remote URL '$path'.", E_USER_ERROR);
-        }
-        $path = str_replace(array('/', '\\'), DIRECTORY_SEPARATOR, $path);
-        $a_old = explode(DIRECTORY_SEPARATOR, $path);
-        switch ($a_old[0])
-        {
-            case '.':
-                array_splice($a_old, 0, 1, explode(DIRECTORY_SEPARATOR, getcwd()));
-            case '':
-                break;
-            case 'a:':
-            case 'b:':
-            case 'c:':
-            case 'd:':
-            case 'e:':
-            case 'f:':
-            case 'g:':
-            case 'h:':
-            case 'i:':
-            case 'j:':
-            case 'k:':
-            case 'l:':
-            case 'm:':
-            case 'n:':
-            case 'o:':
-            case 'p:':
-            case 'q:':
-            case 'r:':
-            case 's:':
-            case 't:':
-            case 'u:':
-            case 'v:':
-            case 'w:':
-            case 'x:':
-            case 'y:':
-            case 'z:':
-                if ('\\' == DIRECTORY_SEPARATOR)
-                {
-                    break;
-                }
-            default:
-                array_splice($a_old, 0, 0, explode(DIRECTORY_SEPARATOR, getcwd()));
-        }
-        $i_old = count($a_old);
-        $a_new = array();
-        $i_new = 0;
-        for ($ii = 0; $ii < $i_old; $ii++)
-        {
-            $s_node = array_shift($a_old);
-            switch ($s_node)
-            {
-                case '':
-                    if (!$ii)
-                    {
-                        $a_new[] = '';
-                        $i_new++;
-                    }
-                case '.':
-                    break;
-                case '..':
-                    if (1 < $i_new)
-                    {
-                        array_pop($a_new);
-                        $i_new--;
-                    }
-                    break;
-                default:
-                    $a_new[] = $s_node;
-                    $i_new++;
-            }
-        }
-        return implode('/', $a_new);
-    }
-
-    protected function confirmPackage($package)
-    {
-        if (!$this->isConjectural($package))
-        {
-            return $this;
-        }
-        unset($this->conjecturalPackages[$package]);
-        return $this->bootstrap($package);
-    }
-
+    /**
+     * CONSTRUCT FUNCTION
+     */
     public function __construct()
     {
-        $this->conjecturalPackages =
-        $this->packages =
-        $this->phars =
-        $this->roots = array();
+        $this->packages = array();
     }
 
-    protected function dropPackage($package)
+    /**
+     * Locates where the assembly be put.
+     *
+     * NOTICE: The returning definition file has not been validated for
+     * accessability.
+     *
+     * @param  string $class Assembly name.
+     * @return string
+     */
+    public function locate($class)
     {
-        if (!$this->hasPackage($package))
-        {
-            return $this;
+        $s_class = ltrim(str_replace('.', '\\', strtolower($class)), '\\');
+        $a_class = explode('\\', $s_class);
+        $p_file = array_pop($a_class);
+        if (strrpos($p_file, 'exception')) {
+            $p_file = '@exception/' . substr($p_file, 0, -9);
         }
-        foreach ($this->conjecturalPackages as $s_pack => $s_from)
-        {
-            if ($package == $s_from)
-            {
-                $this->dropPackage($s_pack);
+        $p_file .= '.php';
+        $a_extra = array();
+        $i_offs = ('tox' == $a_class[0]) ? 1 : 2;
+        $s_class = implode('\\', array_splice($a_class, 0, $i_offs));
+        for ($ii = 0, $jj = count($a_class); $ii < $jj; $ii++) {
+            $s_new = "{$s_class}\\{$a_class[$ii]}";
+            if (!isset($this->packages[$s_new])) {
+                if (!isset($this->packages[$s_class])) {
+                    return false;
+                }
+                $this->packages[$s_new] = array(
+                    $this->packages[$s_class][0] . DIRECTORY_SEPARATOR . $a_class[$ii],
+                    false
+                );
             }
+            $s_class = $s_new;
         }
-        unset($this->conjecturalPackages[$package],
-            $this->packages[$package],
-            $this->phars[$package],
-            $this->roots[$package]
-        );
+        return $this->bootstrap($s_class)->packages[$s_class][0] . DIRECTORY_SEPARATOR . $p_file;
+    }
+
+    /**
+     * Registers a namespace.
+     *
+     * @param  string $namespace New namespace.
+     * @param  string $path      Where the namespace be put.
+     * @return self
+     *
+     * @throws PackageAccessDeniedException          If the path access denied.
+     * @throws PackageDuplicateRegistrationException If registering an existant
+     *                                               namespace.
+     * @throws Illegal3rdPartyPackageException       If the 3rd-party namespace
+     *                                               is illegal.
+     */
+    public function register($namespace, $path)
+    {
+        $s_ns = ltrim(str_replace('.', '\\', strtolower($namespace)), '\\');
+        $path = (string) $path;
+        if (!is_dir($path) || !is_readable($path)) {
+            throw new PackageAccessDeniedException(array('path' => $path));
+        }
+        if (isset($this->packages[$s_ns])) {
+            throw new PackageDuplicateRegistrationException(array('package' => $namespace));
+        }
+        $a_ns = explode('\\', $s_ns);
+        if ('tox' != $a_ns[0] && 3 > count($a_ns)) {
+            throw new Illegal3rdPartyPackageException(array('package' => $namespace));
+        }
+        $this->packages[$s_ns] = array($this->canonicalize($path), false);
+        if ('tox\\core' == $s_ns && 'core' == basename($this->packages[$s_ns][0])) {
+            $this->packages['tox'] = array(dirname($this->packages[$s_ns][0]), true);
+        }
         return $this;
     }
 
-    protected function findParentPackage($package)
+    /**
+     * Canonicalize the path.
+     *
+     * @internal
+     *
+     * @param  string $path Input path to be formatted.
+     * @return string
+     */
+    protected function canonicalize($path)
     {
-        $a_nnodes = array_reverse(explode('.', $package));
-        $p_dir = $this->getPath($package);
-        $a_bnodes = array_reverse(explode('.', basename($p_dir)));
-        if (is_file($p_dir) && 'phar' == $a_bnodes[0])
-        {
-            array_shift($a_bnodes);
+        $s_prefix = '';
+        $i_pos = strpos($path, '://');
+        if ($i_pos) {
+            $s_prefix = substr($path, 0, 3 + $i_pos);
+            $path = substr($path, 3 + $i_pos);
         }
-        $i_bnodes = count($a_bnodes);
-        if (array_slice($a_nnodes, 0, $i_bnodes) != $a_bnodes)
-        {
-            return $this;
+        if ('/' == DIRECTORY_SEPARATOR) {
+            $a_nodes = explode('/', str_replace('\\', '/', $path));
+        } else {
+            $a_nodes = explode('\\', str_replace('/', '\\', $path));
+            $s_prefix .= array_shift($a_nodes);
         }
-        $a_nnodes = array_reverse(array_slice($a_nnodes, $i_bnodes));
-        return $this->addPackage(implode('.', $a_nnodes), dirname($p_dir), $package);
-    }
-
-    protected function getPath($package)
-    {
-        return array_key_exists($package, $this->phars) ? $this->phars[$package] : $this->packages[$package];
-    }
-
-    protected function hasPackage($package)
-    {
-        return array_key_exists($package, $this->packages);
-    }
-
-    protected function isConjectural($package)
-    {
-        if (!$this->hasPackage($package))
-        {
-            return FALSE;
+        $a_new = array();
+        for ($ii = 0, $jj = count($a_nodes); $ii < $jj; $ii++) {
+            switch ($a_nodes[$ii]) {
+                case '..':
+                    array_pop($a_new);
+                case '.':
+                    break;
+                default:
+                    $a_new[] = $a_nodes[$ii];
+            }
         }
-        return array_key_exists($package, $this->conjecturalPackages);
+        return $s_prefix . implode(DIRECTORY_SEPARATOR, $a_new);
     }
 
-    public function locateClass($class)
+    /**
+     * Bootstraps the namespace and all its higher-ups.
+     *
+     * @internal
+     *
+     * @param  string $namespace Target namespace.
+     * @return self
+     */
+    protected function bootstrap($namespace)
     {
-        $a_nodes = explode('\\', strtolower($class));
-        $i_nodes = count($a_nodes);
-        for ($ii = $i_nodes - 1; 0 < $ii; $ii--)
-        {
-            $s_pack = implode('.', array_slice($a_nodes, 0, $ii));
-            if ($this->hasPackage($s_pack))
-            {
-                $p_class = $this->packages[$s_pack] . '/'. implode('/', array_slice($a_nodes, $ii));
-                $s_pack = implode('.', array_slice($a_nodes, 0, $i_nodes - 1));
-                $p_test = $p_class . '.php';
-                if (!is_file($p_test))
-                {
-                    $s_pack .= '.' . $a_nodes[$i_nodes - 1];
-                    $p_test = $p_class . '/' . $a_nodes[$i_nodes - 1] . '.php';
+        $a_ns = explode('\\', $namespace);
+        for ($ii = 0, $jj = count($a_ns); $ii < $jj; $ii++) {
+            $s_ns = $ii ? "{$s_ns}\\{$a_ns[$ii]}" : $a_ns[0];
+            if (isset($this->packages[$s_ns]) && !$this->packages[$s_ns][1]) {
+                $p_bs = "{$this->packages[$s_ns][0]}/@bootstrap.php";
+                if (is_file($p_bs) && is_readable($p_bs)) {
+                    require_once $p_bs;
                 }
-                if (is_file($p_test))
-                {
-                    if ($this->isConjectural($s_pack))
-                    {
-                        $this->confirmPackage($s_pack);
-                    }
-                    if (!$this->hasPackage($s_pack))
-                    {
-                        $this->addPackage($s_pack, dirname($p_test));
-                    }
-                }
-                return $p_test;
+                $this->packages[$s_ns][1] = true;
             }
-        }
-        trigger_error('TODO: locate from roots.', E_USER_ERROR);
-    }
-
-    public function registerPackage($package, $path)
-    {
-        settype($package, 'string');
-        settype($path, 'string');
-        $path = $this->compactPath($path);
-        if (is_file($path))
-        {
-            if (in_array($path, $this->phars))
-            {
-                trigger_error("Tox: Phar '$path' repetitiously used.", E_USER_WARNING);
-            }
-            else if (!is_readable($path))
-            {
-                trigger_error("Tox: Phar '$path' access denied.", E_USER_ERROR);
-            }
-        }
-        else if (is_dir($path))
-        {
-            if (in_array($path, $this->packages))
-            {
-                trigger_error("Tox: directory '$path' repetitiously used.", E_USER_WARNING);
-            }
-            else if (!is_readable($path))
-            {
-                trigger_error("Tox: directory '$path' access denied.", E_USER_ERROR);
-            }
-        }
-        else
-        {
-            trigger_error("Tox: unknown path '$path'.", E_USER_ERROR);
-        }
-        return $this->addPackage($package, $path);
-    }
-
-    protected function scanSubPackages($package)
-    {
-        if (array_key_exists($package, $this->phars))
-        {
-            return $this;
-        }
-        $a_files = scandir($this->packages[$package]);
-        $s_re = '@^\w+(\.\w+)*$@';
-        for ($ii = 0, $jj = count($a_files); $ii < $jj; $ii++)
-        {
-            if (!preg_match($s_re, $a_files[$ii]))
-            {
-                continue;
-            }
-            $p_file = $this->packages[$package] . DIRECTORY_SEPARATOR . $a_files[$ii];
-            if (!is_readable($p_file))
-            {
-                continue;
-            }
-            if (is_dir($p_file))
-            {
-                $s_suffix = $a_files[$ii];
-            }
-            else if (is_file($p_file) && '.phar' == substr($a_files[$ii], -5))
-            {
-                $s_suffix = substr($a_files[$ii], 0, -5);
-            }
-            else
-            {
-                continue;
-            }
-            $this->addPackage($package . '.' . $s_suffix, $p_file, $package);
         }
         return $this;
     }
 }
 
-// vi:se ft=php fenc=utf-8 ff=unix ts=4 sts=4 et sw=4 fen fdm=indent fdl=1 tw=120:
+// vi:ft=php fenc=utf-8 ff=unix ts=4 sts=4 et sw=4 fen fdm=indent fdl=1 tw=120

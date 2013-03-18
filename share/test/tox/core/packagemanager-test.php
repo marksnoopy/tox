@@ -125,7 +125,7 @@ class PackageManagerTest extends PHPUnit_Framework_TestCase
     {
         $o_pman = new PackageManager;
         $o_pman->register('TOX.CORE', vfsStream::url('root/include/core'));
-        $this->assertFalse($o_pman->locate('Tox\\Core\\Foo'));
+        $this->assertFalse($o_pman->locate('In\\Szen\\Demo\\Foo'));
     }
 
     /**
@@ -209,7 +209,9 @@ class PackageManagerTest extends PHPUnit_Framework_TestCase
         $o_pman = new PackageManager;
         $o_pman->register('Tox.Type.Foo', vfsStream::url('root/include/foo'))
             ->register('Tox\\Core', vfsStream::url('root/include/core'));
-        $this->assertFalse($this->locate('Tox\\Type\\Foo\\Bar\\Blah'));
+        $this->assertEquals(vfsStream::url('root/include/foo/bar/blah.php'),
+            $o_pman->locate('Tox\\Type\\Foo\\Bar\\Blah')
+        );
     }
 
     /**
@@ -217,10 +219,11 @@ class PackageManagerTest extends PHPUnit_Framework_TestCase
      */
     public function testBootstrappingInLocatingNotRegsitration()
     {
+        $_GET = array();
         $o_pman = new PackageManager;
         $o_pman->register('Tox\\Core', vfsStream::url('root/include/core'));
         $this->assertEmpty($_GET);
-        $this->locate('Tox\\Core\\Blah');
+        $o_pman->locate('Tox\\Core\\Blah');
         $this->assertEquals(array('Tox\\Core'), $_GET);
     }
 
@@ -230,12 +233,14 @@ class PackageManagerTest extends PHPUnit_Framework_TestCase
      */
     public function testBootstrappingFromVeryRoot()
     {
+        $_POST['x'] = 1;
         $o_pman = new PackageManager;
         $o_pman->register('Tox\\Core', vfsStream::url('root/include/core'))
             ->register('tox.type.foo.bar', vfsStream::url('root/include/type/foo/bar'))
             ->register('tox.type.foo', vfsStream::url('root/include/foo'))
             ->locate('Tox\\Type\\Foo\\Bar\\Blah');
         $this->assertEquals(array('Tox\\Type', 'Tox\\Foo', 'Tox\\Type\\Foo\\Bar'), $_GET);
+        unset($_POST['x']);
     }
 
     /**
