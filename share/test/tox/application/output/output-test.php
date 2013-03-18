@@ -30,9 +30,9 @@ require_once __DIR__ . '/../../../../../src/tox/application/ioutput.php';
 require_once __DIR__ . '/../../../../../src/tox/application/output/output.php';
 
 require_once __DIR__ . '/../../../../../src/tox/core/exception.php';
-require_once __DIR__ . '/../../../../../src/tox/application/output/closedoutputexception.php';
-require_once __DIR__ . '/../../../../../src/tox/application/output/bufferreadonlyexception.php';
-require_once __DIR__ . '/../../../../../src/tox/application/output/streamingviewexpectedexception.php';
+require_once __DIR__ . '/../../../../../src/tox/application/output/@exception/closedoutput.php';
+require_once __DIR__ . '/../../../../../src/tox/application/output/@exception/bufferreadonly.php';
+require_once __DIR__ . '/../../../../../src/tox/application/output/@exception/streamingviewexpected.php';
 
 require_once __DIR__ . '/../../../../../src/tox/application/iview.php';
 require_once __DIR__ . '/../../../../../src/tox/application/istreamingview.php';

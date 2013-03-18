@@ -31,7 +31,7 @@ require_once __DIR__ . '/../../../../../src/tox/web/ihttpheadersprocessor.php';
 require_once __DIR__ . '/../../../../../src/tox/web/response/httpheadersprocessor.php';
 
 require_once __DIR__ . '/../../../../../src/tox/core/exception.php';
-require_once __DIR__ . '/../../../../../src/tox/web/response/responserequiredexception.php';
+require_once __DIR__ . '/../../../../../src/tox/web/response/@exception/responserequired.php';
 
 require_once __DIR__ . '/../../../../../src/tox/application/ioutput.php';
 require_once __DIR__ . '/../../../../../src/tox/application/output/output.php';

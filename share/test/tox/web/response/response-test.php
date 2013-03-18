@@ -32,9 +32,9 @@ require_once __DIR__ . '/../../../../../src/tox/web/iresponse.php';
 require_once __DIR__ . '/../../../../../src/tox/web/response/response.php';
 
 require_once __DIR__ . '/../../../../../src/tox/core/exception.php';
-require_once __DIR__ . '/../../../../../src/tox/application/output/closedoutputexception.php';
-require_once __DIR__ . '/../../../../../src/tox/web/response/headersreadonlyexception.php';
-require_once __DIR__ . '/../../../../../src/tox/web/response/illegalhttpstatuscodeexception.php';
+require_once __DIR__ . '/../../../../../src/tox/application/output/@exception/closedoutput.php';
+require_once __DIR__ . '/../../../../../src/tox/web/response/@exception/headersreadonly.php';
+require_once __DIR__ . '/../../../../../src/tox/web/response/@exception/illegalhttpstatuscode.php';
 
 require_once __DIR__ . '/../../../../../src/tox/application/ioutputtask.php';
 require_once __DIR__ . '/../../../../../src/tox/web/ihttpheadersprocessor.php';
