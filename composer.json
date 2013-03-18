@@ -1,12 +1,12 @@
 {
-  "name": "snakevil/tox",
+  "name": "php-tox/tox",
   "description": "An experimental PHP framework based on v5.3.0 or later.",
   "keywords": [
     "tox",
     "php",
     "framework"
   ],
-  "homepage": "https://github.com/snakevil/tox",
+  "homepage": "https://github.com/php-tox/tox",
   "license": "GPL-3.0+",
   "authors": [
     {
@@ -27,8 +27,8 @@
     }
   ],
   "support": {
-    "issues": "https://github.com/snakevil/tox/issues",
-    "wiki": "https://github.com/snakevil/tox/wiki"
+    "issues": "https://github.com/php-tox/tox/issues",
+    "wiki": "https://github.com/php-tox/tox/wiki"
   },
   "require": {
     "php": ">=5.3.0"
