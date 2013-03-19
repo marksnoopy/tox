@@ -69,9 +69,20 @@ class ClassManagerTest extends PHPUnit_Framework_TestCase
      */
     public function testAliasWouldNotBeAffectedImmediately()
     {
+        $s_class1 = 'c' . md5(microtime());
+        $s_class2 = 'c' . md5(microtime());
+        $this->assertSame($this->cman->alias($s_class1, $s_class2), $this->cman);
+        $this->assertFalse(class_exists($s_class2, false));
+    }
+
+    /**
+     * @depends testAliasWouldNotBeAffectedImmediately
+     */
+    public function testAliasToExistantAssemblyAffectedImmediately()
+    {
         $s_class = 'c' . md5(microtime());
-        $this->assertSame($this->cman->alias(__CLASS__, $s_class), $this->cman);
-        $this->assertFalse(class_exists($s_class));
+        $this->cman->alias(__CLASS__, $s_class);
+        $this->assertTrue(class_exists($s_class));
     }
 
     /**

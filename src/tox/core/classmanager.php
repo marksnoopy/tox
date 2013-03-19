@@ -23,15 +23,13 @@
 
 namespace Tox\Core;
 
-use Tox;
-
 /**
  * Represents as the runtime classes manager.
  *
  * @package tox.core
  * @author  Snakevil Zen <zsnakevil@gmail.com>
  */
-class ClassManager extends Tox\Assembly
+class ClassManager extends Assembly
 {
     /**
      * Stores the aliases.
@@ -69,21 +67,22 @@ class ClassManager extends Tox\Assembly
     public function transform($alias)
     {
         $alias = (string) $alias;
-        if (!array_key_exists($alias, $this->loaded) && array_key_exists($alias, $this->aliases)) {
-            return $this->aliases[$alias];
-        }
-        return $alias;
+        return array_key_exists($alias, $this->aliases) ? $this->aliases[$alias] : $alias;
     }
 
     /**
      * Aliases a class.
      *
-     * @param  string       $class An original class.
-     * @param  string       $alias The Alias.
-     * @return ClassManager
+     * @param  string $class An original class.
+     * @param  string $alias The Alias.
+     * @return self
+     *
+     * @throws ExistantClassToAliasException If the alias is an existant class.
      */
     public function alias($class, $alias)
     {
+        $class = (string) $class;
+        $alias = (string) $alias;
         if (class_exists($alias, false)) {
             throw new ExistantClassToAliasException(array('class' => $alias));
         }
@@ -91,15 +90,21 @@ class ClassManager extends Tox\Assembly
             $class = $this->aliases[$class];
         }
         $this->aliases[$alias] = $class;
+        if (class_exists($class, false)) {
+            if (!array_key_exists($class, $this->loaded)) {
+                $this->loaded[$class] = '';
+            }
+            return $this->announce($alias);
+        }
         return $this;
     }
 
     /**
      * Registers the definition location of a loaded real class.
      *
-     * @param  string       $class A loaded real class.
-     * @param  string       $path  The path of definition file
-     * @return ClassManager
+     * @param  string $class A loaded real class.
+     * @param  string $path  The path of definition file
+     * @return self
      */
     public function register($class, $path)
     {
@@ -111,10 +116,22 @@ class ClassManager extends Tox\Assembly
         $this->loaded[$class] = $path;
         foreach ($this->aliases as $s_alias => $s_class) {
             if ($class == $s_class) {
-                $this->loaded[$s_alias] = '';
-                class_alias($class, $s_alias);
+                $this->announce($s_alias);
             }
         }
+        return $this;
+    }
+
+    /**
+     * Announces an alias to the whole runtime enviroment.
+     *
+     * @param  string $alias A confirmed alias.
+     * @return self
+     */
+    protected function announce($alias)
+    {
+        class_alias($this->aliases[$alias], $alias);
+        $this->loaded[$alias] = '';
         return $this;
     }
 }
