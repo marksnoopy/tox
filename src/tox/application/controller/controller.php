@@ -1,6 +1,6 @@
 <?php
 /**
- * Represents as an active controller for an application.
+ * Defines the abstract controller of applications.
  *
  * This file is part of Tox.
  *
@@ -17,10 +17,8 @@
  * You should have received a copy of the GNU General Public License
  * along with Tox.  If not, see <http://www.gnu.org/licenses/>.
  *
- * @package   Tox\Application
- * @author    Snakevil Zen <zsnakevil@gmail.com>
- * @copyright © 2012 szen.in
- * @license   http://www.gnu.org/licenses/gpl.html
+ * @copyright © 2012-2013 SZen.in
+ * @license   GNU General Public License, version 3
  */
 
 namespace Tox\Application\Controller;
@@ -28,25 +26,58 @@ namespace Tox\Application\Controller;
 use Tox\Core;
 use Tox\Application;
 
+/**
+ * Represents as the abstract controller of applications.
+ *
+ * **THIS CLASS CANNOT BE INSTANTIATED.**
+ *
+ * __*ALIAS*__ as `Tox\Application\Controller`.
+ *
+ * @package tox.application.controller
+ * @author  Snakevil Zen <zsnakevil@gmail.com>
+ */
 abstract class Controller extends Core\Assembly
 {
+    /**
+     * Stores the hosting application.
+     *
+     * @var Application\Application
+     */
     protected $application;
 
+    /**
+     * Stores the runtime configuration of hosting application.
+     *
+     * @var Application\IConfiguration
+     */
     protected $config;
 
+    /**
+     * Stores the inputting pipe of hosting application.
+     *
+     * @var Application\IInput
+     */
     protected $input;
 
+    /**
+     * Stores the outputting pipe of hosting application.
+     *
+     * @var Application\IOutput
+     */
     protected $output;
 
-    public function __construct(Application\Application $app)
+    /**
+     * {@inheritdoc}
+     *
+     * @param Application\Application $application Hosting application.
+     */
+    public function __construct(Application\Application $application)
     {
-        $this->application = $app;
-        $this->config = $app->config;
-        $this->input = $app->input;
-        $this->output = $app->output;
+        $this->application = $application;
+        $this->config = $application->config;
+        $this->input = $application->input;
+        $this->output = $application->output;
     }
-
-    abstract public function act();
 }
 
 // vi:se ft=php fenc=utf-8 ff=unix ts=4 sts=4 et sw=4 fen fdm=indent fdl=1 tw=120:
