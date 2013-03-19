@@ -1,6 +1,6 @@
 <?php
 /**
- *
+ * Defines the behaviors of fallback views.
  *
  * This file is part of Tox.
  *
@@ -17,21 +17,29 @@
  * You should have received a copy of the GNU General Public License
  * along with Tox.  If not, see <http://www.gnu.org/licenses/>.
  *
- * @package   Tox\Application\View
- * @author    Snakevil Zen <zsnakevil@gmail.com>
- * @copyright © 2012 szen.in
- * @license   http://www.gnu.org/licenses/gpl.html
+ * @copyright © 2012-2013 SZen.in
+ * @license   GNU General Public License, version 3
  */
 
-namespace Tox\Application\View;
+namespace Tox\Application;
 
 use Exception;
 
-use Tox\Application;
-
-interface IFallback extends Application\IView
+/**
+ * Announces the behaviors of fallback views.
+ *
+ * @package tox.application
+ * @author  Snakevil Zen <zsnakevil@gmail.com>
+ */
+interface IFallback extends IView
 {
-    public function __invoke(Exception $exception);
+    /**
+     * Indicates the cause of falling back.
+     *
+     * @param  Exception $exception Cause exception.
+     * @return self
+     */
+    public function cause(Exception $exception);
 }
 
-// vi:se ft=php fenc=utf-8 ff=unix ts=4 sts=4 et sw=4 fen fdm=indent fdl=1 tw=120:
+// vi:ft=php fenc=utf-8 ff=unix ts=4 sts=4 et sw=4 fen fdm=indent fdl=1 tw=120
