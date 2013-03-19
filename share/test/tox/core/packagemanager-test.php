@@ -54,24 +54,67 @@ require_once __DIR__ . '/../../../../src/tox/core/@exception/illegal3rdpartypack
  */
 class PackageManagerTest extends PHPUnit_Framework_TestCase
 {
+    /**
+     * Stores the target instance.
+     *
+     * @var PackageManager
+     */
+    protected $pman;
+
+    /**
+     * Stores the virtual file system.
+     *
+     * @var vfsStream
+     */
     protected $vfs;
+
+    /**
+     * Stores the root folder name.
+     *
+     * WARNING: Randomize names are used to ignore the `require_once()`
+     * machenism.
+     *
+     * @var string
+     */
+    protected $root;
+
+    /**
+     * Stores the logs from simulate bootstrappers.
+     *
+     * @var string[]
+     */
+    protected static $log;
+
+    /**
+     * Be used for simulate bootstrappers.
+     *
+     * @param  string $lob Log content.
+     * @return void
+     */
+    public static function log($lob)
+    {
+        self::$log[] = (string) $lob;
+    }
 
     protected function setUp()
     {
-        $this->vfs = vfsStream::setUp('root', 0755, array(
+        self::$log = array();
+        $this->pman = new PackageManager;
+        $this->root = md5(microtime());
+        $this->vfs = vfsStream::setUp($this->root, 0755, array(
                 'include' => array(
                     'core' => array(
-                        '@bootstrap.php' => '<?php $_GET[] = "Tox\\Core";',
+                        '@bootstrap.php' => '<?php Tox\\Core\\PackageManagerTest::log("Tox\\Core");',
                         '@exception' => array(
                             'blah.php' => ''
                         ),
                         'blah.php' => ''
                     ),
                     'type' => array(
-                        '@bootstrap.php' => '<?php $_GET[] = "Tox\\Type";',
+                        '@bootstrap.php' => '<?php Tox\\Core\\PackageManagerTest::log("Tox\\Type");',
                         'foo' => array(
                             'bar' => array(
-                                '@bootstrap.php' => '<?php $_GET[] = "Tox\\Type\\Foo\\Bar";',
+                                '@bootstrap.php' => '<?php Tox\\Core\\PackageManagerTest::log("Tox\\Type\\Foo\\Bar");',
                                 'blah.php' => ''
                             )
                         ),
@@ -80,7 +123,7 @@ class PackageManagerTest extends PHPUnit_Framework_TestCase
                         )
                     ),
                     'foo' => array(
-                        '@bootstrap.php' => '<?php $_GET[] = "Tox\\Foo";'
+                        '@bootstrap.php' => '<?php Tox\\Core\\PackageManagerTest::log("Tox\\Foo");'
                     )
                 ),
                 'lib' => array(
@@ -91,9 +134,8 @@ class PackageManagerTest extends PHPUnit_Framework_TestCase
 
     public function testRegisteringAndLocating()
     {
-        $o_pman = new PackageManager;
-        $this->assertSame($o_pman, $o_pman->register('tox.core', vfsStream::url('root/include/core')));
-        $this->assertEquals(vfsStream::url('root/include/core/blah.php'), $o_pman->locate('Tox\\Core\\Blah'));
+        $this->assertSame($this->pman, $this->pman->register('tox.core', vfsStream::url($this->root . '/include/core')));
+        $this->assertEquals(vfsStream::url($this->root . '/include/core/blah.php'), $this->pman->locate('Tox\\Core\\Blah'));
     }
 
     /**
@@ -102,8 +144,7 @@ class PackageManagerTest extends PHPUnit_Framework_TestCase
      */
     public function testDuplicateRegistrationForbidden()
     {
-        $o_pman = new PackageManager;
-        $o_pman->register('tox.core', vfsStream::url('root/include/core'))
+        $this->pman->register('tox.core', vfsStream::url($this->root . '/include/core'))
             ->register('tox.core', __DIR__);
     }
 
@@ -113,8 +154,7 @@ class PackageManagerTest extends PHPUnit_Framework_TestCase
      */
     public function testNamespacesRegisteredAsWish()
     {
-        $o_pman = new PackageManager;
-        $o_pman->register('tox.core', vfsStream::url('root/include/core'))
+        $this->pman->register('tox.core', vfsStream::url($this->root . '/include/core'))
             ->register('Tox\\Core', __DIR__);
     }
 
@@ -123,9 +163,8 @@ class PackageManagerTest extends PHPUnit_Framework_TestCase
      */
     public function testFalseReturnedOnLocatingFailure()
     {
-        $o_pman = new PackageManager;
-        $o_pman->register('TOX.CORE', vfsStream::url('root/include/core'));
-        $this->assertFalse($o_pman->locate('In\\SZen\\Demo\\Foo'));
+        $this->pman->register('TOX.CORE', vfsStream::url($this->root . '/include/core'));
+        $this->assertFalse($this->pman->locate('In\\SZen\\Demo\\Foo'));
     }
 
     /**
@@ -133,14 +172,13 @@ class PackageManagerTest extends PHPUnit_Framework_TestCase
      */
     public function testCorePackageUsedForLocatingToxFolder()
     {
-        $o_pman = new PackageManager;
-        $o_pman->register('TOX\\CORE', vfsStream::url('root/include/core'));
-        $this->assertEquals(vfsStream::url('root/include/type/foo/bar/blah.php'),
-            $o_pman->locate('Tox\\Type\\Foo\\Bar\\Blah')
+        $this->pman->register('TOX\\CORE', vfsStream::url($this->root . '/include/core'));
+        $this->assertEquals(vfsStream::url($this->root . '/include/type/foo/bar/blah.php'),
+            $this->pman->locate('Tox\\Type\\Foo\\Bar\\Blah')
         );
-        $o_pman = new PackageManager;
-        $o_pman->register('tox.type', vfsStream::url('root/include/type'));
-        $this->assertFalse($o_pman->locate('Tox\\Core\\Blah'));
+        $this->pman = new PackageManager;
+        $this->pman->register('tox.type', vfsStream::url($this->root . '/include/type'));
+        $this->assertFalse($this->pman->locate('Tox\\Core\\Blah'));
     }
 
     /**
@@ -150,8 +188,7 @@ class PackageManagerTest extends PHPUnit_Framework_TestCase
      */
     public function testToxRegisteredAutomaticallyByCore()
     {
-        $o_pman = new PackageManager;
-        $o_pman->register('TOX\\CORE', vfsStream::url('root/include/core'))
+        $this->pman->register('TOX\\CORE', vfsStream::url($this->root . '/include/core'))
             ->register('tox', __DIR__);
     }
 
@@ -160,9 +197,8 @@ class PackageManagerTest extends PHPUnit_Framework_TestCase
      */
     public function testCorePackageMustNamedCore()
     {
-        $o_pman = new PackageManager;
-        $o_pman->register('tox\\core', vfsStream::url('root/include/foo'));
-        $this->assertFalse($o_pman->locate('Tox\\Type\\Foo\\Bar\\Blah'));
+        $this->pman->register('tox\\core', vfsStream::url($this->root . '/include/foo'));
+        $this->assertFalse($this->pman->locate('Tox\\Type\\Foo\\Bar\\Blah'));
     }
 
     /**
@@ -170,9 +206,8 @@ class PackageManagerTest extends PHPUnit_Framework_TestCase
      */
     public function testHigherUpsWouldNotProbed()
     {
-        $o_pman = new PackageManager;
-        $o_pman->register('Tox\\Type\\Foo', vfsStream::url('root/include/type/foo'));
-        $this->assertFalse($o_pman->locate('Tox\\Type\\Bar\\Blah'));
+        $this->pman->register('Tox\\Type\\Foo', vfsStream::url($this->root . '/include/type/foo'));
+        $this->assertFalse($this->pman->locate('Tox\\Type\\Bar\\Blah'));
     }
 
     /**
@@ -181,11 +216,10 @@ class PackageManagerTest extends PHPUnit_Framework_TestCase
      */
     public function testPackageRegisteredManuallyBeforeInUse()
     {
-        $o_pman = new PackageManager;
-        $o_pman->register('TOX\\CORE', vfsStream::url('root/include/core'))
-            ->register('Tox\\Type\\Foo', vfsStream::url('root/include/type/bar'));
-        $this->assertEquals(vfsStream::url('root/include/type/bar/blah.php'),
-            $o_pman->locate('Tox\\Type\\Foo\\Blah')
+        $this->pman->register('TOX\\CORE', vfsStream::url($this->root . '/include/core'))
+            ->register('Tox\\Type\\Foo', vfsStream::url($this->root . '/include/type/bar'));
+        $this->assertEquals(vfsStream::url($this->root . '/include/type/bar/blah.php'),
+            $this->pman->locate('Tox\\Type\\Foo\\Blah')
         );
     }
 
@@ -195,10 +229,9 @@ class PackageManagerTest extends PHPUnit_Framework_TestCase
      */
     public function testUsedPackageActedAsRegistered()
     {
-        $o_pman = new PackageManager;
-        $o_pman->register('Tox\\Core', vfsStream::url('root/include/core'))
+        $this->pman->register('Tox\\Core', vfsStream::url($this->root . '/include/core'))
             ->locate('Tox\\Type\\Bar\\Blah');
-        $o_pman->register('Tox\\Type', __DIR__);
+        $this->pman->register('Tox\\Type', __DIR__);
     }
 
     /**
@@ -206,11 +239,10 @@ class PackageManagerTest extends PHPUnit_Framework_TestCase
      */
     public function testLocatingFromVeryLeafRegisteredPackage()
     {
-        $o_pman = new PackageManager;
-        $o_pman->register('Tox.Type.Foo', vfsStream::url('root/include/foo'))
-            ->register('Tox\\Core', vfsStream::url('root/include/core'));
-        $this->assertEquals(vfsStream::url('root/include/foo/blah.php'),
-            $o_pman->locate('Tox\\Type\\Foo\\Blah')
+        $this->pman->register('Tox.Type.Foo', vfsStream::url($this->root . '/include/foo'))
+            ->register('Tox\\Core', vfsStream::url($this->root . '/include/core'));
+        $this->assertEquals(vfsStream::url($this->root . '/include/foo/blah.php'),
+            $this->pman->locate('Tox\\Type\\Foo\\Blah')
         );
     }
 
@@ -219,10 +251,9 @@ class PackageManagerTest extends PHPUnit_Framework_TestCase
      */
     public function testEveryHigherUpMustBeSeekableForTox()
     {
-        $o_pman = new PackageManager;
-        $o_pman->register('tox.bar.foo', vfsStream::url('root/include/foo'))
-            ->register('tox.core', vfsStream::url('root/include/core'));
-        $this->assertFalse($o_pman->locate('Tox\\Bar\\Foo\\Bar\\Blah'));
+        $this->pman->register('tox.bar.foo', vfsStream::url($this->root . '/include/foo'))
+            ->register('tox.core', vfsStream::url($this->root . '/include/core'));
+        $this->assertFalse($this->pman->locate('Tox\\Bar\\Foo\\Bar\\Blah'));
     }
 
     /**
@@ -230,12 +261,10 @@ class PackageManagerTest extends PHPUnit_Framework_TestCase
      */
     public function testBootstrappingInLocatingNotRegsitration()
     {
-        $_GET = array();
-        $o_pman = new PackageManager;
-        $o_pman->register('Tox\\Core', vfsStream::url('root/include/core'));
-        $this->assertEmpty($_GET);
-        $o_pman->locate('Tox\\Core\\Blah');
-        $this->assertEquals(array('Tox\\Core'), $_GET);
+        $this->pman->register('Tox\\Core', vfsStream::url($this->root . '/include/core'));
+        $this->assertEmpty(self::$log);
+        $this->pman->locate('Tox\\Core\\Blah');
+        $this->assertEquals(array('Tox\\Core'), self::$log);
     }
 
     /**
@@ -244,12 +273,11 @@ class PackageManagerTest extends PHPUnit_Framework_TestCase
      */
     public function testBootstrappingFromVeryRoot()
     {
-        $o_pman = new PackageManager;
-        $o_pman->register('Tox\\Core', vfsStream::url('root/include/core'))
-            ->register('tox.type.foo.bar', vfsStream::url('root/include/type/foo/bar'))
-            ->register('tox.type.foo', vfsStream::url('root/include/foo'))
+        $this->pman->register('Tox\\Core', vfsStream::url($this->root . '/include/core'))
+            ->register('tox.type.foo.bar', vfsStream::url($this->root . '/include/type/foo/bar'))
+            ->register('tox.type.foo', vfsStream::url($this->root . '/include/foo'))
             ->locate('Tox\\Type\\Foo\\Bar\\Blah');
-        $this->assertEquals(array('Tox\\Type', 'Tox\\Foo', 'Tox\\Type\\Foo\\Bar'), $_GET);
+        $this->assertEquals(array('Tox\\Type', 'Tox\\Foo', 'Tox\\Type\\Foo\\Bar'), self::$log);
     }
 
     /**
@@ -257,14 +285,13 @@ class PackageManagerTest extends PHPUnit_Framework_TestCase
      */
     public function testSupportingOf3rdPartyPackages()
     {
-        $o_pman = new PackageManager;
-        $o_pman->register('In\\SZen\\App', vfsStream::url('root/include/type'))
-            ->register('in.szen.app2.api.new', vfsStream::url('root/include/type'));
-        $this->assertEquals(vfsStream::url('root/include/type/foo/bar/blah.php'),
-            $o_pman->locate('In\\SZen\\App\\Foo\\Bar\\Blah')
+        $this->pman->register('In\\SZen\\App', vfsStream::url($this->root . '/include/type'))
+            ->register('in.szen.app2.api.new', vfsStream::url($this->root . '/include/type'));
+        $this->assertEquals(vfsStream::url($this->root . '/include/type/foo/bar/blah.php'),
+            $this->pman->locate('In\\SZen\\App\\Foo\\Bar\\Blah')
         );
-        $this->assertEquals(vfsStream::url('root/include/type/foo/bar/blah.php'),
-            $o_pman->locate('In\\SZen\\App2\\API\\New\\Foo\\Bar\\Blah')
+        $this->assertEquals(vfsStream::url($this->root . '/include/type/foo/bar/blah.php'),
+            $this->pman->locate('In\\SZen\\App2\\API\\New\\Foo\\Bar\\Blah')
         );
     }
 
@@ -274,8 +301,7 @@ class PackageManagerTest extends PHPUnit_Framework_TestCase
      */
     public function test3rdPartyPackagesHave3NodesAtLeast()
     {
-        $o_pman = new PackageManager;
-        $o_pman->register('App.type', vfsStream::url('root/include/type'));
+        $this->pman->register('App.type', vfsStream::url($this->root . '/include/type'));
     }
 
     /**
@@ -284,10 +310,9 @@ class PackageManagerTest extends PHPUnit_Framework_TestCase
      */
     public function testEveryHigherUpSubOfRegistered3rdPartyPackageMustBeSeekable()
     {
-        $o_pman = new PackageManager;
-        $o_pman->register('in.szen.app', vfsStream::url('root/include/core'))
-            ->register('in.szen.app.web.dao', vfsStream::url('root/include/type'));
-        $this->assertFalse($o_pman->locate('In\\SZen\\App\\Web\\Dao\\Blah'));
+        $this->pman->register('in.szen.app', vfsStream::url($this->root . '/include/core'))
+            ->register('in.szen.app.web.dao', vfsStream::url($this->root . '/include/type'));
+        $this->assertFalse($this->pman->locate('In\\SZen\\App\\Web\\Dao\\Blah'));
     }
 
     /**
@@ -295,10 +320,9 @@ class PackageManagerTest extends PHPUnit_Framework_TestCase
      */
     public function testExceptionsSeparatedFromClassesAndInterfaces()
     {
-        $o_pman = new PackageManager;
-        $o_pman->register('Tox\\Core', vfsStream::url('root/include/core'));
-        $this->assertEquals(vfsStream::url('root/include/core/@exception/blah.php'),
-            $o_pman->locate('Tox\\Core\\BlahException')
+        $this->pman->register('Tox\\Core', vfsStream::url($this->root . '/include/core'));
+        $this->assertEquals(vfsStream::url($this->root . '/include/core/@exception/blah.php'),
+            $this->pman->locate('Tox\\Core\\BlahException')
         );
     }
 }
