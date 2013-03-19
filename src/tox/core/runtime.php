@@ -87,14 +87,19 @@ final class Runtime
     public function load($class)
     {
         settype($class, 'string');
-        $s_class = $this->cman->transform($class);
-        $p_class = $this->pman->locateClass($s_class);
-        if (!is_string($p_class)) {
-            return;
-        }
-        require_once($p_class);
-        if (class_exists($class, false)) {
-            $this->cman->register($class, $p_class);
+        $p_class = $this->pman->locate($this->cman->transform($class));
+        for ($ii = 0; $ii < 10; $ii++) {
+            if (!is_string($p_class)) {
+                return;
+            }
+            if (is_file($p_class)) {
+                require_once $p_class;
+                if (class_exists($class, false)) {
+                    $this->cman->register($class, $p_class);
+                }
+                return;
+            }
+            $p_class = $this->pman->locate($this->cman->transform($class));
         }
     }
 
@@ -111,7 +116,7 @@ final class Runtime
     {
         static::setUp();
         try {
-            static::$instance->pman->registerPackage(str_replace('\\', '.', strtolower($namespace)), $path);
+            static::$instance->pman->register(str_replace('\\', '.', strtolower($namespace)), $path);
         } catch (Exception $ex) {
             trigger_error('Tox: ' . $ex->getMessage(), E_USER_ERROR);
         }

@@ -125,7 +125,7 @@ class PackageManagerTest extends PHPUnit_Framework_TestCase
     {
         $o_pman = new PackageManager;
         $o_pman->register('TOX.CORE', vfsStream::url('root/include/core'));
-        $this->assertFalse($o_pman->locate('In\\Szen\\Demo\\Foo'));
+        $this->assertFalse($o_pman->locate('In\\SZen\\Demo\\Foo'));
     }
 
     /**
@@ -209,9 +209,20 @@ class PackageManagerTest extends PHPUnit_Framework_TestCase
         $o_pman = new PackageManager;
         $o_pman->register('Tox.Type.Foo', vfsStream::url('root/include/foo'))
             ->register('Tox\\Core', vfsStream::url('root/include/core'));
-        $this->assertEquals(vfsStream::url('root/include/foo/bar/blah.php'),
-            $o_pman->locate('Tox\\Type\\Foo\\Bar\\Blah')
+        $this->assertEquals(vfsStream::url('root/include/foo/blah.php'),
+            $o_pman->locate('Tox\\Type\\Foo\\Blah')
         );
+    }
+
+    /**
+     * @depends testLocatingFromVeryLeafRegisteredPackage
+     */
+    public function testEveryHigherUpMustBeSeekableForTox()
+    {
+        $o_pman = new PackageManager;
+        $o_pman->register('tox.bar.foo', vfsStream::url('root/include/foo'))
+            ->register('tox.core', vfsStream::url('root/include/core'));
+        $this->assertFalse($o_pman->locate('Tox\\Bar\\Foo\\Bar\\Blah'));
     }
 
     /**
@@ -233,14 +244,12 @@ class PackageManagerTest extends PHPUnit_Framework_TestCase
      */
     public function testBootstrappingFromVeryRoot()
     {
-        $_POST['x'] = 1;
         $o_pman = new PackageManager;
         $o_pman->register('Tox\\Core', vfsStream::url('root/include/core'))
             ->register('tox.type.foo.bar', vfsStream::url('root/include/type/foo/bar'))
             ->register('tox.type.foo', vfsStream::url('root/include/foo'))
             ->locate('Tox\\Type\\Foo\\Bar\\Blah');
         $this->assertEquals(array('Tox\\Type', 'Tox\\Foo', 'Tox\\Type\\Foo\\Bar'), $_GET);
-        unset($_POST['x']);
     }
 
     /**
@@ -249,9 +258,13 @@ class PackageManagerTest extends PHPUnit_Framework_TestCase
     public function testSupportingOf3rdPartyPackages()
     {
         $o_pman = new PackageManager;
-        $o_pman->register('In\\Szen\\App', vfsStream::url('root/include/type'));
+        $o_pman->register('In\\SZen\\App', vfsStream::url('root/include/type'))
+            ->register('in.szen.app2.api.new', vfsStream::url('root/include/type'));
         $this->assertEquals(vfsStream::url('root/include/type/foo/bar/blah.php'),
-            $o_pman->locate('In\\Szen\\App\\Foo\\Bar\\Blah')
+            $o_pman->locate('In\\SZen\\App\\Foo\\Bar\\Blah')
+        );
+        $this->assertEquals(vfsStream::url('root/include/type/foo/bar/blah.php'),
+            $o_pman->locate('In\\SZen\\App2\\API\\New\\Foo\\Bar\\Blah')
         );
     }
 
@@ -263,6 +276,18 @@ class PackageManagerTest extends PHPUnit_Framework_TestCase
     {
         $o_pman = new PackageManager;
         $o_pman->register('App.type', vfsStream::url('root/include/type'));
+    }
+
+    /**
+     * @depends testLocatingFromVeryLeafRegisteredPackage
+     * @depends test3rdPartyPackagesHave3NodesAtLeast
+     */
+    public function testEveryHigherUpSubOfRegistered3rdPartyPackageMustBeSeekable()
+    {
+        $o_pman = new PackageManager;
+        $o_pman->register('in.szen.app', vfsStream::url('root/include/core'))
+            ->register('in.szen.app.web.dao', vfsStream::url('root/include/type'));
+        $this->assertFalse($o_pman->locate('In\\SZen\\App\\Web\\Dao\\Blah'));
     }
 
     /**

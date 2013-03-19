@@ -73,7 +73,18 @@ class PackageManager extends Assembly
             $s_new = "{$s_class}\\{$a_class[$ii]}";
             if (!isset($this->packages[$s_new])) {
                 if (!isset($this->packages[$s_class])) {
+                    if (2 == $i_offs) {
+                        // Higher-ups of registered 3rd-party package MAY not
+                        // exist.
+                        $s_class = $s_new;
+                        continue;
+                    }
                     return false;
+                }
+                if (2 == $i_offs) {
+                    // Lower-downs of the root registered 3rd-party package MUST
+                    // work as similarly as Tox packages.
+                    $i_offs = 1;
                 }
                 $this->packages[$s_new] = array(
                     $this->packages[$s_class][0] . DIRECTORY_SEPARATOR . $a_class[$ii],
@@ -82,7 +93,10 @@ class PackageManager extends Assembly
             }
             $s_class = $s_new;
         }
-        return $this->bootstrap($s_class)->packages[$s_class][0] . DIRECTORY_SEPARATOR . $p_file;
+        if (!isset($this->packages[$s_class]) || !$this->bootstrap($s_class)) {
+            return false;
+        }
+        return $this->packages[$s_class][0] . DIRECTORY_SEPARATOR . $p_file;
     }
 
     /**
@@ -168,13 +182,17 @@ class PackageManager extends Assembly
         $a_ns = explode('\\', $namespace);
         for ($ii = 0, $jj = count($a_ns); $ii < $jj; $ii++) {
             $s_ns = $ii ? "{$s_ns}\\{$a_ns[$ii]}" : $a_ns[0];
-            if (isset($this->packages[$s_ns]) && !$this->packages[$s_ns][1]) {
-                $p_bs = "{$this->packages[$s_ns][0]}/@bootstrap.php";
-                if (is_file($p_bs) && is_readable($p_bs)) {
-                    require_once $p_bs;
-                }
-                $this->packages[$s_ns][1] = true;
+            if (!isset($this->packages[$s_ns]) || $this->packages[$s_ns][1]) {
+                continue;
             }
+            if (!is_dir($this->packages[$s_ns][0]) || !is_readable($this->packages[$s_ns][0])) {
+                return false;
+            }
+            $p_bs = "{$this->packages[$s_ns][0]}/@bootstrap.php";
+            if (is_file($p_bs) && is_readable($p_bs)) {
+                require_once $p_bs;
+            }
+            $this->packages[$s_ns][1] = true;
         }
         return $this;
     }
