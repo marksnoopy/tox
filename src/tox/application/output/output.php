@@ -23,7 +23,7 @@
 
 namespace Tox\Application\Output;
 
-use Tox;
+use Tox\Core;
 use Tox\Application;
 use Tox\Application\View;
 
@@ -39,7 +39,7 @@ use Tox\Application\View;
  * @package tox.application.output
  * @author  Snakevil Zen <zsnakevil@gmail.com>
  */
-abstract class Output extends Tox\Assembly implements Application\IOutput
+abstract class Output extends Core\Assembly implements Application\IOutput
 {
     /**
      * Stores the binded view.

@@ -25,10 +25,10 @@
 
 namespace Tox\Application;
 
-use Tox;
+use Tox\Core;
 use Tox\Data;
 
-interface IDao extends Tox\ISingleton
+interface IDao extends Core\ISingleton
 {
     public static function bindDomain(Data\ISource $domain);
 
