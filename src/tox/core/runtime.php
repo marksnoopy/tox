@@ -26,8 +26,6 @@ namespace Tox\Core;
 
 use Exception;
 
-class_alias('Tox\\Core\\Runtime', 'Tox');
-
 /**
  * Provides the APIs to control applications runtime environments.
  *
@@ -156,6 +154,7 @@ final class Runtime
         }
         static::$instance = new static;
         spl_autoload_register(array(static::$instance, 'load'), true, true);
+        self::alias(__CLASS__, 'Tox');
     }
 
     /**

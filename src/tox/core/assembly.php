@@ -26,8 +26,6 @@ namespace Tox\Core;
 use ReflectionClass;
 use ReflectionException;
 
-class_alias('Tox\\Core\\Assembly', 'Tox\\Assembly');
-
 /**
  * Represents as the root class of all components to provide essential
  * behaviors.

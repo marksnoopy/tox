@@ -23,30 +23,32 @@
  * @license   GNU General Public License, version 3
  */
 
+namespace Tox\Core;
+
 if ('@bootstrap.php' == basename(__FILE__))
 {
     require_once __DIR__ . '/assembly.php';
     require_once __DIR__ . '/classmanager.php';
     require_once __DIR__ . '/packagemanager.php';
     require_once __DIR__ . '/runtime.php';
-    Tox::import('Tox\\Core', __DIR__);
+    Runtime::import('tox.core', __DIR__);
 }
 else
 {
     // Phar::mapPhar('tox.core');
-    require_once('phar://tox.core/assembly.php');
-    require_once('phar://tox.core/classmanager.php');
-    require_once('phar://tox.core/packagemanager.php');
-    require_once('phar://tox.core/tox.php');
-    Tox::import('Tox\\Core', __FILE__);
+    require_once 'phar://tox.core/assembly.php';
+    require_once 'phar://tox.core/classmanager.php';
+    require_once 'phar://tox.core/packagemanager.php';
+    require_once 'phar://tox.core/tox.php';
+    Runtime::import('tox.core', __FILE__);
 }
 
-Tox::setUp();
+Runtime::setUp();
 
-Tox::alias('Tox\\Core\\Exception', 'Tox\\Exception');
-Tox::alias('Tox\\Core\\ISingleton', 'Tox\\ISingleton');
+Runtime::alias('Tox\\Core\\Exception', 'Tox\\Exception');
+Runtime::alias('Tox\\Core\\ISingleton', 'Tox\\ISingleton');
 
-Tox::alias('Tox\\Application\\Application', 'Tox\\Application');
+Runtime::alias('Tox\\Application\\Application', 'Tox\\Application');
 
 __HALT_COMPILER();
 

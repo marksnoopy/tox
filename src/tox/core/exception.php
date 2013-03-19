@@ -26,8 +26,6 @@ namespace Tox\Core;
 
 use Exception as PHPException;
 
-class_alias('Tox\\Core\\Exception', 'Tox\\Exception');
-
 /**
  * Represents as the root exception for all derived ones to provide essential
  * behaviors.
