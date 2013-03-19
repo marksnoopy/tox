@@ -47,7 +47,6 @@ class FallbackTest extends PHPUnit_Framework_TestCase
     {
         $o_fb = new Fallback;
         $this->assertSame($o_fb, $o_fb->cause(new Exception));
-        echo($o_fb->render());
     }
 
     /**
