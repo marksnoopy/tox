@@ -1,6 +1,6 @@
 <?php
 /**
- * Processes the bootstrap of `tox.application' on importing.
+ * Processes the bootstrap of `tox.data' on importing.
  *
  * This file is part of Tox.
  *
@@ -17,18 +17,13 @@
  * You should have received a copy of the GNU General Public License
  * along with Tox.  If not, see <http://www.gnu.org/licenses/>.
  *
- * @package   tox.application
+ * @package   tox.data
  * @author    Snakevil Zen <zsnakevil@gmail.com>
  * @copyright © 2012-2013 SZen.in
  * @license   GNU General Public License, version 3
  */
 
-Tox::alias('Tox\\Application\\Router\\Router', 'Tox\\Application\\Router');
-Tox::alias('Tox\\Application\\Controller\\Controller', 'Tox\\Application\\Controller');
-Tox::alias('Tox\\Application\\View\\View', 'Tox\\Application\\View');
-Tox::alias('Tox\\Application\\Model\\Model', 'Tox\\Application\\Model');
-Tox::alias('Tox\\Application\\Dao\\Dao', 'Tox\\Application\\Dao');
-Tox::alias('Tox\\Application\\Output\\Output', 'Tox\\Application\\Output');
+Tox::alias('Tox\\Data\\Pdo\\Pdo', 'Tox\\Data\\Pdo');
 
 __HALT_COMPILER();
 

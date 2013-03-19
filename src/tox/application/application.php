@@ -25,11 +25,13 @@
  * @license   http://www.gnu.org/licenses/gpl.html
  */
 
-namespace Tox;
+namespace Tox\Application;
 
 use Exception;
 
-abstract class Application extends Assembly
+use Tox\Core;
+
+abstract class Application extends Core\Assembly
 {
     protected $config;
 
@@ -41,7 +43,7 @@ abstract class Application extends Assembly
 
     protected $output;
 
-    protected function __construct(Application\IInput $input = NULL, Application\IOutput $output = NULL)
+    protected function __construct(IInput $input = NULL, IOutput $output = NULL)
     {
         $this->input = $input;
         $this->output = $output;
@@ -75,42 +77,42 @@ abstract class Application extends Assembly
     abstract protected function init();
 
     final public static function run(
-        Application\IConfiguration $config = NULL,
-        Application\IRouter $router = NULL,
-        Application\View\IFallback $fallback = NULL
+        IConfiguration $config = NULL,
+        IRouter $router = NULL,
+        View\IFallback $fallback = NULL
     )
     {
         if (self::$instance instanceof self)
         {
             self::$instance->output->writeClose(
                 self::$instance->fallback(
-                    new Application\MultipleApplicationRuntimeException(array('existant' => self::$instance))
+                    new MultipleApplicationRuntimeException(array('existant' => self::$instance))
                 )
             );
             return;
         }
         if (NULL === $config)
         {
-            $config = new Application\Configuration;
+            $config = new Configuration;
         }
         if (NULL === $router)
         {
-            $router = new Application\Router;
+            $router = new Router;
         }
         if (NULL === $fallback)
         {
-            $fallback = new Application\View\Fallback;
+            $fallback = new View\Fallback;
         }
-        $o_output = isset($config['output']) && is_subclass_of($config['output'], '\Application\\IOutput')
+        $o_output = isset($config['output']) && is_subclass_of($config['output'], '\\IOutput')
             ? new $config['output']
             : static::getDefaultOutput();
         try
         {
             if (isset($config['input']))
             {
-                if (!is_subclass_of($config['input'], '\Application\\IInput'))
+                if (!is_subclass_of($config['input'], '\\IInput'))
                 {
-                    throw new Application\InvalidInputComponentException(array('input' => $config['input']));
+                    throw new InvalidInputComponentException(array('input' => $config['input']));
                 }
                 $o_input = new $config['input'];
             }

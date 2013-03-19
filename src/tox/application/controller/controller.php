@@ -23,11 +23,12 @@
  * @license   http://www.gnu.org/licenses/gpl.html
  */
 
-namespace Tox\Application;
+namespace Tox\Application\Controller;
 
-use Tox;
+use Tox\Core;
+use Tox\Application;
 
-abstract class Controller extends Tox\Assembly
+abstract class Controller extends Core\Assembly
 {
     protected $application;
 
@@ -37,7 +38,7 @@ abstract class Controller extends Tox\Assembly
 
     protected $output;
 
-    public function __construct(Tox\Application $app)
+    public function __construct(Application\Application $app)
     {
         $this->application = $app;
         $this->config = $app->config;

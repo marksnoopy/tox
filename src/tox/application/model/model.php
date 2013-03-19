@@ -19,9 +19,10 @@
  * @license   GNU Public License
  */
 
-namespace Tox\Application;
+namespace Tox\Application\Model;
 
-use Tox;
+use Tox\Core;
+use Tox\Application;
 
 /**
  * Represents as an entity.
@@ -138,7 +139,7 @@ use Tox;
  * @package Tox\Application
  * @author  Snakevil Zen <zsnakevil@gmail.com>
  */
-abstract class Model extends Tox\Assembly implements Model\IEntity
+abstract class Model extends Core\Assembly implements IEntity
 {
     /**
      * Maps the names of properties as up-level attributes to the names of
@@ -292,7 +293,7 @@ abstract class Model extends Tox\Assembly implements Model\IEntity
         for ($ii = 0, $jj = count($this->_stack); $ii < $jj; $ii++)
         {
             list($s_attr) = each($this->_stack);
-            if (NULL !== $this->$s_attr && $this->__get($s_attr) instanceof Model\Set)
+            if (NULL !== $this->$s_attr && $this->__get($s_attr) instanceof Set)
             {
                 if (NULL === $this->_stack[$s_attr])
                 {
@@ -302,7 +303,7 @@ abstract class Model extends Tox\Assembly implements Model\IEntity
                 {
                     $this->$s_attr->clear()->append($this->_stack[$s_attr]);
                 }
-                if ($this->_stack[$s_attr] instanceof Model\Set)
+                if ($this->_stack[$s_attr] instanceof Set)
                 {
                     $this->$s_attr->replace($this->_stack[$s_attr]);
                 }
@@ -354,7 +355,7 @@ abstract class Model extends Tox\Assembly implements Model\IEntity
         return $this;
     }
 
-    protected function __construct(IDao $dao)
+    protected function __construct(Application\IDao $dao)
     {
         $this->_committing = FALSE;
         $this->_dao = $dao;
@@ -408,12 +409,12 @@ abstract class Model extends Tox\Assembly implements Model\IEntity
     /**
      * Loads an entity from a collection.
      *
-     * @param  Model\ICollection $set
+     * @param  ICollection $set
      * @param  IDao              $dao OPTIONAL. Data accessor used. NULL
      *                                defaults.
      * @return self
      */
-    public static function import(Model\ICollection $set, IDao $dao = NULL)
+    public static function import(ICollection $set, Application\IDao $dao = NULL)
     {
         if ($set->export() instanceof self)
         {
@@ -442,7 +443,7 @@ abstract class Model extends Tox\Assembly implements Model\IEntity
      * @param  IDao  $dao        OPTIONAL. Data accessor used. NULL defaults.
      * @return self
      */
-    protected static function manufactor($attributes, IDao $dao = NULL)
+    protected static function manufactor($attributes, Application\IDao $dao = NULL)
     {
         $attributes = (array) $attributes;
         if (NULL === $dao)
@@ -524,7 +525,7 @@ abstract class Model extends Tox\Assembly implements Model\IEntity
      * @param  IDao    $dao        OPTIONAL. Data accessor used. NULL defaults.
      * @return self
      */
-    public static function prepare($attributes, IDao $dao = NULL)
+    public static function prepare($attributes, Application\IDao $dao = NULL)
     {
         $attributes = (array) $attributes;
         $s_id = '';
@@ -548,7 +549,7 @@ abstract class Model extends Tox\Assembly implements Model\IEntity
      * @param  string $collection
      * @return self
      */
-    public function receiveChanging(Model\IEntity $entity, $collection)
+    public function receiveChanging(IEntity $entity, $collection)
     {
         $collection = (string) $collection;
         list($a_props) = $this->__getProperties();
@@ -567,7 +568,7 @@ abstract class Model extends Tox\Assembly implements Model\IEntity
      * @param  string $collection
      * @return self
      */
-    public function receiveResuming(Model\IEntity $entity, $collection)
+    public function receiveResuming(IEntity $entity, $collection)
     {
         $collection = (string) $collection;
         list($a_props) = $this->__getProperties();
@@ -660,11 +661,11 @@ abstract class Model extends Tox\Assembly implements Model\IEntity
      * @param  string $value
      * @return void
      *
-     * @throws Model\IdentifierReadOnlyException
+     * @throws IdentifierReadOnlyException
      */
     protected function __setId($value)
     {
-        throw new Model\IdentifierReadOnlyException(array('object' => $this));
+        throw new IdentifierReadOnlyException(array('object' => $this));
     }
 
     /**
@@ -674,7 +675,7 @@ abstract class Model extends Tox\Assembly implements Model\IEntity
      * @param  IDao   $dao OPTIONAL. Data accessor used. NULL defaults.
      * @return self
      */
-    public static function setUp($id, IDao $dao = NULL)
+    public static function setUp($id, Application\IDao $dao = NULL)
     {
         $s_type = get_called_class();
         $id = (string) $id;

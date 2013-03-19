@@ -43,9 +43,10 @@ else
 
 Tox::setUp();
 
+Tox::alias('Tox\\Core\\Exception', 'Tox\\Exception');
 Tox::alias('Tox\\Core\\ISingleton', 'Tox\\ISingleton');
 
-Tox::alias('Tox\\Core\\Exception', 'Tox\\Exception');
+Tox::alias('Tox\\Application\\Application', 'Tox\\Application');
 
 __HALT_COMPILER();
 

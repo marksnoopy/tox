@@ -23,17 +23,18 @@
  * @license   http://www.gnu.org/licenses/gpl.html
  */
 
-namespace Tox\Application;
+namespace Tox\Application\Router;
 
 use Exception;
 
-use Tox;
+use Tox\Core;
+use Tox\Application;
 
-class Router extends Tox\Assembly implements IRouter
+class Router extends Core\Assembly implements Application\IRouter
 {
     protected $routes;
 
-    public function analyse(IInput $input)
+    public function analyse(Application\IInput $input)
     {
         $s_sense = $input->getCommandLine();
         for ($ii = 0, $jj = count($this->routes); $ii < $jj; $ii++)
@@ -44,12 +45,12 @@ class Router extends Tox\Assembly implements IRouter
                 list($s_pattern, $a_options) = each($this->routes[$ii]);
                 if (preg_match($s_pattern, $s_sense, $a_matches))
                 {
-                    $o_token = new Router\Token($a_options);
+                    $o_token = new Token($a_options);
                     return $o_token->bind($a_matches);
                 }
             }
         }
-        throw new Router\UnknownApplicationSituationException(array('input' => $input));
+        throw new UnknownApplicationSituationException(array('input' => $input));
     }
 
     public function __construct($routes = array())

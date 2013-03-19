@@ -25,8 +25,9 @@ namespace Tox\Application\Dao\Cache;
 
 use PDO;
 
-use Tox;
+use Tox\Core;
 use Tox\Data;
+use Tox\Application;
 
 /**
  * Defines cache dao as a shell of default dao, cache data with 'data.kv.memcache' for get.
@@ -36,7 +37,7 @@ use Tox\Data;
  * @package tox.application.dao.cache
  * @author  Trainxy Ho <trainxy@gmail.com>
  */
-abstract class Dao extends Tox\Assembly implements Tox\Application\IDao
+abstract class Dao extends Core\Assembly implements Application\IDao
 {
 
     /**
@@ -56,7 +57,7 @@ abstract class Dao extends Tox\Assembly implements Tox\Application\IDao
     /**
      * stores an instance of default dao.
      *
-     * @var Tox\Application\Dao
+     * @var Tox\Application\Dao\Dao
      */
     protected $dao;
 
@@ -77,10 +78,10 @@ abstract class Dao extends Tox\Assembly implements Tox\Application\IDao
     /**
      * CONSTRUCT FUNCTION
      *
-     * @param  Tox\Application\Dao  $dao    Instance of a default dao
-     * @param  Tox\Data\IKV         $cache  Instance of a kv data driver
+     * @param  Application\Dao\Dao $dao   Instance of a default dao
+     * @param  Tox\Data\IKV        $cache Instance of a kv data driver
      */
-    public function __construct(Tox\Application\Dao $dao, Data\IKV $cache)
+    public function __construct(Application\Dao\Dao $dao, Data\IKV $cache)
     {
         $this->dao = $dao;
         $this->cache = $cache;

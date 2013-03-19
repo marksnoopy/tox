@@ -24,13 +24,14 @@
  * @license    http://www.gnu.org/licenses/gpl.html
  */
 
-namespace Tox\Data;
+namespace Tox\Data\Pdo;
 
 use PDO as PHPPdo;
 
-use Tox;
+use Tox\Core;
+use Tox\Data;
 
-class Pdo extends Tox\Assembly implements IPdo
+class Pdo extends Core\Assembly implements Data\IPdo
 {
     protected $dsn;
 
@@ -84,12 +85,12 @@ class Pdo extends Tox\Assembly implements IPdo
             $s_func = 'on' . $this->pdo->getAttribute(PHPPdo::ATTR_DRIVER_NAME) . 'Connected';
             if (!method_exists($this, $s_func))
             {
-                throw new Pdo\UnsupportedDriverToListTablesException(array('driver' => substr($s_func, 2, -9)));
+                throw new UnsupportedDriverToListTablesException(array('driver' => substr($s_func, 2, -9)));
             }
             $this->tables = $this->$s_func();
             if (!is_array($this->tables) || empty($this->tables))
             {
-                throw new Pdo\EmptyDataSourceException(array('source' => $this->dsn));
+                throw new EmptyDataSourceException(array('source' => $this->dsn));
             }
         }
         return $this->pdo;
@@ -121,7 +122,7 @@ class Pdo extends Tox\Assembly implements IPdo
     public function exec($statement, $partitions = array())
     {
         settype($partitions, 'array');
-        $o_sql = $statement instanceof Pdo\Sql ? $statement : new Pdo\Sql($statement);
+        $o_sql = $statement instanceof Sql ? $statement : new Sql($statement);
         return $this->connect()->exec($o_sql->identifyPartitions($this, $partitions));
     }
 
@@ -226,7 +227,7 @@ class Pdo extends Tox\Assembly implements IPdo
         settype($table, 'string');
         if (!is_callable($method))
         {
-            throw new Pdo\InvalidPartitionStrategyException(array('strategy' => $method));
+            throw new InvalidPartitionStrategyException(array('strategy' => $method));
         }
         $this->partitions[$table] = $method;
         return $this;
@@ -234,29 +235,29 @@ class Pdo extends Tox\Assembly implements IPdo
 
     public function prepare($statement, $partitions = array(), $driver_options = array())
     {
-        if ($statement instanceof Pdo\Statement)
+        if ($statement instanceof Statement)
         {
             $a_args = $this->statementMetas[$statement->id];
             unset($this->statementMetas[$statement->id]);
             return $this->connect()->prepare($statement, $a_args);
         }
-        $o_sql = $statement instanceof Pdo\Sql ? $statement : new Pdo\Sql($statement);
-        $o_stmt = new Pdo\Statement($this, Pdo\Statement::TYPE_PREPARE, $o_sql->identifyPartitions($this, $partitions));
+        $o_sql = $statement instanceof Sql ? $statement : new Sql($statement);
+        $o_stmt = new Statement($this, Statement::TYPE_PREPARE, $o_sql->identifyPartitions($this, $partitions));
         $this->statementMetas[$o_stmt->id] = $driver_options;
         return $o_stmt;
     }
 
     public function query($statement, $partitions = array())
     {
-        if ($statement instanceof Pdo\Statement)
+        if ($statement instanceof Statement)
         {
             $a_args = $this->statementMetas[$statement->id];
             unset($this->statementMetas[$statement->id]);
             $a_args[0] = $statement;
             return call_user_func_array(array($this->connect(), 'query'), $a_args);
         }
-        $o_sql = $statement instanceof Pdo\Sql ? $statement : new Pdo\Sql($statement);
-        $o_stmt = new Pdo\Statement($this, Pdo\Statement::TYPE_QUERY, $o_sql->identifyPartitions($this, $partitions));
+        $o_sql = $statement instanceof Sql ? $statement : new Sql($statement);
+        $o_stmt = new Statement($this, Statement::TYPE_QUERY, $o_sql->identifyPartitions($this, $partitions));
         $this->statementMetas[$o_stmt->id] = func_get_args();
         array_splice($this->statementMetas[$o_stmt->id], 1, 1);
         return $o_stmt;
@@ -271,7 +272,7 @@ class Pdo extends Tox\Assembly implements IPdo
     {
         if (!$this->connected())
         {
-            throw new Pdo\NoActiveTransactionException;
+            throw new NoActiveTransactionException;
         }
         if ($this->connect()->rollBack())
         {

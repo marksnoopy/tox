@@ -50,7 +50,7 @@ class DaoTest extends PHPUnit_Framework_TestCase
 
     public function testCacheFlowWouldWorkFine()
     {
-        $o_mock_dao = $this->getMock('Tox\\Application\\Dao', array('read', 'update', 'create', 'delete'));
+        $o_mock_dao = $this->getMock('Tox\\Application\\Dao\\Dao', array('read', 'update', 'create', 'delete'));
         $o_mock_dao->expects($this->once())
                    ->method('read')
                    ->with($this->equalTo('111'))
@@ -78,7 +78,7 @@ class DaoTest extends PHPUnit_Framework_TestCase
 
     public function testTransmitToNormalDaoWhenCreateUpdateDeleteOperationCalled()
     {
-        $o_mock_dao = $this->getMock('Tox\\Application\\Dao', array('update', 'create', 'delete'));
+        $o_mock_dao = $this->getMock('Tox\\Application\\Dao\\Dao', array('update', 'create', 'delete'));
         $o_mock_dao->expects($this->once())
                    ->method('create')
                    ->with($this->equalTo(array('title' => 'hello', 'description' => 'world')))
@@ -102,7 +102,7 @@ class DaoTest extends PHPUnit_Framework_TestCase
 
     public function testTransmitToNormalDaoWhenCountByAndListAndSortByOperationCalled()
     {
-        $o_mock_dao = $this->getMock('Tox\\Application\\Dao', array('countBy', 'listAndSortBy'));
+        $o_mock_dao = $this->getMock('Tox\\Application\\Dao\\Dao', array('countBy', 'listAndSortBy'));
         $o_mock_dao->expects($this->once())
                    ->method('countBy');
         $o_mock_dao->expects($this->once())

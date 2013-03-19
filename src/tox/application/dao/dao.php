@@ -23,14 +23,15 @@
  * @license   http://www.gnu.org/licenses/gpl.html
  */
 
-namespace Tox\Application;
+namespace Tox\Application\Dao;
 
 use PDO;
 
-use Tox;
+use Tox\Core;
 use Tox\Data;
+use Tox\Application;
 
-abstract class Dao extends Tox\Assembly implements IDao
+abstract class Dao extends Core\Assembly implements Application\IDao
 {
     const PK = 'id';
 
@@ -44,7 +45,7 @@ abstract class Dao extends Tox\Assembly implements IDao
     {
         if (static::$domain instanceof Data\ISource)
         {
-            throw new Dao\DataDomainRebindingException(array('domain' => $domain));
+            throw new DataDomainRebindingException(array('domain' => $domain));
         }
         static::$domain = $domain;
     }
@@ -82,7 +83,7 @@ abstract class Dao extends Tox\Assembly implements IDao
     {
         if (!is_array($where))
         {
-            throw new Dao\IllegalWhereClauseException(array('where' => $where));
+            throw new IllegalWhereClauseException(array('where' => $where));
         }
         foreach ($fields as $ii)
         {
@@ -94,31 +95,31 @@ abstract class Dao extends Tox\Assembly implements IDao
                 }
                 if (empty($where[$ii]) || 2 < count($where[$ii]))
                 {
-                    throw new Dao\ExpectedConditionFieldMissingException(array('clause' => $where, 'field' => $ii));
+                    throw new ExpectedConditionFieldMissingException(array('clause' => $where, 'field' => $ii));
                 }
             }
-            if (!$where[$ii][1] instanceof Type\SetFilterType)
+            if (!$where[$ii][1] instanceof Application\Type\SetFilterType)
             {
-                throw new Dao\IllegalExpectedConditionFieldException(array('clause' => $where, 'field' => $ii));
+                throw new IllegalExpectedConditionFieldException(array('clause' => $where, 'field' => $ii));
             }
             switch ($where[$ii][1])
             {
-                case Type\SetFilterType::BETWEEN:
-                case Type\SetFilterType::NOT_BETWEEN:
+                case Application\Type\SetFilterType::BETWEEN:
+                case Application\Type\SetFilterType::NOT_BETWEEN:
                     if (!is_array($where[$ii][0]) || 2 != count($where[$ii][0]))
                     {
-                        throw new Dao\IllegalConditionFieldException(array('field' => $ii,
+                        throw new IllegalConditionFieldException(array('field' => $ii,
                                 'type' => $where[$ii][1],
                                 'value' => $where[$ii][0]
                             )
                         );
                     }
                     break;
-                case Type\SetFilterType::IN:
-                case Type\SetFilterType::NOT_IN:
+                case Application\Type\SetFilterType::IN:
+                case Application\Type\SetFilterType::NOT_IN:
                     if (!is_array($where[$ii][0]))
                     {
-                        throw new Dao\IllegalConditionFieldException(array('field' => $ii,
+                        throw new IllegalConditionFieldException(array('field' => $ii,
                                 'type' => $where[$ii][1],
                                 'value' => $where[$ii][0]
                             )
