@@ -86,20 +86,21 @@ final class Runtime
      */
     public function load($class)
     {
-        settype($class, 'string');
-        $p_class = $this->pman->locate($this->cman->transform($class));
+        $s_class = $this->cman->transform($class);
+        $p_class = $this->pman->locate($s_class);
         for ($ii = 0; $ii < 10; $ii++) {
             if (!is_string($p_class)) {
                 return;
             }
             if (is_file($p_class)) {
                 require_once $p_class;
-                if (class_exists($class, false)) {
-                    $this->cman->register($class, $p_class);
+                if (class_exists($s_class, false)) {
+                    $this->cman->register($s_class, $p_class);
                 }
                 return;
             }
-            $p_class = $this->pman->locate($this->cman->transform($class));
+            $s_class = $this->cman->transform($class);
+            $p_class = $this->pman->locate($s_class);
         }
     }
 

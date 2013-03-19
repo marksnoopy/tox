@@ -27,7 +27,9 @@ namespace Tox\Application\View;
 
 use Exception;
 
-interface IFallback extends IView
+use Tox\Application;
+
+interface IFallback extends Application\IView
 {
     public function __invoke(Exception $exception);
 }
