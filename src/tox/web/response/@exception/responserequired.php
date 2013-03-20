@@ -40,9 +40,9 @@ final class ResponseRequiredException extends Core\Exception
     /**
      * {@inheritdoc}
      *
-     * > Defined as `0x80030101`.
+     * > Defined as `0x80030201`.
      */
-    const CODE = 0x80030101;
+    const CODE = 0x80030201;
 
     /**
      * {@inheritdoc}

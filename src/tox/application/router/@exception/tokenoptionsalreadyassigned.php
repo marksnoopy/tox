@@ -38,9 +38,9 @@ final class TokenOptionsAlreadyAssignedException extends Core\Exception
     /**
      * {@inheritdoc}
      *
-     * > Defined as `0x80010401`.
+     * > Defined as `0x80020401`.
      */
-    const CODE = 0x80010401;
+    const CODE = 0x80020401;
 
     /**
      * {@inheritdoc}
