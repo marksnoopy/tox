@@ -1,6 +1,6 @@
 <?php
 /**
- * Defines the behaviors of applications routers.
+ * Defines an exception for re-assigning the options of routing tokens.
  *
  * This file is part of Tox.
  *
@@ -21,40 +21,33 @@
  * @license   GNU General Public License, version 3
  */
 
-namespace Tox\Application;
+namespace Tox\Application\Router;
+
+use Tox\Core;
 
 /**
- * Announces the behaviors of applications routers.
+ * Be raised on re-assigning the options of routing tokens.
  *
- * @package tox.application
+ * **THIS CLASS CANNOT BE INHERITED.**
+ *
+ * @package tox.application.router
  * @author  Snakevil Zen <zsnakevil@gmail.com>
  */
-interface IRouter
+final class TokenOptionsAlreadyAssignedException extends Core\Exception
 {
     /**
-     * CONSTRUCT FUNCTION
+     * {@inheritdoc}
      *
-     * @param array[] $routes OPTIONAL. Initial routing rules.
+     * > Defined as `0x80010401`.
      */
-    public function __construct($routes = array());
+    const CODE = 0x80010401;
 
     /**
-     * Analysis routing token from applications input.
+     * {@inheritdoc}
      *
-     * @param  IInput $input Applications input.
-     * @return IToken
+     * > Defined as `options assigned`.
      */
-    public function analyse(IInput $input);
-
-    /**
-     * Imports extra routing rules.
-     *
-     * @param  array[]  $routes  Routing rules to be imported.
-     * @param  boolean  $prepend OPTIONAL. Whether prepending the rules to
-     *                           existant. FALSE defaults.
-     * @return self
-     */
-    public function import($routes, $prepend = false);
+    const MESSAGE = 'options assigned';
 }
 
 // vi:ft=php fenc=utf-8 ff=unix ts=4 sts=4 et sw=4 fen fdm=indent fdl=1 tw=120

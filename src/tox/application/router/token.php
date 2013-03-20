@@ -1,6 +1,6 @@
 <?php
 /**
- * Represents as a routing result token.
+ * Defines the applications routing tokens.
  *
  * This file is part of Tox.
  *
@@ -17,82 +17,140 @@
  * You should have received a copy of the GNU General Public License
  * along with Tox.  If not, see <http://www.gnu.org/licenses/>.
  *
- * @package   Tox\Application\Router
- * @author    Snakevil Zen <zsnakevil@gmail.com>
- * @copyright © 2012 szen.in
- * @license   http://www.gnu.org/licenses/gpl.html
+ * @copyright © 2012-2013 SZen.in
+ * @license   GNU General Public License, version 3
  */
 
 namespace Tox\Application\Router;
 
-use ArrayAccess;
+use Tox\Core;
+use Tox\Application;
 
-use Tox;
-
-class Token extends Tox\Assembly implements ArrayAccess, IToken
+/**
+ * Represents as the applications routing tokens.
+ *
+ * **THIS CLASS CANNOT BE INHERITED.**
+ *
+ * @package tox.application.router
+ * @author  Snakevil Zen <zsnakevil@gmail.com>
+ */
+final class Token extends Core\Assembly implements Application\IToken
 {
-    protected $binded;
+    /**
+     * Stores whether values have been assigned.
+     *
+     * @var bool
+     */
+    protected $assigned;
 
+    /**
+     * Stores the name of target controller.
+     *
+     * @var string
+     */
     protected $controller;
 
+    /**
+     * Stores the options and values.
+     *
+     * @var mixed[]
+     */
     protected $options;
 
-    public function bind(Array $values)
+    /**
+     * {@inheritdoc}
+     *
+     * @param  string[]  $values Values of options.
+     * @return self
+     */
+    public function assign(Array $values)
     {
+        if ($this->assigned) {
+            throw new TokenOptionsAlreadyAssignedException;
+        }
+        $this->assigned = true;
+        if (empty($this->options)) {
+            return $this;
+        }
         array_shift($values);
         for ($ii = count($values), $jj = count($this->options); $ii < $jj; $ii++)
         {
-            $values[] = '';
+            $values[] = false;
         }
         if ($ii > $jj)
         {
             array_splice($values, $jj);
         }
-        if (!empty($this->options))
-        {
-            $this->options = array_combine(array_keys($this->options), $values);
-        }
+        $this->options = array_combine(array_keys($this->options), $values);
         return $this;
     }
 
+    /**
+     * {@inheritdoc}
+     *
+     * @param Array $options Available options from a routing rule.
+     */
     public function __construct(Array $options)
     {
-        $this->binded = false;
+        $this->assigned = false;
         $this->controller = array_shift($options);
         $this->options = array_fill_keys($options, '');
     }
 
-    public function dump()
-    {
-        return $this->options;
-    }
-
-    protected function __getController()
+    /**
+     * {@inheritdoc}
+     *
+     * @return string
+     */
+    public function getController()
     {
         return $this->controller;
     }
 
-    public function offsetExists($offset)
+    /**
+     * Be invoked on checking the existance of an option.
+     *
+     * @param  string $option Option name.
+     * @return bool
+     */
+    public function offsetExists($option)
     {
-        settype($offset, 'string');
-        return isset($this->options[$offset]);
+        return isset($this->options[(string) $option]);
     }
 
-    public function offsetGet($offset)
+    /**
+     * Be invoked on retrieving the value of an option.
+     *
+     * @param  string $option Option name.
+     * @return mixed
+     */
+    public function offsetGet($option)
     {
-        settype($offset, 'string');
-        return $this->options[$offset];
+        return $this->options[(string) $option];
     }
 
-    public function offsetSet($offset, $value)
+    /**
+     * Be invoked on setting or changing the value of an option.
+     *
+     * @param  string $option Option name.
+     * @param  mixed  $value  The new value.
+     * @return void
+     */
+    public function offsetSet($option, $value)
     {
         return;
     }
 
-    public function offsetUnset($offset)
+    /**
+     * Be invoked on dropping an option.
+     *
+     * @param  string $option Option name.
+     * @return void
+     */
+    public function offsetUnset($option)
     {
         return;
     }
 }
 
-// vi:se ft=php fenc=utf-8 ff=unix ts=4 sts=4 et sw=4 fen fdm=indent fdl=1 tw=120:
+// vi:ft=php fenc=utf-8 ff=unix ts=4 sts=4 et sw=4 fen fdm=indent fdl=1 tw=120

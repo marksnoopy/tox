@@ -29,6 +29,9 @@ require_once __DIR__ . '/../../../../../src/tox/core/assembly.php';
 require_once __DIR__ . '/../../../../../src/tox/application/itoken.php';
 require_once __DIR__ . '/../../../../../src/tox/application/router/token.php';
 
+require_once __DIR__ . '/../../../../../src/tox/core/exception.php';
+require_once __DIR__ . '/../../../../../src/tox/application/router/@exception/tokenoptionsalreadyassigned.php';
+
 /**
  * Tests Tox\Application\Router\Token.
  *
