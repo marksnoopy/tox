@@ -217,9 +217,9 @@ abstract class Dao extends Core\Assembly implements Application\IDao
      * @param  int      $length     Length of data get.
      * @return mixed[]
      */
-    public function listAndSortBy($where = array(), $orderBy = array(), $offset = 0, $length = 0)
+    public function listBy($where = array(), $orderBy = array(), $offset = 0, $length = 0)
     {
-        $this->dao->listAndSortBy($where, $orderBy, $offset, $length);
+        $this->dao->listBy($where, $orderBy, $offset, $length);
     }
 
     /**

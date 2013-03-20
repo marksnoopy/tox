@@ -21,7 +21,7 @@
  * @license   GNU General Public License, version 3
  */
 
-namespace Tox\Application\View;
+namespace Tox\Application\Dao\Cache;
 
 use PHPUnit_Framework_TestCase;
 
@@ -102,11 +102,11 @@ class DaoTest extends PHPUnit_Framework_TestCase
 
     public function testTransmitToNormalDaoWhenCountByAndListAndSortByOperationCalled()
     {
-        $o_mock_dao = $this->getMock('Tox\\Application\\Dao\\Dao', array('countBy', 'listAndSortBy'));
+        $o_mock_dao = $this->getMock('Tox\\Application\\Dao\\Dao', array('countBy', 'listBy'));
         $o_mock_dao->expects($this->once())
                    ->method('countBy');
         $o_mock_dao->expects($this->once())
-                   ->method('listAndSortBy');
+                   ->method('listBy');
 
         $o_mock_cache = $this->getMock('Tox\\Data\\KV\\Memcache', array('get', 'set', 'delete'));
 
@@ -114,7 +114,7 @@ class DaoTest extends PHPUnit_Framework_TestCase
                             ->setConstructorArgs(array($o_mock_dao, $o_mock_cache))
                             ->getMockForAbstractClass();
         $o_cache_dao->countBy();
-        $o_cache_dao->listAndSortBy();
+        $o_cache_dao->listBy();
     }
 
 }
