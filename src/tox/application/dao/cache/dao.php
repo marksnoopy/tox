@@ -41,35 +41,37 @@ abstract class Dao extends Core\Assembly implements Application\IDao
 {
 
     /**
-     * stores a data domain.
+     * Stores the binded domains for all derived data access objects.
      *
-     * @var string
+     * @internal
+     *
+     * @var Data\ISource[]
      */
-    protected static $domain;
+    protected static $domains = array();
 
     /**
-     * stores the uniq instance in whole process.
+     * Stores the uniq instance in whole process.
      *
      * @var Tox\Application\Dao\Cache\Dao
      */
-    protected static $instance;
+    protected static $instances;
 
     /**
-     * stores an instance of default dao.
+     * Stores an instance of default dao.
      *
      * @var Tox\Application\Dao\Dao
      */
     protected $dao;
 
     /**
-     * stores an instance of  kv data driver.
+     * Stores an instance of  kv data driver.
      *
      * @var Tox\Data\IKV
      */
     protected $cache;
 
     /**
-     * stores a cache alive time (ms).
+     * Stores a cache alive time (ms).
      *
      * @var Tox\Data\IKV
      */
@@ -81,52 +83,92 @@ abstract class Dao extends Core\Assembly implements Application\IDao
      * @param  Application\Dao\Dao $dao   Instance of a default dao
      * @param  Tox\Data\IKV        $cache Instance of a kv data driver
      */
-    public function __construct(Application\Dao\Dao $dao, Data\IKV $cache)
+    protected function __construct()
     {
-        $this->dao = $dao;
-        $this->cache = $cache;
+
     }
 
     /**
-     * Retrieve the default dao when class isn't set.
+     * Retrieves the most suitable data domain.
+     *
+     * **THIS METHOD CANNOT BE OVERRIDDEN.**
+     *
+     * NOTICE: MOST SUITABLE means that the data domain was binded by the type
+     * of current invoker, or its most recently parent.
+     *
+     * @return Data\ISource
      */
-    abstract protected static function getDefaultDao();
+    final protected function getDomain()
+    {
+        $s_class = get_called_class();
+        while (FALSE !== $s_class)
+        {
+            if (isset(self::$domains[$s_class]))
+            {
+                return self::$domains[$s_class];
+            }
+            $s_class = get_parent_class($s_class);
+        }
+    }
 
     /**
-     * Set cache expire value for each dao.
+     * {@inheritdoc}
+     *
+     * **THIS METHOD CANNOT BE OVERRIDDEN.**
+     *
+     * @param  Data\ISource $domain Data domain to be binded.
+     * @return void
+     */
+    final public static function bindDomain(Data\ISource $kv)
+    {
+        if (!$kv instanceof Data\IKv) {
+            throw new InvalidCachingDataDomainException();
+        }
+        self::$domains[get_called_class()] = $kv;
+    }
+
+    /**
+     * Binds a data access source.
+     *
+     * @param  Application\Dao\Dao $dao Data access source to be bined.
+     * @return self
+     */
+    public function bind(Application\Dao\Dao $dao)
+    {
+        if ($this->dao) {
+            throw new CachingDataSourceBindedException();
+        }
+        $this->dao = $dao;
+        return $this;
+    }
+
+    /**
+     * Sets cache expirement time value for each dao.
      *
      * @param   string      $expire Time value (ms).
      * @return  void
      */
-    protected function setExpire($expire)
+    public function setExpire($expire)
     {
         $this->expire = $expire;
     }
 
     /**
-     * Get singleton instance of self.
+     * {@inheritdoc}
+     *
+     * **THIS METHOD CANNOT BE OVERRIDDEN.**
+     *
+     * @return self
      */
     final public static function getInstance()
     {
-        if (!static::$instance instanceof static)
-        {
-            static::$instance = new static;
+        $s_class = get_called_class();
+        if (!isset(self::$instances[$s_class])) {
+            self::$instances[$s_class] = new $s_class();
         }
-        return static::$instance;
+        return self::$instances[$s_class];
     }
 
-    /**
-     * Bind source to dao.
-     *
-     * This class not surppose the operation, will be transmitted to default dao.
-     *
-     * @param  Tox\Data\ISource $domain     Instance of source.
-     * @return void
-     */
-    public static function bindDomain(Data\ISource $domain)
-    {
-        $this->dao->bindDomain($domain);
-    }
 
     /**
      * Create physical data with default dao and set cache.
@@ -136,10 +178,10 @@ abstract class Dao extends Core\Assembly implements Application\IDao
      */
     public function create($fields)
     {
-        $s_id = $this->dao->create($fields);
+        $s_id = $this->getDao()->create($fields);
 
         $s_key = $this->generateKey($s_id);
-        $this->cache->set($s_key, $fields, $this->expire);
+        self::getDomain()->set($s_key, $fields, $this->expire);
     }
 
     /**
@@ -152,12 +194,12 @@ abstract class Dao extends Core\Assembly implements Application\IDao
     {
         $s_key = $this->generateKey($id);
 
-        $a_value = $this->cache->get($s_key);
+        $a_value = self::getDomain()->get($s_key);
         if ($a_value) {
             return $a_value;
         } else {
-            $a_value = $this->dao->read($id);
-            $this->cache->set($s_key, $a_value, $this->expire);
+            $a_value = $this->getDao()->read($id);
+            self::getDomain()->set($s_key, $a_value, $this->expire);
             return $a_value;
         }
     }
@@ -173,8 +215,8 @@ abstract class Dao extends Core\Assembly implements Application\IDao
     {
         $s_key = $this->generateKey($id);
 
-        $this->dao->update($id, $fields);
-        $this->cache->set($s_key, $fields, $this->expire);
+        $this->getDao()->update($id, $fields);
+        self::getDomain()->set($s_key, $fields, $this->expire);
     }
 
     /**
@@ -187,8 +229,8 @@ abstract class Dao extends Core\Assembly implements Application\IDao
     {
         $s_key = $this->generateKey($id);
 
-        $this->dao->delete($id);
-        $this->cache->delete($s_key);
+        $this->getDao()->delete($id);
+        self::getDomain()->delete($s_key);
     }
 
     /**
@@ -203,7 +245,7 @@ abstract class Dao extends Core\Assembly implements Application\IDao
      */
     public function countBy($where = array(), $offset = 0, $length = 0)
     {
-        $this->dao->countBy($where, $offset, $length);
+        $this->getDao()->countBy($where, $offset, $length);
     }
 
     /**
@@ -219,7 +261,7 @@ abstract class Dao extends Core\Assembly implements Application\IDao
      */
     public function listBy($where = array(), $orderBy = array(), $offset = 0, $length = 0)
     {
-        $this->dao->listBy($where, $orderBy, $offset, $length);
+        $this->getDao()->listBy($where, $orderBy, $offset, $length);
     }
 
     /**
@@ -230,8 +272,21 @@ abstract class Dao extends Core\Assembly implements Application\IDao
      */
     protected function generateKey($id)
     {
-        $s_class = get_class($this->dao);
+        $s_class = get_class($this->getDao());
         return md5($s_class . '-' . $id);
+    }
+
+    /**
+     * Get property of dao.
+     *
+     * @return Application\Dao\Dao
+     */
+    protected function getDao()
+    {
+        if (!$this->dao) {
+            throw new DataSourceExpectedException();
+        }
+        return $this->dao;
     }
 
 }

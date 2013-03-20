@@ -29,16 +29,16 @@ namespace Tox\Data;
  * @package tox.data
  * @author  Qiang Fu <fuqiang007enter@gmail.com>
  */
-interface IKV extends \ArrayAccess
+interface IKV extends \ArrayAccess, ISource
 {
     /**
      * Retrieves a value from cache with a specified key.
-     * 
+     *
      * @param  string $key a unique key identifying the cached value.
-     * @return string 
+     * @return string
      */
     public function get($key);
-    
+
     /**
      * Stores a value identified by a key in cache.
      *
@@ -50,10 +50,10 @@ interface IKV extends \ArrayAccess
      *                         cache, false otherwise
      */
     public function set($key, $val, $expire);
-    
+
     /**
      * Makes the value +1 that identified by a key in cache.
-     * 
+     *
      * This is the implementation of the method declared in the parent class.
      *
      * @param  string  $key the key identifying the value to be cached.
@@ -61,10 +61,10 @@ interface IKV extends \ArrayAccess
      *                      false otherwise
      */
     public function increase($key);
-    
+
     /**
      * Makes the value -1 that identified by a key in cache.
-     * 
+     *
      * This is the implementation of the method declared in the parent class.
      *
      * @param  string  $key the key identifying the value to be cached.
@@ -72,36 +72,36 @@ interface IKV extends \ArrayAccess
      *                      false otherwise
      */
     public function decrease($key);
-    
+
     /**
      * Inserts the value lasted cell that identified by a key in cache.
-     * 
+     *
      * @param  string $key the key identifying the value to be cached.
-     * @return array 
+     * @return array
      */
     public function push($key);
-    
+
     /**
      * Deletes the value lasted cell that identified by a key in cache.
-     * 
+     *
      * @param  string $key the key identifying the value to be cached.
-     * @return array 
+     * @return array
      */
     public function pop($key);
-    
+
     /**
      * Deletes the value first cell that identified by a key in cache.
-     * 
+     *
      * @param  string $key the key identifying the value to be cached.
-     * @return array 
+     * @return array
      */
     public function shift($key);
-    
+
     /**
      * Inserts the value first cell that identified by a key in cache.
-     * 
+     *
      * @param  string $key the key identifying the value to be cached.
-     * @return array 
+     * @return array
      */
     public function unshift($key);
 }

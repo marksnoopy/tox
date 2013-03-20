@@ -29,10 +29,15 @@ require_once __DIR__ . '/../../../../../../src/tox/core/assembly.php';
 require_once __DIR__ . '/../../../../../../src/tox/core/isingleton.php';
 require_once __DIR__ . '/../../../../../../src/tox/data/isource.php';
 require_once __DIR__ . '/../../../../../../src/tox/application/idao.php';
+require_once __DIR__ . '/../../../../../../src/tox/application/dao/dao.php';
 require_once __DIR__ . '/../../../../../../src/tox/application/dao/cache/dao.php';
 require_once __DIR__ . '/../../../../../../src/tox/data/ikv.php';
 require_once __DIR__ . '/../../../../../../src/tox/data/kv/kv.php';
 require_once __DIR__ . '/../../../../../../src/tox/data/kv/memcache.php';
+
+require_once __DIR__ . '/../../../../../../src/tox/core/exception.php';
+require_once __DIR__ . '/../../../../../../src/tox/application/dao/cache/@exception/datasourceexpected.php';
+require_once __DIR__ . '/../../../../../../src/tox/application/dao/cache/@exception/invalidcachingdatadomain.php';
 
 use Tox;
 use stdClass;
@@ -50,7 +55,10 @@ class DaoTest extends PHPUnit_Framework_TestCase
 
     public function testCacheFlowWouldWorkFine()
     {
-        $o_mock_dao = $this->getMock('Tox\\Application\\Dao\\Dao', array('read', 'update', 'create', 'delete'));
+        $o_mock_dao = $this->getMockBuilder('Tox\\Application\\Dao\\Dao')
+                           ->disableOriginalConstructor()
+                           ->getMockForAbstractClass();
+
         $o_mock_dao->expects($this->once())
                    ->method('read')
                    ->with($this->equalTo('111'))
@@ -69,16 +77,23 @@ class DaoTest extends PHPUnit_Framework_TestCase
                      ->will($this->returnValue('world'));
 
         $o_cache_dao = $this->getMockBuilder('Tox\\Application\\Dao\\Cache\\Dao')
-                            ->setConstructorArgs(array($o_mock_dao, $o_mock_cache))
+                            ->disableOriginalConstructor()
                             ->getMockForAbstractClass();
 
+        $o_cache_dao::bindDomain($o_mock_cache);
+        $o_cache_dao::getInstance();
+        $o_cache_dao->bind($o_mock_dao);
+
         $this->assertEquals('hello', $o_cache_dao->read('111'));
-        $this->assertEquals('world', $o_cache_dao->read('111'));
+            $this->assertEquals('world', $o_cache_dao->read('111'));
     }
 
     public function testTransmitToNormalDaoWhenCreateUpdateDeleteOperationCalled()
     {
-        $o_mock_dao = $this->getMock('Tox\\Application\\Dao\\Dao', array('update', 'create', 'delete'));
+        $o_mock_dao = $this->getMockBuilder('Tox\\Application\\Dao\\Dao')
+                           ->disableOriginalConstructor()
+                           ->getMockForAbstractClass();
+
         $o_mock_dao->expects($this->once())
                    ->method('create')
                    ->with($this->equalTo(array('title' => 'hello', 'description' => 'world')))
@@ -93,8 +108,13 @@ class DaoTest extends PHPUnit_Framework_TestCase
         $o_mock_cache = $this->getMock('Tox\\Data\\KV\\Memcache', array('get', 'set', 'delete'));
 
         $o_cache_dao = $this->getMockBuilder('Tox\\Application\\Dao\\Cache\\Dao')
-                            ->setConstructorArgs(array($o_mock_dao, $o_mock_cache))
+                            ->disableOriginalConstructor()
                             ->getMockForAbstractClass();
+
+        $o_cache_dao::bindDomain($o_mock_cache);
+        $o_cache_dao::getInstance();
+        $o_cache_dao->bind($o_mock_dao);
+
         $o_cache_dao->create(array('title' => 'hello', 'description' => 'world'));
         $o_cache_dao->update('111', array('id' => '111', 'title' => 'aaa', 'description' => 'bbb'));
         $o_cache_dao->delete('111');
@@ -102,7 +122,10 @@ class DaoTest extends PHPUnit_Framework_TestCase
 
     public function testTransmitToNormalDaoWhenCountByAndListAndSortByOperationCalled()
     {
-        $o_mock_dao = $this->getMock('Tox\\Application\\Dao\\Dao', array('countBy', 'listBy'));
+        $o_mock_dao = $this->getMockBuilder('Tox\\Application\\Dao\\Dao')
+                           ->disableOriginalConstructor()
+                           ->getMockForAbstractClass();
+
         $o_mock_dao->expects($this->once())
                    ->method('countBy');
         $o_mock_dao->expects($this->once())
@@ -111,12 +134,16 @@ class DaoTest extends PHPUnit_Framework_TestCase
         $o_mock_cache = $this->getMock('Tox\\Data\\KV\\Memcache', array('get', 'set', 'delete'));
 
         $o_cache_dao = $this->getMockBuilder('Tox\\Application\\Dao\\Cache\\Dao')
-                            ->setConstructorArgs(array($o_mock_dao, $o_mock_cache))
+                            ->disableOriginalConstructor()
                             ->getMockForAbstractClass();
+
+        $o_cache_dao::bindDomain($o_mock_cache);
+        $o_cache_dao::getInstance();
+        $o_cache_dao->bind($o_mock_dao);
+
         $o_cache_dao->countBy();
         $o_cache_dao->listBy();
     }
-
 }
 
 // vi:ft=php fenc=utf-8 ff=unix ts=4 sts=4 et sw=4 fen fdm=indent fdl=1 tw=120

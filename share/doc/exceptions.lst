@@ -38,6 +38,8 @@
 
 [Tox\Application\Dao]
 ;0x800208??
+0x80020801 = DataSourceExpectedException
+0x80020802 = InvalidCachingDataDomainException
 
 [Tox\Application\Type]
 ;0x800209??
