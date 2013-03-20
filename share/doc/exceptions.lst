@@ -25,6 +25,7 @@
 
 [Tox\Application\Router]
 0x80020401 = TokenOptionsAlreadyAssignedException
+0x80020402 = UnknownApplicationSituationException
 
 [Tox\Application\Controller]
 ;0x800205??

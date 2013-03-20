@@ -1,6 +1,6 @@
 <?php
 /**
- * Represents as the input pipe of an application.
+ * Defines the essential behaviors of applications input.
  *
  * This file is part of Tox.
  *
@@ -17,21 +17,36 @@
  * You should have received a copy of the GNU General Public License
  * along with Tox.  If not, see <http://www.gnu.org/licenses/>.
  *
- * @package   Tox\Application
- * @author    Snakevil Zen <zsnakevil@gmail.com>
- * @copyright © 2012 szen.in
- * @license   http://www.gnu.org/licenses/gpl.html
+ * @copyright © 2012-2013 SZen.in
+ * @license   GNU General Public License, version 3
  */
 
 namespace Tox\Application;
 
 use ArrayAccess;
 
+/**
+ * Announces the essential behaviors of applications input.
+ *
+ * @package tox.application
+ * @author  Snakevil Zen <zsnakevil@gmail.com>
+ */
 interface IInput extends ArrayAccess
 {
+    /**
+     * Retrieves the formatted command-line for routing.
+     *
+     * @return string
+     */
     public function getCommandLine();
 
-    public function recruit(Router\IToken $token);
+    /**
+     * Recruits the analysed options and values.
+     *
+     * @param  IToken $token Routing token containing the options and values.
+     * @return self
+     */
+    public function recruit(IToken $token);
 }
 
-// vi:se ft=php fenc=utf-8 ff=unix ts=4 sts=4 et sw=4 fen fdm=indent fdl=1 tw=120:
+// vi:ft=php fenc=utf-8 ff=unix ts=4 sts=4 et sw=4 fen fdm=indent fdl=1 tw=120

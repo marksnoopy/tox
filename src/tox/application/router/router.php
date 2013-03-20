@@ -1,6 +1,6 @@
 <?php
 /**
- * Represents as the router to analyse applications runtime situations.
+ * Defines the applications routers.
  *
  * This file is part of Tox.
  *
@@ -17,10 +17,8 @@
  * You should have received a copy of the GNU General Public License
  * along with Tox.  If not, see <http://www.gnu.org/licenses/>.
  *
- * @package   Tox\Application
- * @author    Snakevil Zen <zsnakevil@gmail.com>
- * @copyright © 2012 szen.in
- * @license   http://www.gnu.org/licenses/gpl.html
+ * @copyright © 2012-2013 SZen.in
+ * @license   GNU General Public License, version 3
  */
 
 namespace Tox\Application\Router;
@@ -30,10 +28,29 @@ use Exception;
 use Tox\Core;
 use Tox\Application;
 
+/**
+ * Represents as the applications routing tokens.
+ *
+ * __*ALIAS*__ as `Tox\Application\Router`.
+ *
+ * @package tox.application.router
+ * @author  Snakevil Zen <zsnakevil@gmail.com>
+ */
 class Router extends Core\Assembly implements Application\IRouter
 {
+    /**
+     * Stores the imported routing rules.
+     *
+     * @var array[]
+     */
     protected $routes;
 
+    /**
+     * {@inheritdoc}
+     *
+     * @param  Application\IInput $input Applications input.
+     * @return Application\IToken
+     */
     public function analyse(Application\IInput $input)
     {
         $s_sense = $input->getCommandLine();
@@ -46,24 +63,37 @@ class Router extends Core\Assembly implements Application\IRouter
                 if (preg_match($s_pattern, $s_sense, $a_matches))
                 {
                     $o_token = new Token($a_options);
-                    return $o_token->bind($a_matches);
+                    return $o_token->assign($a_matches);
                 }
             }
         }
         throw new UnknownApplicationSituationException(array('input' => $input));
     }
 
+    /**
+     * {@inheritdoc}
+     *
+     * @param array[] $routes OPTIONAL. Initial routing rules.
+     */
     public function __construct($routes = array())
     {
-        settype($routes, 'array');
+        $routes = (array) $routes;
         $this->routes = array();
         $this->import($routes);
     }
 
-    public function import($routes, $prepend = FALSE)
+    /**
+     * {@inheritdoc}
+     *
+     * @param  array[]  $routes  Routing rules to be imported.
+     * @param  boolean  $prepend OPTIONAL. Whether prepending the rules to
+     *                           existant. FALSE defaults.
+     * @return self
+     */
+    public function import($routes, $prepend = false)
     {
-        settype($routes, 'array');
-        settype($prepend, 'bool');
+        $routes = (array) $routes;
+        $prepend = (bool) $prepend;
         if (empty($routes))
         {
             return $this;
@@ -88,4 +118,4 @@ class Router extends Core\Assembly implements Application\IRouter
     }
 }
 
-// vi:se ft=php fenc=utf-8 ff=unix ts=4 sts=4 et sw=4 fen fdm=indent fdl=1 tw=120:
+// vi:ft=php fenc=utf-8 ff=unix ts=4 sts=4 et sw=4 fen fdm=indent fdl=1 tw=120
