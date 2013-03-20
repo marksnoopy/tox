@@ -31,7 +31,6 @@ require_once __DIR__ . '/../../../../../src/tox/application/idao.php';
 require_once __DIR__ . '/../../../../../src/tox/application/dao/dao.php';
 
 require_once __DIR__ . '/../../../../../src/tox/core/exception.php';
-require_once __DIR__ . '/../../../../../src/tox/application/dao/@exception/datadomainrebinding.php';
 
 require_once __DIR__ . '/../../../../../src/tox/data/isource.php';
 
@@ -60,18 +59,28 @@ class DaoTest extends PHPUnit_Framework_TestCase
     {
         $o_dd1 = $this->getMock('Tox\\Data\\ISource');
         Dao::bindDomain($o_dd1);
-        $o_dao1 = $this->getMockForAbstractClass('Tox\\Application\\Dao\\DaoMock', array(), '', false);
+        $o_dao1 = $this->getMockForAbstractClass('Tox\\Application\\Dao\\DaoMock',
+            array(),
+            'c' . md5(microtime()),
+            false
+        );
         $o_dd2 = $this->getMock('Tox\\Data\\ISource');
         call_user_func(array(get_class($o_dao1), 'bindDomain'), $o_dd2);
         $this->assertSame($o_dd2, $o_dao1->getDomainTest());
-        $o_dao2 = $this->getMockForAbstractClass('Tox\\Application\\Dao\\DaoMock', array(), '', false);
+        $o_dao2 = $this->getMockForAbstractClass('Tox\\Application\\Dao\\DaoMock',
+            array(),
+            'c' . md5(microtime()),
+            false
+        );
         $this->assertSame($o_dd1, $o_dao2->getDomainTest());
     }
 
     public function testSingletonPattern()
     {
-        $s_sub1 = get_class($this->getMockForAbstractClass('Tox\\Application\\Dao\\Dao', array(), '', false));
-        $s_sub2 = get_class($this->getMockForAbstractClass('Tox\\Application\\Dao\\DaoMock', array(), '', false));
+        $s_sub1 = 'c' . md5(microtime());
+        $this->getMockForAbstractClass('Tox\\Application\\Dao\\Dao', array(), $s_sub1, false);
+        $s_sub2 = 'c' . md5(microtime());
+        $this->getMockForAbstractClass('Tox\\Application\\Dao\\Dao', array(), $s_sub2, false);
         $o_dao1 = call_user_func(array($s_sub1, 'getInstance'));
         $this->assertInstanceOf($s_sub1, $o_dao1);
         $o_dao2 = call_user_func(array($s_sub2, 'getInstance'));

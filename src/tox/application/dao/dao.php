@@ -1,6 +1,6 @@
 <?php
 /**
- * Represents as the data accessor instance of an entity prototype.
+ * Defines the data access objects.
  *
  * This file is part of Tox.
  *
@@ -17,118 +17,96 @@
  * You should have received a copy of the GNU General Public License
  * along with Tox.  If not, see <http://www.gnu.org/licenses/>.
  *
- * @package   Tox\Application
- * @author    Snakevil Zen <zsnakevil@gmail.com>
- * @copyright © 2012 szen.in
- * @license   http://www.gnu.org/licenses/gpl.html
+ * @copyright © 2012-2013 SZen.in
+ * @license   GNU General Public License, version 3
  */
 
 namespace Tox\Application\Dao;
-
-use PDO;
 
 use Tox\Core;
 use Tox\Data;
 use Tox\Application;
 
+/**
+ * Represents as a data access object.
+ *
+ * **THIS CLASS CANNOT BE INSTANTIATED.**
+ *
+ * __*ALIAS*__ as `Tox\Application\Dao`.
+ *
+ * @package tox.application.dao
+ * @author  Snakevil Zen <zsnakevil@gmail.com>
+ */
 abstract class Dao extends Core\Assembly implements Application\IDao
 {
-    const PK = 'id';
+    /**
+     * Stores the binded domains for all derived data access objects.
+     *
+     * @internal
+     *
+     * @var Data\ISource[]
+     */
+    protected static $domains = array();
 
-    const TABLE = 'table';
+    /**
+     * Stores the instances of all derived data access objects.
+     *
+     * @internal
+     *
+     * @var self[]
+     */
+    protected static $instances = array();
 
-    protected static $domain;
-
-    protected static $instance;
-
-    public static function bindDomain(Data\ISource $domain)
+    /**
+     * {@inheritdoc}
+     *
+     * **THIS METHOD CANNOT BE OVERRIDDEN.**
+     *
+     * @param  Data\ISource $domain Data domain to be binded.
+     * @return void
+     */
+    final public static function bindDomain(Data\ISource $domain)
     {
-        if (static::$domain instanceof Data\ISource)
-        {
-            throw new DataDomainRebindingException(array('domain' => $domain));
-        }
-        static::$domain = $domain;
+        self::$domains[get_called_class()] = $domain;
     }
 
-    final protected function __construct()
-    {
-    }
-
-    abstract protected function execute($sql, $params = array());
-
+    /**
+     * Retrieves the most suitable data domain.
+     *
+     * **THIS METHOD CANNOT BE OVERRIDDEN.**
+     *
+     * NOTICE: MOST SUITABLE means that the data domain was binded by the type
+     * of current invoker, or its most recently parent.
+     *
+     * @return Data\ISource
+     */
     final protected function getDomain()
     {
         $s_class = get_called_class();
         while (FALSE !== $s_class)
         {
-            if ($s_class::$domain instanceof Data\ISource)
+            if (isset(self::$domains[$s_class]))
             {
-                static::$domain = $s_class::$domain;
-                return $s_class::$domain;
+                return self::$domains[$s_class];
             }
             $s_class = get_parent_class($s_class);
         }
     }
 
+    /**
+     * {@inheritdoc}
+     *
+     * **THIS METHOD CANNOT BE OVERRIDDEN.**
+     *
+     * @return self
+     */
     final public static function getInstance()
     {
-        if (!static::$instance instanceof static)
-        {
-            static::$instance = new static;
+        $s_class = get_called_class();
+        if (!isset(self::$instances[$s_class])) {
+            self::$instances[$s_class] = new $s_class;
         }
-        return static::$instance;
-    }
-
-    final protected function validateWhereFields($where, Array $fields)
-    {
-        if (!is_array($where))
-        {
-            throw new IllegalWhereClauseException(array('where' => $where));
-        }
-        foreach ($fields as $ii)
-        {
-            if (!isset($where[$ii]))
-            {
-                if (!is_array($where[$ii]))
-                {
-                    continue;
-                }
-                if (empty($where[$ii]) || 2 < count($where[$ii]))
-                {
-                    throw new ExpectedConditionFieldMissingException(array('clause' => $where, 'field' => $ii));
-                }
-            }
-            if (!$where[$ii][1] instanceof Application\Type\SetFilterType)
-            {
-                throw new IllegalExpectedConditionFieldException(array('clause' => $where, 'field' => $ii));
-            }
-            switch ($where[$ii][1])
-            {
-                case Application\Type\SetFilterType::BETWEEN:
-                case Application\Type\SetFilterType::NOT_BETWEEN:
-                    if (!is_array($where[$ii][0]) || 2 != count($where[$ii][0]))
-                    {
-                        throw new IllegalConditionFieldException(array('field' => $ii,
-                                'type' => $where[$ii][1],
-                                'value' => $where[$ii][0]
-                            )
-                        );
-                    }
-                    break;
-                case Application\Type\SetFilterType::IN:
-                case Application\Type\SetFilterType::NOT_IN:
-                    if (!is_array($where[$ii][0]))
-                    {
-                        throw new IllegalConditionFieldException(array('field' => $ii,
-                                'type' => $where[$ii][1],
-                                'value' => $where[$ii][0]
-                            )
-                        );
-                    }
-                    break;
-            }
-        }
-        return TRUE;
+        return self::$instances[$s_class];
     }
 }
 
