@@ -38,9 +38,9 @@ final class IllegalHTTPStatusCodeException extends Core\Exception
     /**
      * {@inheritdoc}
      *
-     * > Defined as `0x80030103`.
+     * > Defined as `0x80030203`.
      */
-    const CODE = 0x80030103;
+    const CODE = 0x80030203;
 
     /**
      * {@inheritdoc}

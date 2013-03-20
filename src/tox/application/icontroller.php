@@ -1,6 +1,6 @@
 <?php
 /**
- * Defines the behaviors of applications routers.
+ * Defines the essential behaviors of controllers.
  *
  * This file is part of Tox.
  *
@@ -24,37 +24,26 @@
 namespace Tox\Application;
 
 /**
- * Announces the behaviors of applications routers.
+ * Announces the essential behaviors of controllers.
  *
  * @package tox.application
  * @author  Snakevil Zen <zsnakevil@gmail.com>
  */
-interface IRouter
+interface IController
 {
     /**
      * CONSTRUCT FUNCTION
      *
-     * @param array[] $routes OPTIONAL. Initial routing rules.
+     * @param Application $application Hosting application.
      */
-    public function __construct($routes = array());
+    public function __construct(Application $application);
 
     /**
-     * Analysis routing token from applications input.
+     * Executes controlling progress.
      *
-     * @param  IInput $input Applications input.
-     * @return IToken
-     */
-    public function analyse(IInput $input);
-
-    /**
-     * Imports extra routing rules.
-     *
-     * @param  array[]  $routes  Routing rules to be imported.
-     * @param  boolean  $prepend OPTIONAL. Whether prepending the rules to
-     *                           existant. FALSE defaults.
      * @return self
      */
-    public function import($routes, $prepend = false);
+    public function act();
 }
 
 // vi:ft=php fenc=utf-8 ff=unix ts=4 sts=4 et sw=4 fen fdm=indent fdl=1 tw=120

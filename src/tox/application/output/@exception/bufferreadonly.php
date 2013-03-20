@@ -38,9 +38,9 @@ final class BufferReadonlyException extends Core\Exception
     /**
      * {@inheritdoc}
      *
-     * > Defined as `0x80010203`.
+     * > Defined as `0x80020203`.
      */
-    const CODE = 0x80010203;
+    const CODE = 0x80020203;
 
     /**
      * {@inheritdoc}

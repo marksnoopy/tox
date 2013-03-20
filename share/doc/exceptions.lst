@@ -1,0 +1,59 @@
+[Tox\Core]
+0x80000001 = PropertyReadDeniedException
+0x80000002 = PropertyWriteDeniedException
+0x80000003 = ExistantClassToAliasException
+0x80000004 = PackageDuplicateRegistrationException
+0x80000005 = PackageAccessDeniedException
+0x80000006 = Illegal3rdPartyPackageException
+
+[Tox\Type]
+;0x800100??
+
+[Tox\Application]
+;0x800200??
+
+[Tox\Application\Input]
+;0x800201??
+
+[Tox\Application\Output]
+0x80020201 = ClosedOutputException
+0x80020202 = StreamingViewExpectedException
+0x80020203 = BufferReadonlyException
+
+[Tox\Application\Configuration]
+;0x800203??
+
+[Tox\Application\Router]
+0x80020401 = TokenOptionsAlreadyAssignedException
+0x80020402 = UnknownApplicationSituationException
+
+[Tox\Application\Controller]
+;0x800205??
+
+[Tox\Application\View]
+;0x800206??
+
+[Tox\Application\Model]
+;0x800207??
+
+[Tox\Application\Dao]
+;0x800208??
+0x80020801 = DataSourceExpectedException
+0x80020802 = InvalidCachingDataDomainException
+
+[Tox\Application\Type]
+;0x800209??
+
+[Tox\Web]
+;0x800300??
+
+[Tox\Web\Request]
+;0x800301??
+
+[Tox\Web\Response]
+0x80030201 = ResponseRequiredException
+0x80030202 = HeadersReadonlyException
+0x80030203 = IllegalHTTPStatusCodeException
+
+[Tox\Data]
+;0x800400??

@@ -38,9 +38,9 @@ final class HeadersReadonlyException extends Core\Exception
     /**
      * {@inheritdoc}
      *
-     * > Defined as `0x80030102`.
+     * > Defined as `0x80030202`.
      */
-    const CODE = 0x80030102;
+    const CODE = 0x80030202;
 
     /**
      * {@inheritdoc}

@@ -1,6 +1,6 @@
 <?php
 /**
- * Defines the behaviors of applications routers.
+ * Defines the behaviors of applications routing tokens.
  *
  * This file is part of Tox.
  *
@@ -23,38 +23,37 @@
 
 namespace Tox\Application;
 
+use ArrayAccess;
+
 /**
- * Announces the behaviors of applications routers.
+ * Announces the behaviors of applications routing tokens.
  *
  * @package tox.application
  * @author  Snakevil Zen <zsnakevil@gmail.com>
  */
-interface IRouter
+interface IToken extends ArrayAccess
 {
     /**
      * CONSTRUCT FUNCTION
      *
-     * @param array[] $routes OPTIONAL. Initial routing rules.
+     * @param string[] $options Available options from a routing rule.
      */
-    public function __construct($routes = array());
+    public function __construct(Array $options);
 
     /**
-     * Analysis routing token from applications input.
+     * Assigns values to options.
      *
-     * @param  IInput $input Applications input.
-     * @return IToken
-     */
-    public function analyse(IInput $input);
-
-    /**
-     * Imports extra routing rules.
-     *
-     * @param  array[]  $routes  Routing rules to be imported.
-     * @param  boolean  $prepend OPTIONAL. Whether prepending the rules to
-     *                           existant. FALSE defaults.
+     * @param  string[]  $values Values of options.
      * @return self
      */
-    public function import($routes, $prepend = false);
+    public function assign(Array $values);
+
+    /**
+     * Retrieves the name of the controller to be acted.
+     *
+     * @return string
+     */
+    public function getController();
 }
 
 // vi:ft=php fenc=utf-8 ff=unix ts=4 sts=4 et sw=4 fen fdm=indent fdl=1 tw=120

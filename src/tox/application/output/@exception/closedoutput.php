@@ -38,9 +38,9 @@ final class ClosedOutputException extends Core\Exception
     /**
      * {@inheritdoc}
      *
-     * > Defined as `0x80010201`.
+     * > Defined as `0x80020201`.
      */
-    const CODE = 0x80010201;
+    const CODE = 0x80020201;
 
     /**
      * {@inheritdoc}

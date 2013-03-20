@@ -40,9 +40,9 @@ final class StreamingViewExpectedException extends Core\Exception
     /**
      * {@inheritdoc}
      *
-     * > Defined as `0x80010202`.
+     * > Defined as `0x80020202`.
      */
-    const CODE = 0x80010202;
+    const CODE = 0x80020202;
 
     /**
      * {@inheritdoc}
