@@ -1,6 +1,7 @@
 <?php
 /**
- * Defines the behaviors of applications routing tokens.
+ * Defines an exception for setting up an invalid configured output of
+ * applications.
  *
  * This file is part of Tox.
  *
@@ -23,44 +24,31 @@
 
 namespace Tox\Application;
 
-use ArrayAccess;
+use Tox\Core;
 
 /**
- * Announces the behaviors of applications routing tokens.
+ * Be raised on setting up an invalid configured output of applications.
+ *
+ * **THIS CLASS CANNOT BE INHERITED.**
  *
  * @package tox.application
  * @author  Snakevil Zen <zsnakevil@gmail.com>
  */
-interface IToken extends ArrayAccess
+final class InvalidConfiguredOutputTypeException extends Core\Exception
 {
     /**
-     * CONSTRUCT FUNCTION
+     * {@inheritdoc}
      *
-     * @param string[] $options Available options from a routing rule.
+     * > Defined as `0x80020003`.
      */
-    public function __construct(Array $options);
+    const CODE = 0x80020003;
 
     /**
-     * Assigns values to options.
+     * {@inheritdoc}
      *
-     * @param  string[]  $values Values of options.
-     * @return self
+     * > Defined as `invalid output type '%type$s' configured`.
      */
-    public function assign(Array $values);
-
-    /**
-     * Retrieves the name of the controller to be acted.
-     *
-     * @return string
-     */
-    public function getController();
-
-    /**
-     * Exports all options as an array.
-     *
-     * @return array
-     */
-    public function export();
+    const MESSAGE = 'invalid output type \'%type$s\' configured';
 }
 
 // vi:ft=php fenc=utf-8 ff=unix ts=4 sts=4 et sw=4 fen fdm=indent fdl=1 tw=120

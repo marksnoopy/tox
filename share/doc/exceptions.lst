@@ -11,6 +11,11 @@
 
 [Tox\Application]
 ;0x800200??
+0x80020001 = MultipleApplicationRuntimeException
+0x80020002 = InvalidConfiguredFallbackTypeException
+0x80020003 = InvalidConfiguredOutputTypeException
+0x80020004 = InvalidConfiguredInputTypeException
+0x80020005 = InvalidConfiguredRouterTypeException
 
 [Tox\Application\Input]
 ;0x800201??

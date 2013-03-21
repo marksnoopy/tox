@@ -26,9 +26,9 @@
 
 namespace Tox\Application;
 
-use Tox;
+use Tox\Core;
 
-class Configuration extends Tox\Assembly implements IConfiguration {
+class Configuration extends Core\Assembly implements IConfiguration {
 
     protected $data;
     protected $file;

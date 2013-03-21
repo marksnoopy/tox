@@ -1,6 +1,6 @@
 <?php
 /**
- * Defines the behaviors of applications routing tokens.
+ * Defines an exception for running the second application instance.
  *
  * This file is part of Tox.
  *
@@ -23,44 +23,31 @@
 
 namespace Tox\Application;
 
-use ArrayAccess;
+use Tox\Core;
 
 /**
- * Announces the behaviors of applications routing tokens.
+ * Be raised on running the second application instance.
+ *
+ * **THIS CLASS CANNOT BE INHERITED.**
  *
  * @package tox.application
  * @author  Snakevil Zen <zsnakevil@gmail.com>
  */
-interface IToken extends ArrayAccess
+final class MultipleApplicationRuntimeException extends Core\Exception
 {
     /**
-     * CONSTRUCT FUNCTION
+     * {@inheritdoc}
      *
-     * @param string[] $options Available options from a routing rule.
+     * > Defined as `0x80020001`.
      */
-    public function __construct(Array $options);
+    const CODE = 0x80020001;
 
     /**
-     * Assigns values to options.
+     * {@inheritdoc}
      *
-     * @param  string[]  $values Values of options.
-     * @return self
+     * > Defined as `only one application instance allowed`.
      */
-    public function assign(Array $values);
-
-    /**
-     * Retrieves the name of the controller to be acted.
-     *
-     * @return string
-     */
-    public function getController();
-
-    /**
-     * Exports all options as an array.
-     *
-     * @return array
-     */
-    public function export();
+    const MESSAGE = 'only one application instance allowed';
 }
 
 // vi:ft=php fenc=utf-8 ff=unix ts=4 sts=4 et sw=4 fen fdm=indent fdl=1 tw=120

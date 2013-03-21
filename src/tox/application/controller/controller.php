@@ -74,9 +74,9 @@ abstract class Controller extends Core\Assembly
     public function __construct(Application\Application $application)
     {
         $this->application = $application;
-        $this->config = $application->config;
-        $this->input = $application->input;
-        $this->output = $application->output;
+        $this->config = $application->getConfig();
+        $this->input = $application->getInput();
+        $this->output = $application->getOutput();
     }
 }
 

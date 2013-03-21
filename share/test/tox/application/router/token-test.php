@@ -95,6 +95,22 @@ class TokenTest extends PHPUnit_Framework_TestCase
         unset($o_token['bar']);
         $this->assertEquals($s_bar, $o_token['bar']);
     }
+
+    /**
+     * @depends testValuesAssignedToCorrespondingOptions
+     */
+    public function testExporting()
+    {
+        $a_opts = $a_values = range(1, 9);
+        shuffle($a_opts);
+        shuffle($a_values);
+        $o_token = new Token($a_opts);
+        $o_token->assign($a_values);
+        array_shift($a_opts);
+        array_shift($a_values);
+        $a_opts = array_combine($a_opts, $a_values);
+        $this->assertEquals($a_opts, $o_token->export());
+    }
 }
 
 // vi:ft=php fenc=utf-8 ff=unix ts=4 sts=4 et sw=4 fen fdm=indent fdl=1 tw=120

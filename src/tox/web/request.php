@@ -25,10 +25,10 @@
 
 namespace Tox\Web;
 
-use Tox;
-use Tox\Application\Router;
+use Tox\Core;
+use Tox\Application;
 
-class Request extends Tox\Assembly implements IRequest
+class Request extends Core\Assembly implements IRequest
 {
     protected $data;
 
@@ -97,9 +97,9 @@ class Request extends Tox\Assembly implements IRequest
         return;
     }
 
-    public function recruit(Router\IToken $token)
+    public function recruit(Application\IToken $token)
     {
-        return $this->import('route', $token->dump());
+        return $this->import('route', $token->export());
     }
 }
 
