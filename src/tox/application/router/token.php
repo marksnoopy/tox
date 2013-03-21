@@ -57,7 +57,7 @@ final class Token extends Core\Assembly implements Application\IToken
      */
     protected $options;
 
-    /**
+	/**
      * {@inheritdoc}
      *
      * @param  string[]  $values Values of options.
@@ -150,6 +150,16 @@ final class Token extends Core\Assembly implements Application\IToken
     public function offsetUnset($option)
     {
         return;
+    }
+
+    /**
+     * {@inheritdoc}
+     *
+     * @return array
+     */
+    public function export()
+    {
+        return $this->options;
     }
 }
 

@@ -126,7 +126,8 @@ abstract class Application extends Core\Assembly
             self::$instance->init();
             $o_token = $router->import($config->export('route.*', array()), TRUE)->analyse($o_input);
             self::$instance->input->recruit($o_token);
-            $o_controller = new $o_token->controller(self::$instance);
+			$s_ctrl = $o_token->getController();
+            $o_controller = new $s_ctrl(self::$instance);
             $o_controller->act();
         }
         catch (Exception $ex)
