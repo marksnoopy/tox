@@ -1,6 +1,6 @@
 <?php
 /**
- * Defines an exception for setting up an invalid configured input of
+ * Defines an exception for setting up an invalid configured output of
  * applications.
  *
  * This file is part of Tox.
@@ -27,28 +27,28 @@ namespace Tox\Application;
 use Tox\Core;
 
 /**
- * Be raised on setting up an invalid configured input of applications.
+ * Be raised on setting up an invalid configured output of applications.
  *
  * **THIS CLASS CANNOT BE INHERITED.**
  *
  * @package tox.application
  * @author  Snakevil Zen <zsnakevil@gmail.com>
  */
-final class InvalidConfiguredInputTypeException extends Core\Exception
+final class InvalidConfiguredOutputTypeException extends Core\Exception
 {
     /**
      * {@inheritdoc}
      *
-     * > Defined as `0x80020004`.
+     * > Defined as `0x80020003`.
      */
-    const CODE = 0x80020004;
+    const CODE = 0x80020003;
 
     /**
      * {@inheritdoc}
      *
-     * > Defined as `invalid input type '%type$s' configured`.
+     * > Defined as `invalid output type '%type$s' configured`.
      */
-    const MESSAGE = 'invalid input type \'%type$s\' configured';
+    const MESSAGE = 'invalid output type \'%type$s\' configured';
 }
 
 // vi:ft=php fenc=utf-8 ff=unix ts=4 sts=4 et sw=4 fen fdm=indent fdl=1 tw=120

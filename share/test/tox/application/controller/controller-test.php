@@ -46,16 +46,13 @@ class ControllerTest extends PHPUnit_Framework_TestCase
     public function testApplicationContextAttachedOnConstructing()
     {
         $o_app = $this->getMockBuilder('Tox\\Application\\Application')
-            ->setMethods(array('__getInput', '__getOutput', '__getConfig',
-                'getDefaultInput', 'getDefaultOutput', 'init'
-                )
-            )
+            ->setMethods(array('getInput', 'getOutput', 'getConfig'))
             ->disableOriginalConstructor()
-            ->getMock();
-        $o_app->expects($this->once())->method('__getInput');
-        $o_app->expects($this->once())->method('__getOutput');
-        $o_app->expects($this->once())->method('__getConfig');
-        $o_ctrl = $this->getMock('Tox\\Application\\Controller\\Controller', array('act'), array($o_app));
+            ->getMockForAbstractClass();
+        $o_app->expects($this->once())->method('getInput');
+        $o_app->expects($this->once())->method('getOutput');
+        $o_app->expects($this->once())->method('getConfig');
+        $o_ctrl = $this->getMockForAbstractClass('Tox\\Application\\Controller\\Controller', array($o_app));
     }
 }
 

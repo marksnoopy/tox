@@ -1,8 +1,6 @@
 <?php
 /**
- * Provides behaviors to all derived applications.
- *
- * This class cannot be instantiated.
+ * Defines the essential behaviors of applications.
  *
  * This file is part of Tox.
  *
@@ -19,10 +17,8 @@
  * You should have received a copy of the GNU General Public License
  * along with Tox.  If not, see <http://www.gnu.org/licenses/>.
  *
- * @package   Tox
- * @author    Snakevil Zen <zsnakevil@gmail.com>
- * @copyright © 2012 szen.in
- * @license   http://www.gnu.org/licenses/gpl.html
+ * @copyright © 2012-2013 SZen.in
+ * @license   GNU General Public License, version 3
  */
 
 namespace Tox\Application;
@@ -31,112 +27,313 @@ use Exception;
 
 use Tox\Core;
 
+use PHPUnit_Framework_Error;
+use PHPUnit_Framework_Exception;
+
+/**
+ * Represents as the abstract application to provide essential behaviors.
+ *
+ * **THIS CLASS CANNOT BE INSTANTIATED.**
+ *
+ * __*ALIAS*__ as `Tox\Application`.
+ *
+ * @property-read IConfiguration $config Retrieves the configuration.
+ * @property-read IInput         $input  Retrieves the input.
+ * @property-read IOutput        $output Retrieves the output.
+ *
+ * @package tox.application
+ * @author  Snakevil Zen <zsnakevil@gmail.com>
+ */
 abstract class Application extends Core\Assembly
 {
+    /**
+     * Stores the configuration.
+     *
+     * @var IConfiguration
+     */
     protected $config;
 
+    /**
+     * Stores the falling back view.
+     *
+     * @var IFallback
+     */
     protected $fallback;
 
+    /**
+     * Stores the input.
+     *
+     * @var IInput
+     */
     protected $input;
 
+    /**
+     * Stores the runtime instance.
+     *
+     * @var self
+     */
     protected static $instance;
 
+    /**
+     * Stores the output.
+     *
+     * @var IOutput
+     */
     protected $output;
 
-    protected function __construct(IInput $input = NULL, IOutput $output = NULL)
+    /**
+     * CONSTRUCT FUNCTION
+     */
+    protected function __construct()
     {
-        $this->input = $input;
-        $this->output = $output;
     }
 
-    public function fallback(Exception $ex)
+    /**
+     * Retrieves the default input on demand.
+     *
+     * **THIS METHOD MUST BE IMPLEMENTED.**
+     *
+     * @return IInput
+     */
+    abstract protected function getDefaultInput();
+
+    /**
+     * Retrieves the default output on demand.
+     *
+     * **THIS METHOD MUST BE IMPLEMENTED.**
+     *
+     * @return IOutput
+     */
+    abstract protected function getDefaultOutput();
+
+    /**
+     * Retrieves the default configuration on demand.
+     *
+     * @param  string         $file External configuration file path.
+     * @return IConfiguration
+     */
+    protected function getDefaultConfiguration($file)
     {
-        $this->output->writeClose($this->fallback($ex));
-        return $this;
+        return new Configuration($file);
     }
 
-    abstract protected static function getDefaultInput();
+    /**
+     * Retrieves the default router on demand.
+     *
+     * @return IRouter
+     *
+     * @throws InvalidConfiguredRouterTypeException If configured router type is
+     *                                              invalid.
+     */
+    protected function getDefaultRouter()
+    {
+        if (isset($this->config['router.type'])) {
+            if (!is_subclass_of($this->config['router.type'], 'Tox\\Application\\IRouter')) {
+                throw new InvalidConfiguredRouterTypeException(array('type' => $this->config['router.type']));
+            }
+            $o_router = new $this->config['router.type'];
+        } else {
+            $o_router = new Router\Router;
+        }
+        // TODO support routes table files.
+        return $o_router;
+    }
 
-    abstract protected static function getDefaultOutput();
+    /**
+     * Retrieves the default falling back view on demand.
+     *
+     * @return IRouter
+     *
+     * @throws InvalidConfiguredFallbackTypeException If configured falling back
+     *                                                view is invalid.
+     */
+    protected function getDefaultFallback()
+    {
+        if (isset($this->config['fallback.type'])) {
+            if (!is_subclass_of($this->config['fallback.type'], 'Tox\\Application\\IFallback')) {
+                throw new InvalidConfiguredFallbackTypeException(array('type' => $this->config['fallback.type']));
+            }
+            $o_fb = new $this->config['fallback.type'];
+        } else {
+            $o_fb = new View\Fallback;
+        }
+        return $o_fb;
+    }
 
-    protected function __getConfig()
+    /**
+     * Retrieves the configuration.
+     *
+     * @return IConfiguration
+     */
+    public function getConfig()
+    {
+        return $this->__getConfig();
+    }
+
+    /**
+     * Be invoked on retrieving the configuration.
+     *
+     * **THIS METHOD CANNOT BE OVERRIDDEN.**
+     *
+     * @internal
+     *
+     * @return IConfiguration
+     */
+    final protected function __getConfig()
     {
         return $this->config;
     }
 
-    protected function __getInput()
+    /**
+     * Retrieves the input.
+     *
+     * @return IInput
+     */
+    public function getInput()
+    {
+        return $this->__getInput();
+    }
+
+    /**
+     * Be invoked on retrieving the input.
+     *
+     * **THIS METHOD CANNOT BE OVERRIDDEN.**
+     *
+     * @internal
+     *
+     * @return IInput
+     */
+    final protected function __getInput()
     {
         return $this->input;
     }
 
-    protected function __getOutput()
+    /**
+     * Retrieves the output.
+     *
+     * @return IOutput
+     */
+    public function getOutput()
+    {
+        return $this->__getOutput();
+    }
+
+    /**
+     * Be invoked on retrieving the output.
+     *
+     * **THIS METHOD CANNOT BE OVERRIDDEN.**
+     *
+     * @internal
+     *
+     * @return IOutput
+     */
+    final protected function __getOutput()
     {
         return $this->output;
     }
 
+    /**
+     * Initializes the appliance runtime.
+     *
+     * **THIS METHOD MUST BE IMPLEMENTED.**
+     *
+     * @return self
+     */
     abstract protected function init();
 
-    final public static function run(
-        IConfiguration $config = NULL,
-        IRouter $router = NULL,
-        View\IFallback $fallback = NULL
-    )
+    /**
+     * Runs the appliance.
+     *
+     * **THIS METHOD CANNOT BE OVERRIDDEN.**
+     *
+     * @param  IConfiguration|string $config   Configuration instance or file
+     *                                         path.
+     * @param  IRouter               $router   Router.
+     * @param  IFallback             $fallback Falling back view.
+     * @return void
+     */
+    final public static function run($config = null, IRouter $router = null, IFallback $fallback = null)
+    {
+        try {
+            $o_app = static::getInstance();
+            $o_app->config =
+            $config = ($config instanceof IConfiguration) ? $config : $o_app->getDefaultConfiguration($config);
+            $o_app->fallback =
+            $fallback = (null === $fallback) ? $o_app->getDefaultFallback() : $fallback;
+            if (isset($config['output.type'])) {
+                if (!is_subclass_of($config['output.type'], 'Tox\\Application\\IOutput')) {
+                    throw new InvalidConfiguredOutputTypeException(array('type' => $config['output.type']));
+                }
+                $o_app->output = new $config['output.type'];
+            } else {
+                $o_app->output = $o_app->getDefaultOutput();
+            }
+            if (isset($config['input.type'])) {
+                if (!is_subclass_of($config['input.type'], 'Tox\\Application\\IInput')) {
+                    throw new InvalidConfiguredInputTypeException(array('type' => $config['input.type']));
+                }
+                $o_app->input = new $config['input.type'];
+            } else {
+                $o_app->input = $o_app->getDefaultInput();
+            }
+            $o_app->init();
+            $o_app->dispatch($o_app->route((null === $router) ? $o_app->getDefaultRouter() : $router))->act();
+        } catch (Exception $ex) {
+            if ($ex instanceof PHPUnit_Framework_Error || $ex instanceof PHPUnit_Framework_Exception) {
+                throw $ex;
+            }
+            if (null === $fallback) {
+                $fallback = self::$instance->getDefaultFallback();
+            }
+            $o_out = (self::$instance->output instanceof IOutput) ?
+                self::$instance->output :
+                self::$instance->getDefaultOutput();
+            $o_out->setView($fallback->cause($ex))->close();
+        }
+    }
+
+    /**
+     * Retrieves the only runtime instance.
+     *
+     * @return self
+     *
+     * @throws MultipleApplicationRuntimeException If there is already another
+     *                                             appliance is running.
+     */
+    protected static function getInstance()
     {
         if (self::$instance instanceof self)
         {
-            self::$instance->output->writeClose(
-                self::$instance->fallback(
-                    new MultipleApplicationRuntimeException(array('existant' => self::$instance))
-                )
-            );
-            return;
+            throw new MultipleApplicationRuntimeException(array('existant' => self::$instance));
         }
-        if (NULL === $config)
-        {
-            $config = new Configuration;
-        }
-        if (NULL === $router)
-        {
-            $router = new Router;
-        }
-        if (NULL === $fallback)
-        {
-            $fallback = new View\Fallback;
-        }
-        $o_output = isset($config['output']) && is_subclass_of($config['output'], '\\IOutput')
-            ? new $config['output']
-            : static::getDefaultOutput();
-        try
-        {
-            if (isset($config['input']))
-            {
-                if (!is_subclass_of($config['input'], '\\IInput'))
-                {
-                    throw new InvalidInputComponentException(array('input' => $config['input']));
-                }
-                $o_input = new $config['input'];
-            }
-            else
-            {
-                $o_input = static::getDefaultInput();
-            }
-            self::$instance = new static($o_input, $o_output);
-            self::$instance->config = $config;
-            self::$instance->fallback = $fallback;
-            self::$instance->init();
-            $o_token = $router->import($config->export('route.*', array()), TRUE)->analyse($o_input);
-            self::$instance->input->recruit($o_token);
-			$s_ctrl = $o_token->getController();
-            $o_controller = new $s_ctrl(self::$instance);
-            $o_controller->act();
-        }
-        catch (Exception $ex)
-        {
-            // DEBUG
-            die('<table>' . $ex->xdebug_message .'</table><pre>' . $ex->getTraceAsString() . '</pre>');
-            $o_output->writeClose($fallback($ex));
-        }
+        self::$instance = new static;
+        return self::$instance;
+    }
+
+    /**
+     * Routes the appliance.
+     *
+     * @param  IRouter $router Router.
+     * @return IToken
+     */
+    protected function route(IRouter $router)
+    {
+        $o_token = $router->analyse($this->input);
+        $this->input->recruit($o_token);
+        return $o_token;
+    }
+
+    /**
+     * Dispatches to a corresponding controller.
+     *
+     * @param  IToken      $token Dispatching token.
+     * @return IController
+     */
+    protected function dispatch(IToken $token)
+    {
+        $s_ctrl = $o_token->getController();
+        return new $s_ctrl($this);
     }
 }
 
-// vi:se ft=php fenc=utf-8 ff=unix ts=4 sts=4 et sw=4 fen fdm=indent fdl=1 tw=120:
+// vi:ft=php fenc=utf-8 ff=unix ts=4 sts=4 et sw=4 fen fdm=indent fdl=1 tw=120

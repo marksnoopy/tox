@@ -1,7 +1,6 @@
 <?php
 /**
- * Defines an exception for setting up an invalid configured input of
- * applications.
+ * Defines an exception for running the second application instance.
  *
  * This file is part of Tox.
  *
@@ -27,28 +26,28 @@ namespace Tox\Application;
 use Tox\Core;
 
 /**
- * Be raised on setting up an invalid configured input of applications.
+ * Be raised on running the second application instance.
  *
  * **THIS CLASS CANNOT BE INHERITED.**
  *
  * @package tox.application
  * @author  Snakevil Zen <zsnakevil@gmail.com>
  */
-final class InvalidConfiguredInputTypeException extends Core\Exception
+final class MultipleApplicationRuntimeException extends Core\Exception
 {
     /**
      * {@inheritdoc}
      *
-     * > Defined as `0x80020004`.
+     * > Defined as `0x80020001`.
      */
-    const CODE = 0x80020004;
+    const CODE = 0x80020001;
 
     /**
      * {@inheritdoc}
      *
-     * > Defined as `invalid input type '%type$s' configured`.
+     * > Defined as `only one application instance allowed`.
      */
-    const MESSAGE = 'invalid input type \'%type$s\' configured';
+    const MESSAGE = 'only one application instance allowed';
 }
 
 // vi:ft=php fenc=utf-8 ff=unix ts=4 sts=4 et sw=4 fen fdm=indent fdl=1 tw=120
