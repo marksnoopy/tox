@@ -26,9 +26,9 @@
 
 namespace Tox\Application\Type;
 
-use Tox\Type;
+use Tox\Type\Enumeration;
 
-class SetFilterType extends Type\Enumeration
+class SetFilterType extends Enumeration\Enumeration
 {
     const BETWEEN = '><';
 

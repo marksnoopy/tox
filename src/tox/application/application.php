@@ -331,7 +331,7 @@ abstract class Application extends Core\Assembly
      */
     protected function dispatch(IToken $token)
     {
-        $s_ctrl = $o_token->getController();
+        $s_ctrl = $token->getController();
         return new $s_ctrl($this);
     }
 }
