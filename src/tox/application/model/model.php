@@ -636,9 +636,7 @@ abstract class Model extends Core\Assembly implements IEntity
     public function __set($prop, $value)
     {
         $prop = (string) $prop;
-        //list(,$a_props) = $this->__getProperties();
-        list($a_props) = array_values($this->__getProperties());
-        if (isset($a_props[$prop]))
+        if ($this->_tox_isMagicPropWritable($prop))
         {
             $m_old = $this->$prop;
         }
