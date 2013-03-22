@@ -93,6 +93,7 @@ class ConfigurationTest extends PHPUnit_Framework_TestCase
                     'memcache.conf.php' => '<?php $a_array = array("memcache" => array("host" => "xxx", "port" => "11211")); ?>',
                     'default.conf.php' => '<?php $a_array = array("aaa" => "value aaa", "bbb" => "value bbb"); ?>',
                     'var.conf.php' => '<?php $a_array = "abc"; ?>',
+                    'export.conf.php' => '<?php $a_array = array("abw9j" => "ababsdf2", "cd" => "cdcd", "ab2ee" => "ab2ee", "ee" => "eeee"); ?>',
                 )
             )
         );
@@ -245,6 +246,73 @@ class ConfigurationTest extends PHPUnit_Framework_TestCase
         $o_configuration->import($import_path);
         $this->assertEquals('9apps.mobi', $o_configuration['domain']);
         $this->assertEquals('com.nineapps.android', $o_configuration['package-name']);
+
+        $o_configuration['domain'] = 'offsetset-domain';
+        $o_configuration['package-name'] = 'offsetset-package-name';
+        $this->assertEquals('offsetset-domain', $o_configuration['domain']);
+        $this->assertEquals('offsetset-package-name', $o_configuration['package-name']);
+
+        unset($o_configuration['domain']);
+        $this->assertNull($o_configuration['domain']);
+        $this->assertNull($o_configuration['confignotseted']);
+    }
+
+    public function testExportItemsWouldBeFine()
+    {
+        $path = '/etc/export.conf.php';
+        $o_configuration = $this->getMockBuilder('Tox\\Application\\Configuration\\Configuration')
+                                ->setMethods(array('getPath'))
+                                ->disableOriginalConstructor()
+                                ->getMock();
+        $o_configuration->expects($this->once())
+                        ->method('getPath')
+                        ->with($this->equalTo($path))
+                        ->will($this->returnValue(vfsStream::url($this->root . $path)));
+        $o_configuration->import($path);
+
+        $a_export = $o_configuration->export('ab*');
+        $this->assertEquals($a_export, array('abw9j' => 'ababsdf2', 'ab2ee' => 'ab2ee'));
+
+        $a_export = $o_configuration->export('sab*', array('default' => 'default'));
+        $this->assertEquals($a_export, array('default' => 'default'));
+    }
+
+    public function testDumpWouldBeFine()
+    {
+        $path = '/etc/essential.conf.php';
+        $import_path = '/etc/import.conf.php';
+        $import_path_2 = '/etc/memcache.conf.php';
+
+        $o_configuration = $this->getMockBuilder('Tox\\Application\\Configuration\\Configuration')
+                                ->setMethods(array('getPath'))
+                                ->disableOriginalConstructor()
+                                ->getMock();
+
+        $o_configuration->expects($this->at(0))
+                        ->method('getPath')
+                        ->with($this->equalTo($path))
+                        ->will($this->returnValue(vfsStream::url($this->root . $path)));
+        $o_configuration->expects($this->at(1))
+                        ->method('getPath')
+                        ->with($this->equalTo($import_path))
+                        ->will($this->returnValue(vfsStream::url($this->root . $import_path)));
+        $o_configuration->expects($this->at(2))
+                        ->method('getPath')
+                        ->with($this->equalTo($import_path_2))
+                        ->will($this->returnValue(vfsStream::url($this->root . $import_path_2)));
+
+        $o_configuration->__construct($path);
+        $o_configuration->import($import_path);
+        $o_configuration->import($import_path_2);
+
+        $o_configuration->load(array('load-item' => 'loaded', 'load-item2' => 'loaded2'));
+        $o_configuration->set('seted-item', 'seted');
+
+        $o_dump = $o_configuration->dump();
+        $this->assertTrue(array_key_exists('global', $o_dump));
+        $this->assertTrue(array_key_exists('imported', $o_dump));
+        $this->assertTrue(array_key_exists('loaded', $o_dump));
+        $this->assertTrue(array_key_exists('seted', $o_dump));
     }
 
     public function invalidConfigurationFile()
