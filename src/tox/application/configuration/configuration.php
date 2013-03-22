@@ -186,9 +186,9 @@ class Configuration extends Core\Assembly implements Application\IConfiguration 
     {
         return array(
             'global'   => $this->items,
-            'imported' => $this->imoprted,
+            'imported' => $this->imported,
             'loaded'   => $this->loaded,
-            'seted'    => $tihs->seted
+            'seted'    => $this->seted
         );
     }
 
@@ -225,7 +225,8 @@ class Configuration extends Core\Assembly implements Application\IConfiguration 
      * @return void
      */
     public function offsetSet($offset, $value) {
-        return;
+        settype($offset, 'string');
+        $this->items[$offset] = $value;
     }
 
     /**
@@ -236,7 +237,8 @@ class Configuration extends Core\Assembly implements Application\IConfiguration 
      */
     public function offsetUnset($offset)
     {
-        return;
+        settype($offset, 'string');
+        unset($this->items[$offset]);
     }
 
     /**
