@@ -1,7 +1,7 @@
 <?php
 /**
  * 发生在空数据源时
- * 
+ *
  * @package    Tox\Data\Pdo
  * @author     Redrum Xiang <xiangcy@ucweb.com>
  * @copyright  2012 (c) www.uc.cn
@@ -9,13 +9,13 @@
 
 namespace Tox\Data\Pdo;
 
-use Tox;
+use Tox\Core;
 
-class EmptyDataSourceException extends Tox\Exception {
+class EmptyDataSourceException extends Core\Exception {
 
     const CODE = 0x8000000E;
 
-	protected static $TEMPLATE = 'Empty Data Source Exception \'%source$s\'.';
+	const MESSAGE = 'Empty Data Source Exception \'%source$s\'.';
 
 }
 

@@ -1,7 +1,7 @@
 <?php
 /**
  * 发生在无效的分区策略时
- * 
+ *
  * @package    Tox\Data\Pdo
  * @author     Redrum Xiang <xiangcy@ucweb.com>
  * @copyright  2012 (c) www.uc.cn
@@ -9,13 +9,13 @@
 
 namespace Tox\Data\Pdo;
 
-use Tox;
+use Tox\Core;
 
-class InvalidPartitionStrategyException extends Tox\Exception {
+class InvalidPartitionStrategyException extends Core\Exception {
 
     const CODE = 0x8000000F;
 
-	protected static $TEMPLATE = 'Invalid Partition Strategy Exception \'%strategy$s\'.';
+	const MESSAGE = 'Invalid Partition Strategy Exception \'%strategy$s\'.';
 
 }
 

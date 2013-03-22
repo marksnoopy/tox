@@ -28,10 +28,10 @@ namespace Tox\Data\Pdo;
 
 use PDOStatement;
 
-use Tox;
+use Tox\Core;
 use Tox\Data;
 
-class Statement extends Tox\Assembly implements IStatement
+class Statement extends Core\Assembly implements IStatement
 {
     protected $columns;
 

@@ -142,6 +142,13 @@ abstract class KV extends Tox\Core\Assembly implements Tox\Data\IKV
     abstract protected function deleteValue($key);
     
     /**
+     * Deletes all value  from cache
+     * 
+     * @return boolean     if no error happens during deletion
+     */
+    abstract protected function clearValues();
+    
+    /**
      * Deletes all values from cache.
      * 
      * @return boolean whether the flush operation was successful.
@@ -160,7 +167,7 @@ abstract class KV extends Tox\Core\Assembly implements Tox\Data\IKV
      */
     public function increase($key)
     {
-        //todo 
+        //ToDo 
     }
 
     /**
