@@ -61,4 +61,6 @@
 0x80030203 = IllegalHTTPStatusCodeException
 
 [Tox\Data]
-;0x800400??
+0x80040201 = EmptyHostException
+0x80040202 = MemcacheConfigNotArrayException
+

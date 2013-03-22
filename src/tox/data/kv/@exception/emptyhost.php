@@ -38,7 +38,7 @@ final class EmptyHostException extends Tox\Exception
      *
      * > Defined as `0x80020001`.
      */
-    const CODE = 0x80020001;
+    const CODE = 0x80040201;
 
     /**
      * {@inheritdoc}
