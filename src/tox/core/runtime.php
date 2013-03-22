@@ -117,7 +117,7 @@ final class Runtime
         try {
             static::$instance->pman->register(str_replace('\\', '.', strtolower($namespace)), $path);
         } catch (Exception $ex) {
-            trigger_error('Tox: ' . $ex->getMessage(), E_USER_ERROR);
+            return self::halt($ex);
         }
     }
 
@@ -172,7 +172,7 @@ final class Runtime
         try {
             static::$instance->cman->alias($class, $alias);
         } catch (Exception $ex) {
-            trigger_error('Tox: ' . $ex->getMessage(), E_USER_ERROR);
+            return self::halt($ex);
         }
     }
 
@@ -193,6 +193,51 @@ final class Runtime
     public static function treatClassAs($class, $classAs)
     {
         return self::alias($class, $classAs);
+    }
+
+    /**
+     * Terminates the runtime environment for errors.
+     *
+     * @internal
+     *
+     * @param  Exception $ex Error occured.
+     * @return void
+     */
+    protected static function halt(Exception $ex)
+    {
+        trigger_error('Tox: ' . $ex->getMessage(), E_USER_ERROR);
+    }
+
+    /**
+     * Revises the current working directory to the *root*.
+     *
+     * The script file of calling would be thought as the reference, and its
+     * parent directory would be treated as the *root*.
+     *
+     * Unless the directory named as `bin`, `sbin`, `include` or `libexec`, one
+     * more parent would be fetched and used.
+     *
+     * @api
+     *
+     * @return void
+     */
+    public static function reviseCwd()
+    {
+        $o_ex = new Exception;
+        $a_ctx = $o_ex->getTrace();
+        if (empty($a_ctx) || !isset($a_ctx[0]['file'])) {
+            return;
+        }
+        $p_dir = dirname($a_ctx[0]['file']);
+        switch (basename($p_dir)) {
+            case 'bin':
+            case 'include':
+            case 'libexec':
+            case 'sbin':
+                $p_dir = dirname($p_dir);
+                break;
+        }
+        chdir($p_dir);
     }
 }
 
