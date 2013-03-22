@@ -26,9 +26,9 @@
 
 namespace Tox\Application\Type;
 
-use Tox\Type;
+use Tox\Type\Enumeration;
 
-class SetSortOrder extends Type\Enumeration
+class SetSortOrder extends Enumeration\Enumeration
 {
     const ASCENDING = 'ASC';
 

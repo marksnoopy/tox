@@ -24,13 +24,13 @@
  * @license    http://www.gnu.org/licenses/gpl.html
  */
 
-namespace Tox\Type;
+namespace Tox\Type\Enumeration;
 
 use ReflectionClass;
 
-use Tox;
+use Tox\Core;
 
-abstract class Enumeration extends Tox\Assembly
+abstract class Enumeration extends Core\Assembly
 {
     protected static $availableValues;
 
