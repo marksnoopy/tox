@@ -1,6 +1,6 @@
 <?php
 /**
- * Represents as the runtime configuration reader for an application.
+ * Defines the essential behaviors of controllers.
  *
  * This file is part of Tox.
  *
@@ -17,19 +17,70 @@
  * You should have received a copy of the GNU General Public License
  * along with Tox.  If not, see <http://www.gnu.org/licenses/>.
  *
- * @package   Tox\Application
- * @author    Snakevil Zen <zsnakevil@gmail.com>
- * @copyright © 2012 szen.in
- * @license   http://www.gnu.org/licenses/gpl.html
+ * @copyright © 2012-2013 SZen.in
+ * @license   GNU General Public License, version 3
  */
 
 namespace Tox\Application;
 
+/**
+ * Announces the essential behaviors of configurations.
+ *
+ * @package tox.application
+ * @author  Trainxy Ho <trainxy@gmail.com>
+ */
 use ArrayAccess;
 
 interface IConfiguration extends ArrayAccess
 {
+
+    /**
+     * CONSTRUCT FUNCTOIN
+     *
+     * @param string $path Path of php configuration file.
+     */
+    public function __construct($path);
+
+    /**
+     * Import php configuration file to global configs.
+     *
+     * @param string $path Path of php configuration file.
+     * @return self
+     */
+    public function import($path);
+
+    /**
+     * Load a hash array of config to global configs.
+     *
+     * @param array $items A has array of config
+     * @return self
+     */
+    public function load(array $items);
+
+    /**
+     * Set a configuration item to global configs.
+     *
+     * @param string $item  Key of configuration
+     * @param mixed  $value Value of configuration
+     * @return self
+     */
+    public function set($item, $value);
+
+    /**
+     * Export configurations by expr rule.
+     *
+     * @param string $expr     Expr rule to export
+     * @param mixed  $defaults Default value
+     */
     public function export($expr, $defaults = NULL);
+
+    /**
+     * Dump all configurations, contains imported, loaded, and seted.
+     *
+     * @return array
+     */
+    public function dump();
+
 }
 
 // vi:se ft=php fenc=utf-8 ff=unix ts=4 sts=4 et sw=4 fen fdm=indent fdl=1 tw=120:

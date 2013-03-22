@@ -27,6 +27,8 @@
 
 [Tox\Application\Configuration]
 ;0x800203??
+0x80020301 = InvalidConfigurationFileException
+0x80020302 = InvalidConfigurationFileException
 
 [Tox\Application\Router]
 0x80020401 = TokenOptionsAlreadyAssignedException

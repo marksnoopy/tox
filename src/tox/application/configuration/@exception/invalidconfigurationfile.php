@@ -1,6 +1,6 @@
 <?php
 /**
- * Processes the bootstrap of `tox.application' on importing.
+ * Defines an exception for running the second application instance.
  *
  * This file is part of Tox.
  *
@@ -17,20 +17,37 @@
  * You should have received a copy of the GNU General Public License
  * along with Tox.  If not, see <http://www.gnu.org/licenses/>.
  *
- * @package   tox.application
- * @author    Snakevil Zen <zsnakevil@gmail.com>
  * @copyright © 2012-2013 SZen.in
  * @license   GNU General Public License, version 3
  */
 
-Tox::alias('Tox\\Application\\Configuration\\Configuration', 'Tox\\Application\\Configuration');
-Tox::alias('Tox\\Application\\Router\\Router', 'Tox\\Application\\Router');
-Tox::alias('Tox\\Application\\Controller\\Controller', 'Tox\\Application\\Controller');
-Tox::alias('Tox\\Application\\View\\View', 'Tox\\Application\\View');
-Tox::alias('Tox\\Application\\Model\\Model', 'Tox\\Application\\Model');
-Tox::alias('Tox\\Application\\Dao\\Dao', 'Tox\\Application\\Dao');
-Tox::alias('Tox\\Application\\Output\\Output', 'Tox\\Application\\Output');
+namespace Tox\Application\Configuration;
 
-__HALT_COMPILER();
+use Tox\Core;
+
+/**
+ * Be raised on invalid configuration file.
+ *
+ * **THIS CLASS CANNOT BE INHERITED.**
+ *
+ * @package tox.application.configuration
+ * @author  Trainxy Ho <trainxy@gmail.com>
+ */
+final class InvalidConfigurationFileException extends Core\Exception
+{
+    /**
+     * {@inheritdoc}
+     *
+     * > Defined as `0x80020301`.
+     */
+    const CODE = 0x80020301;
+
+    /**
+     * {@inheritdoc}
+     *
+     * > Defined as `invalid configuration file '%file$s'`.
+     */
+    const MESSAGE = 'invalid configuration file : \'%file$s\'';
+}
 
 // vi:ft=php fenc=utf-8 ff=unix ts=4 sts=4 et sw=4 fen fdm=indent fdl=1 tw=120
