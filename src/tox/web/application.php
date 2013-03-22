@@ -27,9 +27,9 @@
 
 namespace Tox\Web;
 
-use Tox\Core;
+use Tox\Application as TApp;
 
-abstract class Application extends Core\Application
+abstract class Application extends TApp\Application
 {
     protected function __construct(IRequest $input = NULL, IResponse $output = NULL)
     {
