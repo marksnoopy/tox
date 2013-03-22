@@ -36,12 +36,12 @@ abstract class Application extends Tox\Application
         parent::__construct($input, $output);
     }
 
-    protected static function getDefaultInput()
+    protected function getDefaultInput()
     {
         return new Request;
     }
 
-    protected static function getDefaultOutput()
+    protected function getDefaultOutput()
     {
         return new Response;
     }
