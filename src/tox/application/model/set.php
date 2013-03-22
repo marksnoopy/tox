@@ -21,7 +21,7 @@
 
 namespace Tox\Application\Model;
 
-use Tox;
+use Tox\Core;
 use Tox\Application;
 use Tox\Application\Type;
 
@@ -31,7 +31,7 @@ use Tox\Application\Type;
  * @package Tox\Application\Model
  * @author  Snakevil Zen <zsnakevil@gmail.com>
  */
-abstract class Set extends Tox\Assembly implements ICollection
+abstract class Set extends Core\Assembly implements ICollection
 {
     protected $_committing;
 

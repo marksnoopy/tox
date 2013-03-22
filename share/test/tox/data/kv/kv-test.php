@@ -26,6 +26,7 @@ namespace ToxTest\Data\Kv;
 use PHPUnit_Framework_TestCase;
 
 require_once __DIR__ . '/../../../../../src/tox/core/assembly.php';
+require_once __DIR__ . '/../../../../../src/tox/data/isource.php';
 require_once __DIR__ . '/../../../../../src/tox/data/ikv.php';
 require_once __DIR__ . '/../../../../../src/tox/data/kv/kv.php';
 
@@ -79,7 +80,57 @@ class KvTest extends PHPUnit_Framework_TestCase
         $this->assertEquals($value, $o_mockKv->get($key));
     }
 
-    // todo
+    /**
+     * @dataProvider dataProvider
+     * @depends testSetting
+     */
+    public function testGetting2($key, $value, $expire, $prefixString, $expectResult, $result)
+    {
+
+        $o_mockKv = $this->getMockBuilder('Tox\\Data\\Kv\\kv')
+                ->setMethods(array('getValue'))
+                ->getMockForAbstractClass();
+
+        $o_mockKv->expects($this->once())
+                ->method('getValue')
+                ->with($this->equalTo(md5($prefixString . $key)))
+                ->will($this->returnValue(serialize('sss')));
+
+        $this->assertEquals(false, $o_mockKv->get($key));
+    }
+
+    /**
+     * @dataProvider dataProvider
+     * @depends testSetting
+     */
+    public function testGetting3($key, $value, $expire, $prefixString, $expectResult, $result)
+    {
+
+        $o_mockKv = $this->getMockBuilder('Tox\\Data\\Kv\\kv')
+                ->setMethods(array('getValue'))
+                ->getMockForAbstractClass();
+
+        $o_mockKv->expects($this->once())
+                ->method('getValue')
+                ->with($this->equalTo(md5($prefixString . $key)))
+                ->will($this->returnValue(false));
+
+        $this->assertEquals(false, $o_mockKv->get($key));
+    }
+
+    public function testClear()
+    {
+        $o_mockKv = $this->getMockBuilder('Tox\\Data\\Kv\\kv')
+                ->setMethods(array('clearValues'))
+                ->getMockForAbstractClass();
+
+        $o_mockKv->expects($this->once())
+                ->method('clearValues')
+                ->will($this->returnValue(false));
+
+        $this->assertEquals(false, $o_mockKv->clear());
+    }
+
 
     public function dataProvider()
     {
@@ -109,6 +160,17 @@ class KvTest extends PHPUnit_Framework_TestCase
 
         $o_mockKv[$key] = $value;
         $this->assertEquals($value, $o_mockKv[$key]);
+    }
+    
+    /**
+     * @dataProvider dataProviderOffset
+     */
+    public function testoffsetExists($key, $value, $expire, $prefixString, $expectResult)
+    {
+        $o_mockKv = new Subkv();
+
+        $o_mockKv[$key] = $value;
+        $this->assertEquals(true, isset($o_mockKv[$key]));
     }
 
     /**
@@ -189,6 +251,11 @@ class Subkv extends KV\KV
     protected function deleteValue($key)
     {
         unset($this->container[$key]);
+    }
+
+    protected function clearValues()
+    {
+        unset($this->container);
     }
 
 }

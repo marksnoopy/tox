@@ -26,9 +26,9 @@
 
 namespace Tox\Data\Pdo;
 
-use Tox;
+use Tox\Core;
 
-class Sql extends Tox\Assembly implements ISql
+class Sql extends Core\Assembly implements ISql
 {
     const TYPE_READ = 'read';
 

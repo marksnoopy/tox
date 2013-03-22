@@ -27,21 +27,21 @@
 
 namespace Tox\Web;
 
-use Tox;
+use Tox\Core;
 
-abstract class Application extends Tox\Application
+abstract class Application extends Core\Application
 {
     protected function __construct(IRequest $input = NULL, IResponse $output = NULL)
     {
         parent::__construct($input, $output);
     }
 
-    protected static function getDefaultInput()
+    protected function getDefaultInput()
     {
         return new Request;
     }
 
-    protected static function getDefaultOutput()
+    protected function getDefaultOutput()
     {
         return new Response;
     }

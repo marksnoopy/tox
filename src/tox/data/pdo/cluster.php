@@ -26,10 +26,10 @@
 
 namespace Tox\Data\Pdo;
 
-use Tox;
+use Tox\Core;
 use Tox\Data;
 
-class Cluster extends Tox\Assembly implements ICluster
+class Cluster extends Core\Assembly implements ICluster
 {
     protected $inTransaction;
 

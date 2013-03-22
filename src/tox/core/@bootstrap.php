@@ -45,8 +45,11 @@ else
 
 Runtime::setUp();
 
+Runtime::alias('Tox\\Core\\Assembly', 'Tox\\Assembly');
 Runtime::alias('Tox\\Core\\Exception', 'Tox\\Exception');
 Runtime::alias('Tox\\Core\\ISingleton', 'Tox\\ISingleton');
+
+Runtime::alias('Tox\\Type\\Type', 'Tox\\Type');
 
 Runtime::alias('Tox\\Application\\Application', 'Tox\\Application');
 

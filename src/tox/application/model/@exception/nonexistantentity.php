@@ -10,13 +10,13 @@
 
 namespace Tox\Application\Model;
 
-use Tox;
+use Tox\Core;
 
-class NonExistantEntityException extends Tox\Exception {
+class NonExistantEntityException extends Core\Exception {
 
     const CODE = 0x80000008;
 
-    protected static $TEMPLATE = 'Entity \'%id$s\' of \'%type$s\' does not exist.';
+    const MESSAGE = 'Entity \'%id$s\' of \'%type$s\' does not exist.';
 
 }
 

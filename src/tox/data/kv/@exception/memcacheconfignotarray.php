@@ -26,26 +26,26 @@ namespace Tox\Data\KV;
 use Tox;
 
 /**
- * Be raised on setting the config when the host is Null.
+ * Be raised on setting the config when the config  is not  array.
  *
  * @package tox.data.kv
  * @author  Qiang Fu <fuqiang007enter@gmail.com>
  */
-final class EmptyHostException extends Tox\Exception
+final class MemcacheConfigNotArrayException extends Tox\Exception
 {
     /**
      * {@inheritdoc}
      *
      * > Defined as `0x80020001`.
      */
-    const CODE = 0x80040201;
+    const CODE = 0x80040202;
 
     /**
      * {@inheritdoc}
      *
      * > Defined as `Empty Data Source Exception \'%source$s\'`.
      */
-    const MESSAGE = 'Empty Data Source Exception \'%source$s\'.';
+    const MESSAGE = 'Empty Memcache Server Config Data Source Exception \'%source$s\'.';
 
 }
 
