@@ -444,9 +444,11 @@ abstract class Set extends Core\Assembly implements ICollection
         {
             return self;
         }
+		ksort($this->_filters);
+		$s_func = implode('And', array_keys($this->_filters));
         if (!$this->_length && 0 < $this->_totalLength)
         {
-            $a_elements = call_user_func(array($this->_dao, 'listAndSortBy' . $s_func), $this->_filters, $this->_orders,
+            $a_elements = call_user_func(array($this->_dao, 'listBy' . $s_func), $this->_filters, $this->_orders,
                 $this->_offset, $this->_totalLength
             );
             for ($ii = 0, $jj = count($a_elements); $ii < $jj; $ii++)
@@ -455,7 +457,7 @@ abstract class Set extends Core\Assembly implements ICollection
                 $this->_index[] = $a_elements[$ii]['id'];
             }
         }
-        return self;
+        return $this;
     }
 
     public function next()

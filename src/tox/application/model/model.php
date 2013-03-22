@@ -451,13 +451,13 @@ abstract class Model extends Core\Assembly implements IEntity
             $dao = static::getDefaultDao();
         }
         $o_entity = new static($dao);
-        list($a_rprops, $a_wprops) = array_values($o_entity->__getProperties());
+		$a_props = $o_entity->_tox_getMagicProps();
         $b_prepared = !isset($attributes['id']);
         reset($attributes);
         for ($ii = 0, $jj = count($attributes); $ii < $jj; $ii++)
         {
             list($s_prop) = each($attributes);
-            if (isset($a_rprops[$s_prop]) || isset($a_wprops[$s_prop]))
+            if (isset($a_props[$s_prop]))
             {
                 if ($b_prepared)
                 {
