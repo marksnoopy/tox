@@ -69,7 +69,7 @@ abstract class Type extends Core\Assembly implements IBoxable
      *
      * @param mixed $value Internal scalar value.
      */
-    protected function __construct($value)
+    public function __construct($value)
     {
         $this->value = $value;
     }

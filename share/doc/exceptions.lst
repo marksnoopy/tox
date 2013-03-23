@@ -8,6 +8,7 @@
 
 [Tox\Type]
 0x80010001 = VarbaseUnderAttackException
+0x80010002 = VariableReTeeingException
 
 [Tox\Application]
 ;0x800200??

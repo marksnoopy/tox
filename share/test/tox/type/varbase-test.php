@@ -32,7 +32,6 @@ require_once __DIR__ . '/../../../../src/tox/type/varbase.php';
 require_once __DIR__ . '/../../../../src/tox/core/exception.php';
 require_once __DIR__ . '/../../../../src/tox/type/@exception/varbaseunderattack.php';
 
-
 require_once __DIR__ . '/../../../../src/tox/type/iboxable.php';
 require_once __DIR__ . '/../../../../src/tox/type/type.php';
 

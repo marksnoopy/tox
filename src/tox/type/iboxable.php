@@ -32,6 +32,13 @@ namespace Tox\Type;
 interface IBoxable
 {
     /**
+     * CONSTRUCT FUNCTION
+     *
+     * @param mixed $value Internal scalar value.
+     */
+    public function __construct($value);
+
+    /**
      * Sets the reference ID.
      *
      * NOTICE: This method is designed for internal exchange, DO NOT call it
