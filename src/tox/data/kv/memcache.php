@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Defines the memcache data source.
  *
@@ -29,8 +30,8 @@ namespace Tox\Data\KV;
  * @package tox.data.kv
  * @author  Qiang Fu <fuqiang007enter@gmail.com>
  */
-class Memcache extends KV
-{
+class Memcache extends KV {
+
     /**
      * Choices of Memcache or Memcached .
      * 
@@ -56,25 +57,31 @@ class Memcache extends KV
      * Memcache default expire time
      */
     private $_expireTime;
+    
+    /**
+     * Memcache persistent id
+     */
+    private $_field;
 
     /**
      * Constructor.
      * 
      */
-    public function __construct()
-    {
+    public function __construct($field = null) {
         if (null === $this->useMemcached) {
             $this->useMemcached = true;
+        }
+        if (null != $field) {
+            $this->_field = $field;
         }
     }
 
     /**
      * Sets the memcache default expire time
      * 
-     * @param type $expire
+     * @param field $expire
      */
-    public function setExpireTime($expire)
-    {
+    public function setExpireTime($expire) {
         if (null !== $expire) {
             $this->_expireTime = $expire;
         }
@@ -83,10 +90,9 @@ class Memcache extends KV
     /**
      * Gets the memcache default expire time
      * 
-     * @param type $expire
+     * @param field $expire
      */
-    public function getExpireTime()
-    {
+    public function getExpireTime() {
         return $this->_expireTime;
     }
 
@@ -95,14 +101,20 @@ class Memcache extends KV
      * 
      * @return void 
      */
-    public function init()
-    {
+    public function init() {
         $servers = $this->getServers();
         $cache = $this->getMemCache();
         if (count($servers)) {
             foreach ($servers as $server) {
-                if ($this->useMemcached)
-                    $cache->addServer($server->host, $server->port, $server->weight);
+                if ($this->useMemcached) {
+                    if (null != $this->_field) {
+                        if ($this->_field === $server->field) {
+                            $cache->addServer($server->host, $server->port, $server->weight);
+                        }
+                    } else {
+                        $cache->addServer($server->host, $server->port, $server->weight);
+                    }
+                }
                 else
                     $cache->addServer($server->host, $server->port, $server->persistent, $server->weight, $server->timeout, $server->retryInterval, $server->status);
             }
@@ -117,8 +129,7 @@ class Memcache extends KV
      * 
      * @return Memcache|Memcached 
      */
-    public function getMemCache()
-    {
+    public function getMemCache() {
         if ($this->_cache !== null)
             return $this->_cache;
         else {
@@ -131,9 +142,29 @@ class Memcache extends KV
      * 
      * @return Memcache|Memcached 
      */
-    protected function defaultMemcached()
-    {
-        return new \Memcached;
+    protected function defaultMemcached() {
+        if (null != $this->_field) {
+            static $memcached_instances = array();
+
+            if (array_key_exists($this->_field, $memcached_instances)) {
+                $instance = $memcached_instances[$this->_field];
+            } else {
+                $instance = new \Memcached($this->_field);
+                $instance->setOption(\Memcached::OPT_PREFIX_KEY, $this->_field);
+                $instance->setOption(\Memcached::OPT_LIBKETAMA_COMPATIBLE, true); // advisable option
+                // Add servers if no connections listed. Get server set by $persistent_id or use default set.
+                // In a production environment with multiple server sets you may wish to prevent typos from silently adding data 
+                // to the default pool, in which case return an error on no match instead of defaulting
+                if (!count($instance->getServerList())) {
+                    $servers = array_key_exists($this->_field, $GLOBALS['memcached-sets']) ? $GLOBALS['memcached-sets'][$this->_field] : $GLOBALS['memcached-sets'][DEFAULT_MEMCACHED_SET];
+                }
+
+                $memcached_instances[$this->_field] = $instance;
+            }
+            return $instance;
+        } else {
+            return new \Memcached;
+        }
     }
 
     /**
@@ -141,8 +172,7 @@ class Memcache extends KV
      * 
      * @return Memcache|Memcached 
      */
-    protected function defaultMemcache()
-    {
+    protected function defaultMemcache() {
         return new \Memcache;
     }
 
@@ -151,8 +181,7 @@ class Memcache extends KV
      * 
      * @return array 
      */
-    public function getServers()
-    {
+    public function getServers() {
         return $this->_servers;
     }
 
@@ -162,8 +191,7 @@ class Memcache extends KV
      * @param array $config memcache server configurations value.
      * @return void 
      */
-    public function setServers($config)
-    {
+    public function setServers($config) {
         if ($config['useMemcached'] === true) {
             $memcacheConfig = $config['memcached'];
         } else {
@@ -180,8 +208,7 @@ class Memcache extends KV
      * @param  string $key a unique key identifying the cached value.
      * @return string 
      */
-    protected function getValue($key)
-    {
+    protected function getValue($key) {
         return $this->_cache->get($key);
     }
 
@@ -191,8 +218,7 @@ class Memcache extends KV
      * @param  array $keys a list of keys identifying the cached values.
      * @return array 
      */
-    protected function getValues($keys)
-    {
+    protected function getValues($keys) {
         return $this->useMemcached ? $this->_cache->getMulti($keys) : $this->_cache->get($keys);
     }
 
@@ -206,8 +232,7 @@ class Memcache extends KV
      * @return boolean         true if the value is successfully stored into 
      *                         cache, false otherwise.
      */
-    protected function setValue($key, $value, $expire = 0)
-    {
+    protected function setValue($key, $value, $expire = 0) {
 
         if ($expire > 0) {
             $expire+=time();
@@ -229,8 +254,7 @@ class Memcache extends KV
      * @return boolean         true if the value is successfully stored into 
      *                         cache, false otherwise
      */
-    protected function addValue($key, $value, $expire)
-    {
+    protected function addValue($key, $value, $expire) {
         if ($expire > 0)
             $expire+=time();
         else
@@ -245,8 +269,7 @@ class Memcache extends KV
      * @param  string $key the key of the value to be deleted.
      * @return boolean     if no error happens during deletion.
      */
-    protected function deleteValue($key)
-    {
+    protected function deleteValue($key) {
         return $this->_cache->delete($key, 0);
     }
 
@@ -255,8 +278,7 @@ class Memcache extends KV
      * 
      * @return boolean whether the flush operation was successful.
      */
-    protected function clearValues()
-    {
+    protected function clearValues() {
         return $this->_cache->flush();
     }
 
