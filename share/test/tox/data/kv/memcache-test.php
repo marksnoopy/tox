@@ -79,7 +79,7 @@ class MemcacheTest extends PHPUnit_Framework_TestCase
         if ($expire > 0) {
             $o_mockMemcached->Expects($this->once())
                     ->method('set')
-                    ->with($this->equalTo($key), $this->equalTo($val), $this->equalTo($expire + time()))
+                    ->with($this->equalTo($key), $this->equalTo($val), $this->equalTo($expire))
                     ->will($this->returnValue(True));
         } else {
             $o_mockMemcached->Expects($this->once())
