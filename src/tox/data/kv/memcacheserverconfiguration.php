@@ -81,6 +81,13 @@ class MemCacheServerConfiguration
     public $status;
 
     /**
+     * Memcache persistent id
+     * 
+     * @var string 
+     */
+    public $field;
+    
+    /**
      * Constructor.
      * 
      * @param  array $config list of memcache server configurations.
@@ -95,6 +102,7 @@ class MemCacheServerConfiguration
         $this->timeout = 15;
         $this->retryInterval = 15;
         $this->status = true;
+        $this->field='';
 
 
         if (is_array($config)) {
