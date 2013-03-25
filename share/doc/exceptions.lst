@@ -7,7 +7,8 @@
 0x80000006 = Illegal3rdPartyPackageException
 
 [Tox\Type]
-;0x800100??
+0x80010001 = VarbaseUnderAttackException
+0x80010002 = VariableReTeeingException
 
 [Tox\Application]
 ;0x800200??
@@ -63,6 +64,12 @@
 0x80030203 = IllegalHTTPStatusCodeException
 
 [Tox\Data]
+;0x800400??
+
+[Tox\Data\Pdo]
+;0x800401??
+
+[Tox\Data\Kv]
 0x80040201 = EmptyHostException
 0x80040202 = MemcacheConfigNotArrayException
 0x80040203 = MemcacheKeyOutRangeException
