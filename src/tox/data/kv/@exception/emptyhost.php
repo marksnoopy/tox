@@ -23,7 +23,7 @@
 
 namespace Tox\Data\KV;
 
-use Tox;
+use Tox\Core;
 
 /**
  * Be raised on setting the config when the host is Null.
@@ -31,7 +31,7 @@ use Tox;
  * @package tox.data.kv
  * @author  Qiang Fu <fuqiang007enter@gmail.com>
  */
-final class EmptyHostException extends Tox\Exception
+final class EmptyHostException extends  Core\Exception
 {
     /**
      * {@inheritdoc}
