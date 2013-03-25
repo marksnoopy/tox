@@ -65,4 +65,5 @@
 [Tox\Data]
 0x80040201 = EmptyHostException
 0x80040202 = MemcacheConfigNotArrayException
-
+0x80040203 = MemcacheKeyOutRangeException
+0x80040204 = MemcacheValueNotStringException

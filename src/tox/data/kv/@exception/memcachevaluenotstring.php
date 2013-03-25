@@ -31,21 +31,21 @@ use Tox\Core;
  * @package tox.data.kv
  * @author  Qiang Fu <fuqiang007enter@gmail.com>
  */
-final class EmptyHostException extends  Core\Exception
+final class MemcacheValueNotStringException extends Core\Exception
 {
     /**
      * {@inheritdoc}
      *
      * > Defined as `0x80020001`.
      */
-    const CODE = 0x80040201;
+    const CODE = 0x80040204;
 
     /**
      * {@inheritdoc}
      *
      * > Defined as `Empty Data Source Exception \'%source$s\'`.
      */
-    const MESSAGE = 'Empty Data Source Exception \'%source$s\'.';
+    const MESSAGE = 'Nginx memcache stroe value is not string Exception \'%source$s\'.';
 
 }
 

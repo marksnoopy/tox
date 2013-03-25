@@ -26,26 +26,26 @@ namespace Tox\Data\KV;
 use Tox\Core;
 
 /**
- * Be raised on setting the config when the host is Null.
+ * Be raised on setting store key exceed 255 
  *
  * @package tox.data.kv
  * @author  Qiang Fu <fuqiang007enter@gmail.com>
  */
-final class EmptyHostException extends  Core\Exception
+final class MemcacheKeyTooLongException extends Core\Exception
 {
     /**
      * {@inheritdoc}
      *
      * > Defined as `0x80020001`.
      */
-    const CODE = 0x80040201;
+    const CODE = 0x80040203;
 
     /**
      * {@inheritdoc}
      *
      * > Defined as `Empty Data Source Exception \'%source$s\'`.
      */
-    const MESSAGE = 'Empty Data Source Exception \'%source$s\'.';
+    const MESSAGE = 'Memcache store key is too long Exception ';
 
 }
 
