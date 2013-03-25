@@ -62,6 +62,9 @@ class PackageManager extends Assembly
         $s_class = ltrim(str_replace('.', '\\', strtolower($class)), '\\');
         $a_class = explode('\\', $s_class);
         $p_file = array_pop($a_class);
+        if (2 > count($a_class)) {
+            return false;
+        }
         if (strrpos($p_file, 'exception')) {
             $p_file = '@exception/' . substr($p_file, 0, -9);
         }

@@ -124,7 +124,8 @@ class PackageManagerTest extends PHPUnit_Framework_TestCase
                     ),
                     'foo' => array(
                         '@bootstrap.php' => '<?php Tox\\Core\\PackageManagerTest::log("Tox\\Foo");'
-                    )
+                    ),
+                    'blah.php' => ''
                 ),
                 'lib' => array(
                 )
@@ -324,6 +325,16 @@ class PackageManagerTest extends PHPUnit_Framework_TestCase
         $this->assertEquals(vfsStream::url($this->root . '/include/core/@exception/blah.php'),
             $this->pman->locate('Tox\\Core\\BlahException')
         );
+    }
+
+    /**
+     * @depends testRegisteringAndLocating
+     */
+    public function testClassNamesHave3NodesAtLeast()
+    {
+        $this->assertFalse($this->pman->locate('Smarty'));
+        $this->pman->register('Tox\\Core', vfsStream::url($this->root . '/include/core'));
+        $this->assertFalse($this->pman->locate('Tox\\Blah'));
     }
 }
 
