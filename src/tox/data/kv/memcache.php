@@ -23,7 +23,6 @@
 
 namespace Tox\Data\KV;
 
-define('DEFAULT_MEMCACHED_SET', '_');
 
 /**
  * Represents as the memcache data source.
@@ -311,9 +310,9 @@ class Memcache extends KV
         if(!is_string($value)){
           throw new MemcacheValueNotStringException(array('value' => $value));  
         }
-//        if(strlen($key)>250){
-//           throw new  MemcacheKeyTooLongException(array('key' => $key));  
-//        }
+        if(strlen($key)>250){
+           throw new  MemcacheKeyTooLongException(array('key' => $key));  
+        }
         return $this->useMemcached ? $this->_cache->set($key, $value, $expire) : $this->_cache->set($key, $value, 0, $expire);
     }
 
