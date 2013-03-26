@@ -30,6 +30,7 @@ use Tox\Application;
  *
  * @package tox.application.view
  * @author  Snakevil Zen <zsnakevil@gmail.com>
+ * @since   0.1.0-beta1
  */
 class StreamingView extends View implements Application\IStreamingView
 {

@@ -26,10 +26,11 @@ namespace Tox\Data\KV;
 use Tox\Core;
 
 /**
- * Be raised on setting store key exceed 255 
+ * Be raised on setting store key exceed 255
  *
  * @package tox.data.kv
  * @author  Qiang Fu <fuqiang007enter@gmail.com>
+ * @since   0.1.0-beta1
  */
 final class MemcacheKeyTooLongException extends Core\Exception
 {

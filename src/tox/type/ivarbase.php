@@ -31,6 +31,7 @@ use Countable;
  *
  * @package tox.type
  * @author  Snakevil Zen <zsnakevil@gmail.com>
+ * @since   0.2.0
  */
 interface IVarbase extends ArrayAccess, Countable
 {

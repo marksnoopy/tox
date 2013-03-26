@@ -32,6 +32,7 @@ use Tox\Core;
  *
  * @package tox.type
  * @author  Snakevil Zen <zsnakevil@gmail.com>
+ * @since   0.2.0
  */
 final class VariableReTeeingException extends Core\Exception
 {

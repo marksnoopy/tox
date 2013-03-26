@@ -33,6 +33,7 @@ use Tox\Application;
  *
  * @package tox.web.response
  * @author  Snakevil Zen <zsnakevil@gmail.com>
+ * @since   0.1.0-beta1
  */
 class PageCacheAgent extends Core\Assembly implements Web\IPageCacheAgent
 {

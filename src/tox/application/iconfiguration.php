@@ -23,14 +23,15 @@
 
 namespace Tox\Application;
 
+use ArrayAccess;
+
 /**
  * Announces the essential behaviors of configurations.
  *
  * @package tox.application
  * @author  Trainxy Ho <trainxy@gmail.com>
+ * @since   0.1.0-beta1
  */
-use ArrayAccess;
-
 interface IConfiguration extends ArrayAccess
 {
 

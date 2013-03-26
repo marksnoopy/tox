@@ -34,6 +34,7 @@ use Tox\Core;
  *
  * @package tox.web.response
  * @author  Snakevil Zen <zsnakevil@gmail.com>
+ * @since   0.1.0-beta1
  */
 final class ResponseRequiredException extends Core\Exception
 {

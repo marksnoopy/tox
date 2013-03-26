@@ -35,6 +35,7 @@ use Tox\Core;
  * @package tox.type
  * @author  Artur Graniszewski <aargoth@boo.pl>
  * @author  Snakevil Zen <zsnakevil@gmail.com>
+ * @since   0.2.0
  */
 class Varbase extends Core\Assembly implements IVarbase
 {

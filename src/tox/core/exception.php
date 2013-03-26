@@ -34,8 +34,9 @@ use Exception as PHPException;
  *
  * __*ALIAS*__ as `Tox\Exception`.
  *
- * @package   tox.core
- * @author    Snakevil Zen <zsnakevil@gmail.com>
+ * @package tox.core
+ * @author  Snakevil Zen <zsnakevil@gmail.com>
+ * @since   0.1.0-beta1
  */
 abstract class Exception extends PHPException
 {

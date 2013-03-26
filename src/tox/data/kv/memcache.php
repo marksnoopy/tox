@@ -29,27 +29,28 @@ namespace Tox\Data\KV;
  *
  * @package tox.data.kv
  * @author  Qiang Fu <fuqiang007enter@gmail.com>
+ * @since   0.1.0-beta1
  */
 class Memcache extends KV
 {
     /**
      * Choices of Memcache or Memcached .
-     * 
+     *
      * @var bool
      */
     public $useMemcached;
 
     /**
      * Memcache the Memcache instance.
-     * 
+     *
      * @var mixed
      */
     private $_cache;
 
     /**
      * Lists of memcache server configurations.
-     * 
-     * @var array 
+     *
+     * @var array
      */
     private $_servers;
 
@@ -65,7 +66,7 @@ class Memcache extends KV
 
     /**
      * Constructor.
-     * 
+     *
      */
     public function __construct($field = null)
     {
@@ -79,7 +80,7 @@ class Memcache extends KV
 
     /**
      * Sets the memcache default expire time
-     * 
+     *
      * @param field $expire
      */
     public function setExpireTime($expire)
@@ -91,7 +92,7 @@ class Memcache extends KV
 
     /**
      * Gets the memcache default expire time
-     * 
+     *
      * @param field $expire
      */
     public function getExpireTime()
@@ -101,8 +102,8 @@ class Memcache extends KV
 
     /**
      * It creates the memcache instance and adds memcache servers.
-     * 
-     * @return void 
+     *
+     * @return void
      */
     public function init()
     {
@@ -130,8 +131,8 @@ class Memcache extends KV
 
     /**
      * Get instance of the memcache or memcached.
-     * 
-     * @return Memcache|Memcached 
+     *
+     * @return Memcache|Memcached
      */
     public function getMemCache()
     {
@@ -144,8 +145,8 @@ class Memcache extends KV
 
     /**
      * Get instance of the memcached.
-     * 
-     * @return Memcache|Memcached 
+     *
+     * @return Memcache|Memcached
      */
     protected function defaultMemcached()
     {
@@ -157,7 +158,7 @@ class Memcache extends KV
             } else {
                 $instance = new \Memcached($this->_field);
                 $instance->setOption(\Memcached::OPT_PREFIX_KEY, $this->_field);
-                $instance->setOption(\Memcached::OPT_LIBKETAMA_COMPATIBLE, true); 
+                $instance->setOption(\Memcached::OPT_LIBKETAMA_COMPATIBLE, true);
                 $memcached_instances[$this->_field] = $instance;
             }
             return $instance;
@@ -168,8 +169,8 @@ class Memcache extends KV
 
     /**
      * Get instance of the memcache .
-     * 
-     * @return Memcache|Memcached 
+     *
+     * @return Memcache|Memcached
      */
     protected function defaultMemcache()
     {
@@ -178,8 +179,8 @@ class Memcache extends KV
 
     /**
      * Get memcache server configurations .
-     * 
-     * @return array 
+     *
+     * @return array
      */
     public function getServers()
     {
@@ -188,9 +189,9 @@ class Memcache extends KV
 
     /**
      * Set memcache server configurations .
-     * 
+     *
      * @param array $config memcache server configurations value.
-     * @return void 
+     * @return void
      */
     public function setServers($config)
     {
@@ -206,9 +207,9 @@ class Memcache extends KV
 
     /**
      * Retrieves a value from cache with a specified key.
-     * 
+     *
      * @param  string $key a unique key identifying the cached value.
-     * @return string 
+     * @return string
      */
     protected function getValue($key)
     {
@@ -217,9 +218,9 @@ class Memcache extends KV
 
     /**
      * Retrieves multiple values from cache with the specified keys.
-     * 
+     *
      * @param  array $keys a list of keys identifying the cached values.
-     * @return array 
+     * @return array
      */
     protected function getValues($keys)
     {
@@ -231,9 +232,9 @@ class Memcache extends KV
      *
      * @param  string  $key    the key identifying the value to be cached.
      * @param  string  $value  the value to be cached.
-     * @param  integer $expire the number of seconds in which the cached value 
+     * @param  integer $expire the number of seconds in which the cached value
      *                         will expire. 0 means never expire.
-     * @return boolean         true if the value is successfully stored into 
+     * @return boolean         true if the value is successfully stored into
      *                         cache, false otherwise.
      */
     protected function setValue($key, $value, $expire = 0)
@@ -258,7 +259,7 @@ class Memcache extends KV
      * @param  string  $value  the value to be cached
      * @param  integer $expire the number of seconds in which the cached value
      *                         will expire. 0 means never expire.
-     * @return boolean         true if the value is successfully stored into 
+     * @return boolean         true if the value is successfully stored into
      *                         cache, false otherwise
      */
     protected function addValue($key, $value, $expire)
@@ -272,8 +273,8 @@ class Memcache extends KV
     }
 
     /**
-     * Deletes a value with the specified key from cache. 
-     * 
+     * Deletes a value with the specified key from cache.
+     *
      * @param  string $key the key of the value to be deleted.
      * @return boolean     if no error happens during deletion.
      */
@@ -284,7 +285,7 @@ class Memcache extends KV
 
     /**
      * Deletes all values from cache.
-     * 
+     *
      * @return boolean whether the flush operation was successful.
      */
     protected function clearValues()
@@ -294,33 +295,33 @@ class Memcache extends KV
 
     /**
      * Stores a value identified by a key in cache.
-     * 
+     *
      * Keys need to verify
      * Value must a string
      *
      * @param  string  $key    the key identifying the value to be cached.
      * @param  string  $value  the value to be cached.
-     * @param  integer $expire the number of seconds in which the cached value 
+     * @param  integer $expire the number of seconds in which the cached value
      *                         will expire. 0 means never expire.
-     * @return boolean         true if the value is successfully stored into 
+     * @return boolean         true if the value is successfully stored into
      *                         cache, false otherwise.
      */
     public function setNginxMemcacheValue($key, $value, $expire = 0)
     {
         if(!is_string($value)){
-          throw new MemcacheValueNotStringException(array('value' => $value));  
+          throw new MemcacheValueNotStringException(array('value' => $value));
         }
         if(strlen($key)>250){
-           throw new  MemcacheKeyTooLongException(array('key' => $key));  
+           throw new  MemcacheKeyTooLongException(array('key' => $key));
         }
         return $this->useMemcached ? $this->_cache->set($key, $value, $expire) : $this->_cache->set($key, $value, 0, $expire);
     }
 
     /**
      * Retrieves a value from cache with a specified key.
-     * 
+     *
      * @param  string $key a unique key identifying the cached value.
-     * @return string 
+     * @return string
      */
     public function getNginxMemcacheValue($key)
     {

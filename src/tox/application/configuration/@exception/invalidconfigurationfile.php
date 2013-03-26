@@ -32,6 +32,7 @@ use Tox\Core;
  *
  * @package tox.application.configuration
  * @author  Trainxy Ho <trainxy@gmail.com>
+ * @since   0.1.0-beta1
  */
 final class InvalidConfigurationFileException extends Core\Exception
 {

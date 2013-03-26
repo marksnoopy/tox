@@ -38,6 +38,7 @@ use Tox\Core;
  * @package tox.type
  * @author  Artur Graniszewski <aargoth@boo.pl>
  * @author  Snakevil Zen <zsnakevil@gmail.com>
+ * @since   0.2.0
  */
 abstract class Type extends Core\Assembly implements IBoxable
 {

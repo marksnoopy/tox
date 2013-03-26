@@ -28,68 +28,69 @@ namespace Tox\Data\KV;
  *
  * @package tox.data.kv
  * @author  Qiang Fu <fuqiang007enter@gmail.com>
+ * @since   0.1.0-beta1
  */
 class MemCacheServerConfiguration
 {
     /**
      * Memcache server hostname or IP address.
-     * 
-     * @var string 
+     *
+     * @var string
      */
     public $host;
 
     /**
      * Memcache server port.
-     * 
-     * @var integer 
+     *
+     * @var integer
      */
     public $port;
 
     /**
      * Whether to use a persistent connection.
-     * 
-     * @var boolean 
+     *
+     * @var boolean
      */
     public $persistent;
 
     /**
      * Probability of using this server among all servers.
-     * 
-     * @var integer 
+     *
+     * @var integer
      */
     public $weight;
 
     /**
      * value in seconds which will be used for connecting to the server.
-     * 
-     * @var integer 
+     *
+     * @var integer
      */
     public $timeout;
 
     /**
      * How often a failed server will be retried (in seconds)
-     * 
-     * @var integer 
+     *
+     * @var integer
      */
     public $retryInterval;
 
     /**
      * If the server should be flagged as online upon a failure.
-     * 
-     * @var boolean 
+     *
+     * @var boolean
      */
     public $status;
 
     /**
      * Memcache persistent id
-     * 
-     * @var string 
+     *
+     * @var string
      */
     public $field;
-    
+
     /**
      * Constructor.
-     * 
+     *
      * @param  array $config list of memcache server configurations.
      * @throws               KV\MemcacheConfigNotArrayException if the configuration is not an array
      */

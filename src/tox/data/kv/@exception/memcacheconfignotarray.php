@@ -30,6 +30,7 @@ use Tox\Core;
  *
  * @package tox.data.kv
  * @author  Qiang Fu <fuqiang007enter@gmail.com>
+ * @since   0.1.0-beta1
  */
 final class MemcacheConfigNotArrayException extends Core\Exception
 {

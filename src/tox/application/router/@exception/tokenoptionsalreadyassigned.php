@@ -32,6 +32,7 @@ use Tox\Core;
  *
  * @package tox.application.router
  * @author  Snakevil Zen <zsnakevil@gmail.com>
+ * @since   0.1.0-beta1
  */
 final class TokenOptionsAlreadyAssignedException extends Core\Exception
 {

@@ -138,6 +138,7 @@ use Tox\Application;
  *
  * @package Tox\Application
  * @author  Snakevil Zen <zsnakevil@gmail.com>
+ * @since   0.1.0-beta1
  */
 abstract class Model extends Core\Assembly implements IEntity
 {
