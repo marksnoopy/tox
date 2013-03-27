@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- vi:se fenc=utf-8 ff=unix tw=80 ai si sw=2 et ts=2 sts=2: -->
+<ruleset name="Tox">
+  <description>PSR-2 standard with a modified excluding list.</description>
+  <exclude-pattern>share/test/*</exclude-pattern>
+  <exclude-pattern>src/tox/application/model/*</exclude-pattern>
+  <exclude-pattern>src/tox/data/pdo/*</exclude-pattern>
+  <exclude-pattern>src/tox/data/ipdo.php</exclude-pattern>
+  <exclude-pattern>src/tox/web/*</exclude-pattern>
+  <exclude-pattern>src/tox/type/enumeration/*</exclude-pattern>
+  <rule ref="PSR2"/>
+</ruleset>
