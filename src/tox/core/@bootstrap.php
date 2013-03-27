@@ -50,6 +50,4 @@ Runtime::alias('Tox\\Type\\Type', 'Tox\\Type');
 
 Runtime::alias('Tox\\Application\\Application', 'Tox\\Application');
 
-__HALT_COMPILER();
-
 // vi:ft=php fenc=utf-8 ff=unix ts=4 sts=4 et sw=4 fen fdm=indent fdl=1 tw=120

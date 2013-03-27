@@ -25,6 +25,4 @@
 
 Tox::alias('Tox\\Data\\Pdo\\Pdo', 'Tox\\Data\\Pdo');
 
-__HALT_COMPILER();
-
 // vi:ft=php fenc=utf-8 ff=unix ts=4 sts=4 et sw=4 fen fdm=indent fdl=1 tw=120
