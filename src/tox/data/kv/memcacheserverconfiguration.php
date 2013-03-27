@@ -107,16 +107,16 @@ class MemCacheServerConfiguration
 
 
         if (is_array($config)) {
-            foreach ($config as $key => $value)
+            foreach ($config as $key => $value) {
                 $this->$key = $value;
-            if ($this->host === null)
+            }
+            if ($this->host === null) {
                 throw new EmptyHostException(array('host' => $c));
-        }
-        else {
+            }
+        } else {
             throw new MemcacheConfigNotArrayException(array('config' => $config));
         }
     }
-
 }
 
 // vi:ft=php fenc=utf-8 ff=unix ts=4 sts=4 et sw=4 fen fdm=indent fdl=1 tw=120

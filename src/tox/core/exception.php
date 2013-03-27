@@ -71,7 +71,7 @@ abstract class Exception extends PHPException
      *                              exception raising.
      * @param PHPException $prevEx  Previous exception to be linked.
      */
-    final public function __construct($context = array(), PHPException $prevEx = NULL)
+    final public function __construct($context = array(), PHPException $prevEx = null)
     {
         if ($context instanceof PHPException) {
             $prevEx = $context;

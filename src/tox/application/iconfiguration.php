@@ -73,7 +73,7 @@ interface IConfiguration extends ArrayAccess
      * @param string $expr     Expr rule to export
      * @param mixed  $defaults Default value
      */
-    public function export($expr, $defaults = NULL);
+    public function export($expr, $defaults = null);
 
     /**
      * Dump all configurations, contains imported, loaded, and seted.
@@ -81,7 +81,6 @@ interface IConfiguration extends ArrayAccess
      * @return array
      */
     public function dump();
-
 }
 
-// vi:se ft=php fenc=utf-8 ff=unix ts=4 sts=4 et sw=4 fen fdm=indent fdl=1 tw=120:
+// vi:ft=php fenc=utf-8 ff=unix ts=4 sts=4 et sw=4 fen fdm=indent fdl=1 tw=120

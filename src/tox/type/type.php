@@ -161,7 +161,7 @@ abstract class Type extends Core\Assembly implements IBoxable
      *
      * @return mixed
      */
-    final protected function __getValue()
+    final protected function toxGetValue()
     {
         return $this->getValue();
     }
@@ -176,7 +176,7 @@ abstract class Type extends Core\Assembly implements IBoxable
      * @param  mixed $value Internal scalar value.
      * @return void
      */
-    final protected function __setValue($value)
+    final protected function toxSetValue($value)
     {
         $this->setValue($value);
     }

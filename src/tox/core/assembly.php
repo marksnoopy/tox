@@ -48,28 +48,28 @@ abstract class Assembly
      *
      * @internal
      */
-    const _TOX_PROPERTY_DENIED = '';
+    const TOX_PROPERTY_DENIED = '';
 
     /**
      * Represents a magic property is read only.
      *
      * @internal
      */
-    const _TOX_PROPERTY_READONLY = 'r';
+    const TOX_PROPERTY_READONLY = 'r';
 
     /**
      * Represents a magic property is write only.
      *
      * @internal
      */
-    const _TOX_PROPERTY_WRITEONLY = 'w';
+    const TOX_PROPERTY_WRITEONLY = 'w';
 
     /**
      * Represents a magic property is both readable and writable.
      *
      * @internal
      */
-    const _TOX_PROPERTY_PUBLIC = '*';
+    const TOX_PROPERTY_PUBLIC = '*';
 
     /**
      * Stores detected magic readable and writable properties for each derived
@@ -79,7 +79,7 @@ abstract class Assembly
      *
      * @var array
      */
-    protected static $_tox_properties = array();
+    protected static $toxProperties = array();
 
     /**
      * Be invoked on retrieving a magic property.
@@ -104,10 +104,10 @@ abstract class Assembly
      */
     public function __get($prop)
     {
-        if (!$this->_tox_isMagicPropReadable($prop)) {
+        if (!$this->toxIsMagicPropReadable($prop)) {
             throw new PropertyReadDeniedException(array('object' => $this, 'property' => $prop));
         }
-        return call_user_func(array($this, '__get' . $prop));
+        return call_user_func(array($this, 'toxGet' . $prop));
     }
 
     /**
@@ -118,12 +118,12 @@ abstract class Assembly
      * @param  string $prop Name of a magic property
      * @return bool
      */
-    protected function _tox_isMagicPropReadable($prop)
+    protected function toxIsMagicPropReadable($prop)
     {
         $prop = (string) $prop;
-        $a_props = $this->_tox_getMagicProps();
+        $a_props = $this->toxGetMagicProps();
         return isset($a_props[$prop]) &&
-            (self::_TOX_PROPERTY_READONLY == $a_props[$prop] || self::_TOX_PROPERTY_PUBLIC == $a_props[$prop]);
+            (self::TOX_PROPERTY_READONLY == $a_props[$prop] || self::TOX_PROPERTY_PUBLIC == $a_props[$prop]);
     }
 
     /**
@@ -135,11 +135,11 @@ abstract class Assembly
      *
      * @return array
      */
-    final protected function _tox_getMagicProps()
+    final protected function toxGetMagicProps()
     {
         $s_class = get_class($this);
-        if (!isset(self::$_tox_properties[$s_class])) {
-            self::$_tox_properties[$s_class] = array();
+        if (!isset(self::$toxProperties[$s_class])) {
+            self::$toxProperties[$s_class] = array();
             $o_rclass = new ReflectionClass($this);
             foreach ($o_rclass->getProperties() as $o_rprop) {
                 if (!$o_rprop->isDefault() || !$o_rprop->isProtected() || $o_rprop->isStatic() ||
@@ -148,25 +148,25 @@ abstract class Assembly
                     continue;
                 }
                 try {
-                    $o_rfunc = $o_rclass->getMethod('__get' . $o_rprop->name);
+                    $o_rfunc = $o_rclass->getMethod('toxGet' . $o_rprop->name);
                     if ($o_rfunc->isProtected() && !$o_rfunc->isStatic()) {
-                        self::$_tox_properties[$s_class][$o_rprop->name] = self::_TOX_PROPERTY_READONLY;
+                        self::$toxProperties[$s_class][$o_rprop->name] = self::TOX_PROPERTY_READONLY;
                     }
                 } catch (ReflectionException $ex) {
                 }
                 try {
-                    $o_rfunc = $o_rclass->getMethod('__set' . $o_rprop->name);
+                    $o_rfunc = $o_rclass->getMethod('toxSet' . $o_rprop->name);
                     if ($o_rfunc->isProtected() && !$o_rfunc->isStatic()) {
-                        self::$_tox_properties[$s_class][$o_rprop->name] =
-                            isset(self::$_tox_properties[$s_class][$o_rprop->name]) ?
-                            self::_TOX_PROPERTY_PUBLIC :
-                            self::_TOX_PROPERTY_WRITEONLY;
+                        self::$toxProperties[$s_class][$o_rprop->name] =
+                            isset(self::$toxProperties[$s_class][$o_rprop->name]) ?
+                            self::TOX_PROPERTY_PUBLIC :
+                            self::TOX_PROPERTY_WRITEONLY;
                     }
                 } catch (ReflectionException $ex) {
                 }
             }
         }
-        return self::$_tox_properties[$s_class];
+        return self::$toxProperties[$s_class];
     }
 
     /**
@@ -193,10 +193,10 @@ abstract class Assembly
      */
     public function __set($prop, $value)
     {
-        if (!$this->_tox_isMagicPropWritable($prop)) {
+        if (!$this->toxIsMagicPropWritable($prop)) {
             throw new PropertyWriteDeniedException(array('object' => $this, 'property' => $prop));
         }
-        call_user_func(array($this, '__set' . $prop), $value);
+        call_user_func(array($this, 'toxSet' . $prop), $value);
     }
 
     /**
@@ -207,12 +207,12 @@ abstract class Assembly
      * @param  string $prop Name of a magic property
      * @return bool
      */
-    protected function _tox_isMagicPropWritable($prop)
+    protected function toxIsMagicPropWritable($prop)
     {
         $prop = (string) $prop;
-        $a_props = $this->_tox_getMagicProps();
+        $a_props = $this->toxGetMagicProps();
         return isset($a_props[$prop]) &&
-            (self::_TOX_PROPERTY_WRITEONLY == $a_props[$prop] || self::_TOX_PROPERTY_PUBLIC == $a_props[$prop]);
+            (self::TOX_PROPERTY_WRITEONLY == $a_props[$prop] || self::TOX_PROPERTY_PUBLIC == $a_props[$prop]);
     }
 
     /**

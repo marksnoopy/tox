@@ -50,8 +50,9 @@ abstract class KV extends Tox\Core\Assembly implements Tox\Data\IKV
      */
     public function __construct()
     {
-        if ($this->keyPrefix === null)
+        if ($this->keyPrefix === null) {
             $this->keyPrefix = 'memcached';
+        }
     }
 
     /**
@@ -282,7 +283,6 @@ abstract class KV extends Tox\Core\Assembly implements Tox\Data\IKV
     {
         $this->delete($id);
     }
-
 }
 
 // vi:ft=php fenc=utf-8 ff=unix ts=4 sts=4 et sw=4 fen fdm=indent fdl=1 tw=120

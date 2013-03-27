@@ -25,16 +25,13 @@
 
 namespace Tox\Core;
 
-if ('@bootstrap.php' == basename(__FILE__))
-{
+if ('@bootstrap.php' == basename(__FILE__)) {
     require_once __DIR__ . '/assembly.php';
     require_once __DIR__ . '/classmanager.php';
     require_once __DIR__ . '/packagemanager.php';
     require_once __DIR__ . '/runtime.php';
     Runtime::import('tox.core', __DIR__);
-}
-else
-{
+} else {
     // Phar::mapPhar('tox.core');
     require_once 'phar://tox.core/assembly.php';
     require_once 'phar://tox.core/classmanager.php';

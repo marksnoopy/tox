@@ -103,9 +103,9 @@ class Fallback extends View implements Application\IFallback
             for ($ii = 0, $jj = count($a_line['args']); $ii < $jj; $ii++) {
                 if (is_object($a_line['args'][$ii])) {
                     $a_line['args'][$ii] = get_class($a_line['args'][$ii]);
-                } else if (is_array($a_line['args'][$ii])) {
+                } elseif (is_array($a_line['args'][$ii])) {
                     $a_line['args'][$ii] = 'Array';
-                } else if (is_string($a_line['args'][$ii])) {
+                } elseif (is_string($a_line['args'][$ii])) {
                     $a_line['args'][$ii] = "'{$a_line['args'][$ii]}'";
                 }
             }

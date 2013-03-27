@@ -45,24 +45,24 @@ class Memcache extends KV
      *
      * @var mixed
      */
-    private $_cache;
+    protected $cache;
 
     /**
      * Lists of memcache server configurations.
      *
      * @var array
      */
-    private $_servers;
+    protected $servers;
 
     /**
      * Memcache default expire time
      */
-    private $_expireTime;
+    protected $expireTime;
 
     /**
      * Memcache persistent id
      */
-    private $_field;
+    protected $field;
 
     /**
      * Constructor.
@@ -73,8 +73,8 @@ class Memcache extends KV
         if (null === $this->useMemcached) {
             $this->useMemcached = true;
         }
-        if (null != $field) {
-            $this->_field = $field;
+        if (null !== $field) {
+            $this->field = $field;
         }
     }
 
@@ -86,7 +86,7 @@ class Memcache extends KV
     public function setExpireTime($expire)
     {
         if (null !== $expire) {
-            $this->_expireTime = $expire;
+            $this->expireTime = $expire;
         }
     }
 
@@ -97,7 +97,7 @@ class Memcache extends KV
      */
     public function getExpireTime()
     {
-        return $this->_expireTime;
+        return $this->expireTime;
     }
 
     /**
@@ -112,21 +112,29 @@ class Memcache extends KV
         if (count($servers)) {
             foreach ($servers as $server) {
                 if ($this->useMemcached) {
-                    if (null != $this->_field) {
-                        if ($this->_field === $server->field) {
+                    if (null != $this->field) {
+                        if ($this->field === $server->field) {
                             $cache->addServer($server->host, $server->port, $server->weight);
                         }
                     } else {
                         $cache->addServer($server->host, $server->port, $server->weight);
                     }
+                } else {
+                    $cache->addServer(
+                        $server->host,
+                        $server->port,
+                        $server->persistent,
+                        $server->weight,
+                        $server->timeout,
+                        $server->retryInterval,
+                        $server->status
+                    );
                 }
-                else
-                    $cache->addServer($server->host, $server->port, $server->persistent, $server->weight, $server->timeout, $server->retryInterval, $server->status);
             }
-        }
-        else
+        } else {
             throw new MemcacheConfigNotArrayException(array('config' => ''));
-        //$cache->addServer('localhost', 11211);
+            //$cache->addServer('localhost', 11211);
+        }
     }
 
     /**
@@ -136,10 +144,10 @@ class Memcache extends KV
      */
     public function getMemCache()
     {
-        if ($this->_cache !== null)
-            return $this->_cache;
-        else {
-            return $this->_cache = $this->useMemcached ? $this->defaultMemcached() : $this->defaultMemcache();
+        if ($this->cache !== null) {
+            return $this->cache;
+        } else {
+            return $this->cache = $this->useMemcached ? $this->defaultMemcached() : $this->defaultMemcache();
         }
     }
 
@@ -150,16 +158,16 @@ class Memcache extends KV
      */
     protected function defaultMemcached()
     {
-        if (null != $this->_field) {
+        if (null != $this->field) {
             static $memcached_instances = array();
 
-            if (array_key_exists($this->_field, $memcached_instances)) {
-                $instance = $memcached_instances[$this->_field];
+            if (array_key_exists($this->field, $memcached_instances)) {
+                $instance = $memcached_instances[$this->field];
             } else {
-                $instance = new \Memcached($this->_field);
-                $instance->setOption(\Memcached::OPT_PREFIX_KEY, $this->_field);
+                $instance = new \Memcached($this->field);
+                $instance->setOption(\Memcached::OPT_PREFIX_KEY, $this->field);
                 $instance->setOption(\Memcached::OPT_LIBKETAMA_COMPATIBLE, true);
-                $memcached_instances[$this->_field] = $instance;
+                $memcached_instances[$this->field] = $instance;
             }
             return $instance;
         } else {
@@ -184,7 +192,7 @@ class Memcache extends KV
      */
     public function getServers()
     {
-        return $this->_servers;
+        return $this->servers;
     }
 
     /**
@@ -201,7 +209,7 @@ class Memcache extends KV
             $memcacheConfig = $config['memcache'];
         }
         foreach ($memcacheConfig as $c) {
-            $this->_servers[] = new MemCacheServerConfiguration($c);
+            $this->servers[] = new MemCacheServerConfiguration($c);
         }
     }
 
@@ -213,7 +221,7 @@ class Memcache extends KV
      */
     protected function getValue($key)
     {
-        return $this->_cache->get($key);
+        return $this->cache->get($key);
     }
 
     /**
@@ -224,7 +232,7 @@ class Memcache extends KV
      */
     protected function getValues($keys)
     {
-        return $this->useMemcached ? $this->_cache->getMulti($keys) : $this->_cache->get($keys);
+        return $this->useMemcached ? $this->cache->getMulti($keys) : $this->cache->get($keys);
     }
 
     /**
@@ -244,12 +252,14 @@ class Memcache extends KV
             if ($expire > 2592000) {
                 $expire = 2592000 - 1;
             }
-        } else if (null !== $this->_expireTime) {
-            $expire = $this->_expireTime;
+        } elseif (null !== $this->expireTime) {
+            $expire = $this->expireTime;
         } else {
             $expire = 0;
         }
-        return $this->useMemcached ? $this->_cache->set($key, $value, $expire) : $this->_cache->set($key, $value, 0, $expire);
+        return $this->useMemcached ?
+            $this->cache->set($key, $value, $expire) :
+            $this->cache->set($key, $value, 0, $expire);
     }
 
     /**
@@ -264,12 +274,15 @@ class Memcache extends KV
      */
     protected function addValue($key, $value, $expire)
     {
-        if ($expire > 0)
+        if ($expire > 0) {
             $expire+=time();
-        else
+        } else {
             $expire = 0;
+        }
 
-        return $this->useMemcached ? $this->_cache->add($key, $value, $expire) : $this->_cache->add($key, $value, 0, $expire);
+        return $this->useMemcached ?
+            $this->cache->add($key, $value, $expire) :
+            $this->cache->add($key, $value, 0, $expire);
     }
 
     /**
@@ -280,7 +293,7 @@ class Memcache extends KV
      */
     protected function deleteValue($key)
     {
-        return $this->_cache->delete($key, 0);
+        return $this->cache->delete($key, 0);
     }
 
     /**
@@ -290,7 +303,7 @@ class Memcache extends KV
      */
     protected function clearValues()
     {
-        return $this->_cache->flush();
+        return $this->cache->flush();
     }
 
     /**
@@ -308,13 +321,15 @@ class Memcache extends KV
      */
     public function setNginxMemcacheValue($key, $value, $expire = 0)
     {
-        if(!is_string($value)){
-          throw new MemcacheValueNotStringException(array('value' => $value));
+        if (!is_string($value)) {
+            throw new MemcacheValueNotStringException(array('value' => $value));
         }
-        if(strlen($key)>250){
-           throw new  MemcacheKeyTooLongException(array('key' => $key));
+        if (strlen($key) > 250) {
+            throw new MemcacheKeyTooLongException(array('key' => $key));
         }
-        return $this->useMemcached ? $this->_cache->set($key, $value, $expire) : $this->_cache->set($key, $value, 0, $expire);
+        return $this->useMemcached ?
+            $this->cache->set($key, $value, $expire) :
+            $this->cache->set($key, $value, 0, $expire);
     }
 
     /**
@@ -325,9 +340,8 @@ class Memcache extends KV
      */
     public function getNginxMemcacheValue($key)
     {
-        return $this->_cache->get($key);
+        return $this->cache->get($key);
     }
-
 }
 
 // vi:ft=php fenc=utf-8 ff=unix ts=4 sts=4 et sw=4 fen fdm=indent fdl=1 tw=120

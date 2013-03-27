@@ -47,7 +47,6 @@ final class MemcacheConfigNotArrayException extends Core\Exception
      * > Defined as `Empty Data Source Exception \'%source$s\'`.
      */
     const MESSAGE = 'Empty Memcache Server Config Data Source Exception \'%source$s\'.';
-
 }
 
 // vi:ft=php fenc=utf-8 ff=unix ts=4 sts=4 et sw=4 fen fdm=indent fdl=1 tw=120

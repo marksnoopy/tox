@@ -55,14 +55,11 @@ class Router extends Core\Assembly implements Application\IRouter
     public function analyse(Application\IInput $input)
     {
         $s_sense = $input->getCommandLine();
-        for ($ii = 0, $jj = count($this->routes); $ii < $jj; $ii++)
-        {
+        for ($ii = 0, $jj = count($this->routes); $ii < $jj; $ii++) {
             reset($this->routes[$ii]);
-            for ($kk = 0, $ll = count($this->routes[$ii]); $kk < $ll; $kk++)
-            {
+            for ($kk = 0, $ll = count($this->routes[$ii]); $kk < $ll; $kk++) {
                 list($s_pattern, $a_options) = each($this->routes[$ii]);
-                if (preg_match($s_pattern, $s_sense, $a_matches))
-                {
+                if (preg_match($s_pattern, $s_sense, $a_matches)) {
                     $o_token = new Token($a_options);
                     return $o_token->assign($a_matches);
                 }
@@ -95,24 +92,19 @@ class Router extends Core\Assembly implements Application\IRouter
     {
         $routes = (array) $routes;
         $prepend = (bool) $prepend;
-        if (empty($routes))
-        {
+        if (empty($routes)) {
             return $this;
         }
         $a_routes = array();
         reset($routes);
-        for ($ii = 0, $jj = count($routes); $ii < $jj; $ii++)
-        {
+        for ($ii = 0, $jj = count($routes); $ii < $jj; $ii++) {
             list($s_pattern, $a_options) = each($routes);
             $s_pattern = '@^' . str_replace('@', '\\@', $s_pattern) . '$@';
             $a_routes[$s_pattern] = $a_options;
         }
-        if ($prepend)
-        {
+        if ($prepend) {
             array_unshift($this->routes, $a_routes);
-        }
-        else
-        {
+        } else {
             $this->routes[] = $a_routes;
         }
         return $this;

@@ -163,7 +163,7 @@ class PackageManager extends Assembly
         for ($ii = 0, $jj = count($a_nodes); $ii < $jj; $ii++) {
             switch ($a_nodes[$ii]) {
                 case '..':
-                    array_pop($a_new);
+                    array_pop($a_new); // ignores previous dir
                 case '.':
                     break;
                 default:

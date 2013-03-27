@@ -35,8 +35,8 @@ use Tox\Application;
  * @author  Trainxy Ho <trainxy@gmail.com>
  * @since   0.1.0-beta1
  */
-class Configuration extends Core\Assembly implements Application\IConfiguration {
-
+class Configuration extends Core\Assembly implements Application\IConfiguration
+{
     /**
      * Stores global configuration items.
      *
@@ -150,7 +150,8 @@ class Configuration extends Core\Assembly implements Application\IConfiguration 
      * @param string $expr     Expr rule to export
      * @param mixed  $defaults Default value
      */
-    public function export($expr, $defaults = NULL) {
+    public function export($expr, $defaults = null)
+    {
         settype($expr, 'string');
         $s_expr = '@^' . str_replace(array('\\*', '\\\\.+'), array('.+', '\\*'), preg_quote($expr, '@')) . '$@';
         $a_ret = array();
@@ -163,15 +164,15 @@ class Configuration extends Core\Assembly implements Application\IConfiguration 
         }
         switch (count($a_ret)) {
             case 0:
-                if (NULL !== $defaults) {
+                if (null !== $defaults) {
                     return $defaults;
                 }
-                if (FALSE === strpos($s_expr, '.+')) {
-                    return NULL;
+                if (false === strpos($s_expr, '.+')) {
+                    return null;
                 }
                 break;
             case 1:
-                if (FALSE === strpos($s_expr, '.+')) {
+                if (false === strpos($s_expr, '.+')) {
                     return $a_ret[0];
                 }
         }
@@ -199,7 +200,8 @@ class Configuration extends Core\Assembly implements Application\IConfiguration 
      * @param  string $offset Key of configuration item.
      * @return bool
      */
-    public function offsetExists($offset) {
+    public function offsetExists($offset)
+    {
         settype($offset, 'string');
         return array_key_exists($offset, $this->items);
     }
@@ -210,10 +212,11 @@ class Configuration extends Core\Assembly implements Application\IConfiguration 
      * @param  string $offset Key of configuration item.
      * @return mixed
      */
-    public function offsetGet($offset) {
+    public function offsetGet($offset)
+    {
         settype($offset, 'string');
         if (!$this->offsetExists($offset)) {
-            return NULL;
+            return null;
         }
         return $this->items[$offset];
     }
@@ -225,7 +228,8 @@ class Configuration extends Core\Assembly implements Application\IConfiguration 
      * @param  mixed  $value  Value of configuration item.
      * @return void
      */
-    public function offsetSet($offset, $value) {
+    public function offsetSet($offset, $value)
+    {
         settype($offset, 'string');
         $this->items[$offset] = $value;
     }
@@ -258,7 +262,6 @@ class Configuration extends Core\Assembly implements Application\IConfiguration 
             return false;
         }
     }
-
 }
 
-// vi:se ft=php fenc=utf-8 ff=unix ts=4 sts=4 et sw=4 fen fdm=indent fdl=1 tw=120:
+// vi:ft=php fenc=utf-8 ff=unix ts=4 sts=4 et sw=4 fen fdm=indent fdl=1 tw=120

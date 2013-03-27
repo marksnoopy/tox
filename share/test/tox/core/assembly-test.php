@@ -48,12 +48,12 @@ class AssemblyTest extends PHPUnit_Framework_TestCase
         try {
             $s_prop = md5(microtime());
             $o_mock = $this->getMock('Tox\\Core\\AssemblyMockA',
-                array('_tox_isMagicPropReadable', '__get' . $s_prop)
+                array('toxIsMagicPropReadable', 'toxGet' . $s_prop)
             );
-            $o_mock->expects($this->once())->method('_tox_isMagicPropReadable')
+            $o_mock->expects($this->once())->method('toxIsMagicPropReadable')
                 ->with($this->equalTo($s_prop))
                 ->will($this->returnValue(TRUE));
-            $o_mock->expects($this->once())->method('__get' . $s_prop);
+            $o_mock->expects($this->once())->method('toxGet' . $s_prop);
             $o_mock->$s_prop;
         } catch (Exception $ex) {
             $this->fail();
@@ -128,11 +128,11 @@ class AssemblyTest extends PHPUnit_Framework_TestCase
         try {
             $s_prop = md5(microtime());
             $f_value = microtime(TRUE);
-            $o_mock = $this->getMock('Tox\\Core\\AssemblyMockA', array('_tox_isMagicPropWritable', '__set' . $s_prop));
-            $o_mock->expects($this->once())->method('_tox_isMagicPropWritable')
+            $o_mock = $this->getMock('Tox\\Core\\AssemblyMockA', array('toxIsMagicPropWritable', 'toxSet' . $s_prop));
+            $o_mock->expects($this->once())->method('toxIsMagicPropWritable')
                 ->with($this->equalTo($s_prop))
                 ->will($this->returnValue(TRUE));
-            $o_mock->expects($this->once())->method('__set'. $s_prop)
+            $o_mock->expects($this->once())->method('toxSet'. $s_prop)
                 ->with($this->equalTo($f_value));
             $o_mock->$s_prop = $f_value;
         } catch (Exception $ex) {
@@ -249,7 +249,7 @@ class AssemblyMockA extends Assembly
      *
      * @return mixed
      */
-    protected function __getOk()
+    protected function toxGetOk()
     {
         return $this->ok;
     }
@@ -260,7 +260,7 @@ class AssemblyMockA extends Assembly
      * @param  mixed $value
      * @return void
      */
-    protected function __setOk($value)
+    protected function toxSetOk($value)
     {
         $this->ok = $value;
     }
@@ -270,7 +270,7 @@ class AssemblyMockA extends Assembly
      *
      * @return void
      */
-    protected function __getNoProp()
+    protected function toxGetNoProp()
     {
     }
 
@@ -280,7 +280,7 @@ class AssemblyMockA extends Assembly
      * @param  mixed $value
      * @return void
      */
-    protected function __setNoProp($value)
+    protected function toxSetNoProp($value)
     {
     }
 
@@ -311,7 +311,7 @@ class AssemblyMockA extends Assembly
      *
      * @return void
      */
-    protected function __get_inProp()
+    protected function toxGet_inProp()
     {
     }
 
@@ -322,7 +322,7 @@ class AssemblyMockA extends Assembly
      * @param  mixed $value
      * @return void
      */
-    protected function __set_inProp($value)
+    protected function toxSet_inProp($value)
     {
     }
 
@@ -338,7 +338,7 @@ class AssemblyMockA extends Assembly
      *
      * @return void
      */
-    protected function __getPrivProp()
+    protected function toxGetPrivProp()
     {
     }
 
@@ -348,7 +348,7 @@ class AssemblyMockA extends Assembly
      * @param  mixed $value
      * @return void
      */
-    protected function __setPrivProp($value)
+    protected function toxSetPrivProp($value)
     {
     }
 
@@ -364,7 +364,7 @@ class AssemblyMockA extends Assembly
      *
      * @return void
      */
-    public function __getPubGetter()
+    public function toxGetPubGetter()
     {
     }
 
@@ -381,7 +381,7 @@ class AssemblyMockA extends Assembly
      * @param  mixed $value
      * @return void
      */
-    public function __setPubSetter($value)
+    public function toxSetPubSetter($value)
     {
     }
 }
@@ -410,7 +410,7 @@ class AssemblyMockB extends Assembly
      *
      * @return mixed
      */
-    protected function __getFoo()
+    protected function toxGetFoo()
     {
     }
 
@@ -420,7 +420,7 @@ class AssemblyMockB extends Assembly
      * @param  mixed $value
      * @return void
      */
-    protected function __setFoo($value)
+    protected function toxSetFoo($value)
     {
     }
 }
