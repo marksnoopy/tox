@@ -33,7 +33,7 @@ use Tox\Core;
  * **NOTICE: Boxed variables would not be set free on `unset()` statements,
  * until another more `Varbase::gc()` has invoked.**
  *
- * @property-read mixed $value Retrieves the internal scalar value.
+ * @property mixed $value Retrieves the internal scalar value.
  *
  * @package tox.type
  * @author  Artur Graniszewski <aargoth@boo.pl>
@@ -74,7 +74,7 @@ abstract class Type extends Core\Assembly implements IBoxable
      */
     final public function __construct($value)
     {
-        $this->value = $this->validate($value);
+        $this->setValue($value);
     }
 
     /**
@@ -136,7 +136,20 @@ abstract class Type extends Core\Assembly implements IBoxable
      */
     final public function getValue()
     {
-        return $this->__getValue();
+        return $this->value;
+    }
+
+    /**
+     * {@inheritdoc}
+     *
+     * **THIS METHOD CANNOT BE OVERRIDDEN.**
+     *
+     * @param  mixed $value Internal scalar value.
+     * @return void
+     */
+    final public function setValue($value)
+    {
+        $this->value = $this->validate($value);
     }
 
     /**
@@ -150,7 +163,22 @@ abstract class Type extends Core\Assembly implements IBoxable
      */
     final protected function __getValue()
     {
-        return $this->value;
+        return $this->getValue();
+    }
+
+    /**
+     * Be invoked to set the internal scalar value.
+     *
+     * **THIS METHOD CANNOT BE OVERRIDDEN.**
+     *
+     * @internal
+     *
+     * @param  mixed $value Internal scalar value.
+     * @return void
+     */
+    final protected function __setValue($value)
+    {
+        $this->setValue($value);
     }
 
     /**

@@ -79,6 +79,14 @@ interface IBoxable extends Serializable
     public function getValue();
 
     /**
+     * Sets the internal scalar value.
+     *
+     * @param  mixed $value Internal scalar value.
+     * @return void
+     */
+    public function setValue($value);
+
+    /**
      * Be invoked on string casting.
      *
      * @return string
