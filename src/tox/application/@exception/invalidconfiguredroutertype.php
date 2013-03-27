@@ -33,6 +33,7 @@ use Tox\Core;
  *
  * @package tox.application
  * @author  Snakevil Zen <zsnakevil@gmail.com>
+ * @since   0.1.0-beta1
  */
 final class InvalidConfiguredRouterTypeException extends Core\Exception
 {

@@ -36,6 +36,7 @@ use Tox\Application;
  *
  * @package tox.application.dao
  * @author  Snakevil Zen <zsnakevil@gmail.com>
+ * @since   0.1.0-beta1
  */
 abstract class Dao extends Core\Assembly implements Application\IDao
 {
@@ -83,10 +84,8 @@ abstract class Dao extends Core\Assembly implements Application\IDao
     final protected function getDomain()
     {
         $s_class = get_called_class();
-        while (FALSE !== $s_class)
-        {
-            if (isset(self::$domains[$s_class]))
-            {
+        while (false !== $s_class) {
+            if (isset(self::$domains[$s_class])) {
                 return self::$domains[$s_class];
             }
             $s_class = get_parent_class($s_class);
@@ -110,4 +109,4 @@ abstract class Dao extends Core\Assembly implements Application\IDao
     }
 }
 
-// vi:se ft=php fenc=utf-8 ff=unix ts=4 sts=4 et sw=4 fen fdm=indent fdl=1 tw=120:
+// vi:ft=php fenc=utf-8 ff=unix ts=4 sts=4 et sw=4 fen fdm=indent fdl=1 tw=120

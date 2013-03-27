@@ -43,6 +43,7 @@ use PHPUnit_Framework_Exception;
  *
  * @package tox.application
  * @author  Snakevil Zen <zsnakevil@gmail.com>
+ * @since   0.1.0-beta1
  */
 abstract class Application extends Core\Assembly
 {
@@ -167,7 +168,7 @@ abstract class Application extends Core\Assembly
      */
     public function getConfig()
     {
-        return $this->__getConfig();
+        return $this->config;
     }
 
     /**
@@ -179,9 +180,9 @@ abstract class Application extends Core\Assembly
      *
      * @return IConfiguration
      */
-    final protected function __getConfig()
+    final protected function toxGetConfig()
     {
-        return $this->config;
+        return $this->getConfig();
     }
 
     /**
@@ -191,7 +192,7 @@ abstract class Application extends Core\Assembly
      */
     public function getInput()
     {
-        return $this->__getInput();
+        return $this->input;
     }
 
     /**
@@ -203,9 +204,9 @@ abstract class Application extends Core\Assembly
      *
      * @return IInput
      */
-    final protected function __getInput()
+    final protected function toxGetInput()
     {
-        return $this->input;
+        return $this->getInput();
     }
 
     /**
@@ -215,7 +216,7 @@ abstract class Application extends Core\Assembly
      */
     public function getOutput()
     {
-        return $this->__getOutput();
+        return $this->output;
     }
 
     /**
@@ -227,9 +228,9 @@ abstract class Application extends Core\Assembly
      *
      * @return IOutput
      */
-    final protected function __getOutput()
+    final protected function toxGetOutput()
     {
-        return $this->output;
+        return $this->getOutput();
     }
 
     /**
@@ -302,8 +303,7 @@ abstract class Application extends Core\Assembly
      */
     protected static function getInstance()
     {
-        if (self::$instance instanceof self)
-        {
+        if (self::$instance instanceof self) {
             throw new MultipleApplicationRuntimeException(array('existant' => self::$instance));
         }
         self::$instance = new static;

@@ -32,6 +32,7 @@ use Tox\Core;
  *
  * @package tox.application.output
  * @author  Snakevil Zen <zsnakevil@gmail.com>
+ * @since   0.1.0-beta1
  */
 final class ClosedOutputException extends Core\Exception
 {

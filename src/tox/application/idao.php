@@ -31,6 +31,7 @@ use Tox\Data;
  *
  * @package tox.application
  * @author  Snakevil Zen <zsnakevil@gmail.com>
+ * @since   0.1.0-beta1
  */
 interface IDao extends Core\ISingleton
 {

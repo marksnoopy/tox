@@ -28,6 +28,7 @@ namespace Tox\Core;
  *
  * @package tox.core
  * @author  Snakevil Zen <zsnakevil@gmail.com>
+ * @since   0.1.0-beta1
  */
 class PackageManager extends Assembly
 {
@@ -62,6 +63,9 @@ class PackageManager extends Assembly
         $s_class = ltrim(str_replace('.', '\\', strtolower($class)), '\\');
         $a_class = explode('\\', $s_class);
         $p_file = array_pop($a_class);
+        if (2 > count($a_class)) {
+            return false;
+        }
         if (strrpos($p_file, 'exception')) {
             $p_file = '@exception/' . substr($p_file, 0, -9);
         }
@@ -159,7 +163,7 @@ class PackageManager extends Assembly
         for ($ii = 0, $jj = count($a_nodes); $ii < $jj; $ii++) {
             switch ($a_nodes[$ii]) {
                 case '..':
-                    array_pop($a_new);
+                    array_pop($a_new); // ignores previous dir
                 case '.':
                     break;
                 default:

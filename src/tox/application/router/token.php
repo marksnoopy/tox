@@ -33,6 +33,7 @@ use Tox\Application;
  *
  * @package tox.application.router
  * @author  Snakevil Zen <zsnakevil@gmail.com>
+ * @since   0.1.0-beta1
  */
 final class Token extends Core\Assembly implements Application\IToken
 {
@@ -57,7 +58,7 @@ final class Token extends Core\Assembly implements Application\IToken
      */
     protected $options;
 
-	/**
+    /**
      * {@inheritdoc}
      *
      * @param  string[]  $values Values of options.
@@ -73,12 +74,10 @@ final class Token extends Core\Assembly implements Application\IToken
             return $this;
         }
         array_shift($values);
-        for ($ii = count($values), $jj = count($this->options); $ii < $jj; $ii++)
-        {
+        for ($ii = count($values), $jj = count($this->options); $ii < $jj; $ii++) {
             $values[] = false;
         }
-        if ($ii > $jj)
-        {
+        if ($ii > $jj) {
             array_splice($values, $jj);
         }
         $this->options = array_combine(array_keys($this->options), $values);

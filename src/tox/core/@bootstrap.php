@@ -25,16 +25,13 @@
 
 namespace Tox\Core;
 
-if ('@bootstrap.php' == basename(__FILE__))
-{
+if ('@bootstrap.php' == basename(__FILE__)) {
     require_once __DIR__ . '/assembly.php';
     require_once __DIR__ . '/classmanager.php';
     require_once __DIR__ . '/packagemanager.php';
     require_once __DIR__ . '/runtime.php';
     Runtime::import('tox.core', __DIR__);
-}
-else
-{
+} else {
     // Phar::mapPhar('tox.core');
     require_once 'phar://tox.core/assembly.php';
     require_once 'phar://tox.core/classmanager.php';
@@ -52,7 +49,5 @@ Runtime::alias('Tox\\Core\\ISingleton', 'Tox\\ISingleton');
 Runtime::alias('Tox\\Type\\Type', 'Tox\\Type');
 
 Runtime::alias('Tox\\Application\\Application', 'Tox\\Application');
-
-__HALT_COMPILER();
 
 // vi:ft=php fenc=utf-8 ff=unix ts=4 sts=4 et sw=4 fen fdm=indent fdl=1 tw=120

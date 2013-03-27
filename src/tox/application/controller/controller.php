@@ -35,6 +35,7 @@ use Tox\Application;
  *
  * @package tox.application.controller
  * @author  Snakevil Zen <zsnakevil@gmail.com>
+ * @since   0.1.0-beta1
  */
 abstract class Controller extends Core\Assembly
 {

@@ -32,6 +32,7 @@ use Tox\Core;
  *
  * @package tox.core
  * @author  Trainxy Ho <trainxy@gmail.com>
+ * @since   0.1.0-beta1
  */
 final class InvalidCachingDataDomainException extends Core\Exception
 {

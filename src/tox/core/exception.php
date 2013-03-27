@@ -34,8 +34,9 @@ use Exception as PHPException;
  *
  * __*ALIAS*__ as `Tox\Exception`.
  *
- * @package   tox.core
- * @author    Snakevil Zen <zsnakevil@gmail.com>
+ * @package tox.core
+ * @author  Snakevil Zen <zsnakevil@gmail.com>
+ * @since   0.1.0-beta1
  */
 abstract class Exception extends PHPException
 {
@@ -70,7 +71,7 @@ abstract class Exception extends PHPException
      *                              exception raising.
      * @param PHPException $prevEx  Previous exception to be linked.
      */
-    final public function __construct($context = array(), PHPException $prevEx = NULL)
+    final public function __construct($context = array(), PHPException $prevEx = null)
     {
         if ($context instanceof PHPException) {
             $prevEx = $context;

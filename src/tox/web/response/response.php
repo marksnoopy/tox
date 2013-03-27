@@ -33,6 +33,7 @@ use Tox\Web;
  *
  * @package tox.web.response
  * @author  Snakevil Zen <zsnakevil@gmail.com>
+ * @since   0.1.0-beta1
  */
 class Response extends Output\Output implements Web\IResponse
 {
@@ -96,9 +97,9 @@ class Response extends Output\Output implements Web\IResponse
      *
      * @return array
      */
-    final protected function __getHeaders()
+    final protected function toxGetHeaders()
     {
-        return $this->headers;
+        return $this->getHeaders();
     }
 
     /**
@@ -111,9 +112,9 @@ class Response extends Output\Output implements Web\IResponse
      * @param  Array  $headers New HTTP headers.
      * @return void
      */
-    final protected function __setHeaders(Array $headers)
+    final protected function toxSetHeaders(Array $headers)
     {
-        $this->headers = array();
+        $this->setHeaders($headers);
     }
 
     /**
@@ -123,7 +124,7 @@ class Response extends Output\Output implements Web\IResponse
      */
     public function getHeaders()
     {
-        return $this->__getHeaders();
+        return $this->headers;
     }
 
     /**
@@ -136,9 +137,8 @@ class Response extends Output\Output implements Web\IResponse
     {
         if (!$this->outputting) {
             throw new HeadersReadonlyException;
-
         }
-        $this->__setHeaders($headers);
+        $this->headers = array();
         return $this;
     }
 

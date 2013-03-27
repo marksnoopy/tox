@@ -38,6 +38,7 @@ use Tox\Application\View;
  *
  * @package tox.application.output
  * @author  Snakevil Zen <zsnakevil@gmail.com>
+ * @since   0.1.0-beta1
  */
 abstract class Output extends Core\Assembly implements Application\IOutput
 {
@@ -112,12 +113,9 @@ abstract class Output extends Core\Assembly implements Application\IOutput
      *
      * @return Application\IView
      */
-    final protected function __getView()
+    final protected function toxGetView()
     {
-        if (null === $this->view) {
-            $this->view = new View\StreamingView($this);
-        }
-        return $this->view;
+        return $this->getView();
     }
 
     /**
@@ -130,9 +128,9 @@ abstract class Output extends Core\Assembly implements Application\IOutput
      * @param  Application\IView $view New binded view.
      * @return void
      */
-    final protected function __setView(Application\IView $view)
+    final protected function toxSetView(Application\IView $view)
     {
-        $this->view = $view;
+        $this->setView($view);
     }
 
     /**
@@ -142,7 +140,10 @@ abstract class Output extends Core\Assembly implements Application\IOutput
      */
     public function getView()
     {
-        return $this->__getView();
+        if (null === $this->view) {
+            $this->view = new View\StreamingView($this);
+        }
+        return $this->view;
     }
 
     /**
@@ -153,7 +154,7 @@ abstract class Output extends Core\Assembly implements Application\IOutput
      */
     public function setView(Application\IView $view)
     {
-        $this->__setView($view);
+        $this->view = $view;
         return $this;
     }
 
@@ -166,9 +167,9 @@ abstract class Output extends Core\Assembly implements Application\IOutput
      *
      * @return string
      */
-    final protected function __getBuffer()
+    final protected function toxGetBuffer()
     {
-        return $this->buffer;
+        return $this->getBuffer();
     }
 
     /**
@@ -183,12 +184,9 @@ abstract class Output extends Core\Assembly implements Application\IOutput
      *
      * @throws BufferReadonlyException If setting while not outputting.
      */
-    final protected function __setBuffer($blob)
+    final protected function toxSetBuffer($blob)
     {
-        if (!$this->outputting) {
-            throw new BufferReadonlyException;
-        }
-        $this->buffer = (string) $blob;
+        $this->setBuffer($blob);
     }
 
     /**
@@ -198,7 +196,7 @@ abstract class Output extends Core\Assembly implements Application\IOutput
      */
     public function getBuffer()
     {
-        return $this->__getBuffer();
+        return $this->buffer;
     }
 
     /**
@@ -211,7 +209,10 @@ abstract class Output extends Core\Assembly implements Application\IOutput
      */
     public function setBuffer($blob)
     {
-        $this->__setBuffer($blob);
+        if (!$this->outputting) {
+            throw new BufferReadonlyException;
+        }
+        $this->buffer = (string) $blob;
         return $this;
     }
 
@@ -229,8 +230,8 @@ abstract class Output extends Core\Assembly implements Application\IOutput
         }
         $this->closed = true;
         $this->outputting = true;
-        if (!$this->__getView() instanceof Application\IStreamingView) {
-            $this->buffer = $this->__getView()->render();
+        if (!$this->toxGetView() instanceof Application\IStreamingView) {
+            $this->buffer = $this->toxGetView()->render();
         }
         print($this->preOutput()->buffer);
         $this->postOutput()->buffer = '';
@@ -257,10 +258,10 @@ abstract class Output extends Core\Assembly implements Application\IOutput
         if ($this->closed) {
             throw new ClosedOutputException;
         }
-        if (!$this->__getView() instanceof Application\IStreamingView) {
+        if (!$this->toxGetView() instanceof Application\IStreamingView) {
             throw new StreamingViewExpectedException;
         }
-        $this->__getView()->append($blob);
+        $this->toxGetView()->append($blob);
         return $this;
     }
 
@@ -289,7 +290,7 @@ abstract class Output extends Core\Assembly implements Application\IOutput
         if ($this->closed) {
             return $this;
         }
-        $this->buffer .= $this->__getView()->render();
+        $this->buffer .= $this->toxGetView()->render();
         if (!$this->streaming) {
             return $this;
         }
@@ -312,7 +313,7 @@ abstract class Output extends Core\Assembly implements Application\IOutput
      */
     final public function enableStreaming()
     {
-        if (!$this->__getView() instanceof Application\IStreamingView) {
+        if (!$this->toxGetView() instanceof Application\IStreamingView) {
             throw new StreamingViewExpectedException;
         }
         $this->streaming = true;
@@ -331,7 +332,7 @@ abstract class Output extends Core\Assembly implements Application\IOutput
      */
     final public function disableStreaming()
     {
-        if (!$this->__getView() instanceof Application\IStreamingView) {
+        if (!$this->toxGetView() instanceof Application\IStreamingView) {
             throw new StreamingViewExpectedException;
         }
         $this->streaming = false;

@@ -30,6 +30,7 @@ use Tox\Application\Type;
  *
  * @package Tox\Application\Model
  * @author  Snakevil Zen <zsnakevil@gmail.com>
+ * @since   0.1.0-beta1
  */
 abstract class Set extends Core\Assembly implements ICollection
 {

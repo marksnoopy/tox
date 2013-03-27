@@ -36,10 +36,10 @@ use Tox\Application;
  *
  * @package tox.application.dao.cache
  * @author  Trainxy Ho <trainxy@gmail.com>
+ * @since   0.1.0-beta1
  */
 abstract class Dao extends Core\Assembly implements Application\IDao
 {
-
     /**
      * Stores the binded domains for all derived data access objects.
      *
@@ -85,7 +85,6 @@ abstract class Dao extends Core\Assembly implements Application\IDao
      */
     protected function __construct()
     {
-
     }
 
     /**
@@ -101,10 +100,8 @@ abstract class Dao extends Core\Assembly implements Application\IDao
     final protected function getDomain()
     {
         $s_class = get_called_class();
-        while (FALSE !== $s_class)
-        {
-            if (isset(self::$domains[$s_class]))
-            {
+        while (false !== $s_class) {
+            if (isset(self::$domains[$s_class])) {
                 return self::$domains[$s_class];
             }
             $s_class = get_parent_class($s_class);
@@ -288,7 +285,6 @@ abstract class Dao extends Core\Assembly implements Application\IDao
         }
         return $this->dao;
     }
-
 }
 
-// vi:se ft=php fenc=utf-8 ff=unix ts=4 sts=4 et sw=4 fen fdm=indent fdl=1 tw=120:
+// vi:ft=php fenc=utf-8 ff=unix ts=4 sts=4 et sw=4 fen fdm=indent fdl=1 tw=120

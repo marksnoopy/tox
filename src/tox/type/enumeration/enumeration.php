@@ -51,12 +51,12 @@ abstract class Enumeration extends Core\Assembly
         return $value;
     }
 
-    final protected function __getValue()
+    final protected function toxGetValue()
     {
         return $this->value;
     }
 
-    final protected function __setValue($value)
+    final protected function toxSetValue($value)
     {
     }
 

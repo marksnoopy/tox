@@ -26,10 +26,11 @@ namespace Tox\Data\KV;
 use Tox\Core;
 
 /**
- * Be raised on setting store key exceed 255 
+ * Be raised on setting store key exceed 255
  *
  * @package tox.data.kv
  * @author  Qiang Fu <fuqiang007enter@gmail.com>
+ * @since   0.1.0-beta1
  */
 final class MemcacheKeyTooLongException extends Core\Exception
 {
@@ -46,7 +47,6 @@ final class MemcacheKeyTooLongException extends Core\Exception
      * > Defined as `Empty Data Source Exception \'%source$s\'`.
      */
     const MESSAGE = 'Memcache store key is too long Exception ';
-
 }
 
 // vi:ft=php fenc=utf-8 ff=unix ts=4 sts=4 et sw=4 fen fdm=indent fdl=1 tw=120
