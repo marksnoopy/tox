@@ -61,8 +61,8 @@ class TypeTest extends PHPUnit_Framework_TestCase
      */
     public function testTypeVerification()
     {
-        $o_var = & TypeMock::box(microtime());
-        $this->assertInstanceOf('Tox\\Type\\TypeMock', $o_var);
+        $o_var = & TypeStub::box(microtime());
+        $this->assertInstanceOf('Tox\\Type\\TypeStub', $o_var);
         $s_ref = $o_var->getRef();
         $o_var = microtime();
         $this->assertEquals($s_ref, $o_var->getRef());
@@ -85,6 +85,27 @@ class TypeTest extends PHPUnit_Framework_TestCase
         $this->assertEquals($s_ref, $o_var->setRef($o_vb));
         $o_var->setRef($o_vb);
     }
+
+    public function testSerialization()
+    {
+        $m_value = microtime();
+        $o_var1 = new TypeStub($m_value);
+        $o_var2 = unserialize(serialize($o_var1));
+        $this->assertInstanceOf('Tox\\Type\\TypeStub', $o_var2);
+        $this->assertEquals($m_value, $o_var2->getValue());
+    }
+
+    /**
+     * @depends testSerialization
+     * @expectedException PHPUnit_Framework_Error
+     */
+    public function testValueValidationOnUnserialization()
+    {
+        $m_value = microtime();
+        $o_var1 = new TypeStub($m_value);
+        $s_var2 = str_replace(serialize($m_value), serialize(microtime(true)), serialize($o_var1));
+        unserialize($s_var2);
+    }
 }
 
 /**
@@ -95,19 +116,19 @@ class TypeTest extends PHPUnit_Framework_TestCase
  * @package tox.type
  * @author  Snakevil Zen <zsnakevil@gmail.com>
  */
-class TypeMock extends Type
+class TypeStub extends Type
 {
     /**
      * {@inheritdoc}
      *
      * @param string $value String.
      */
-    public function __construct($value)
+    protected function validate($value)
     {
         if (!is_string($value)) {
             user_error('', E_USER_ERROR);
         }
-        parent::__construct($value);
+        return parent::validate($value);
     }
 }
 

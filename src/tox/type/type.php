@@ -66,13 +66,15 @@ abstract class Type extends Core\Assembly implements IBoxable
     /**
      * CONSTRUCT FUNCTION
      *
-     * NOTICE: Types validating progress would be done here.
+     * **THIS METHOD CANNOT BE OVERRIDDEN.**
      *
      * @param mixed $value Internal scalar value.
+     *
+     * @see Tox\Type\Type::validate()
      */
-    public function __construct($value)
+    final public function __construct($value)
     {
-        $this->value = $value;
+        $this->value = $this->validate($value);
     }
 
     /**
@@ -175,6 +177,50 @@ abstract class Type extends Core\Assembly implements IBoxable
     {
         $o_var = & Varbase::tee(new static($value));
         return $o_var;
+    }
+
+    /**
+     * Validates and Returns the value before assigning.
+     *
+     * NOTICE: Types validating progress would be done here.
+     *
+     * @param  mixed $value Internal scalar value.
+     * @return mixed
+     */
+    protected function validate($value)
+    {
+        return $value;
+    }
+
+    /**
+     * Be invoked on serializing.
+     *
+     * **THIS METHOD CANNOT BE OVERRIDDEN.**
+     *
+     * @return string
+     */
+    final public function serialize()
+    {
+        return serialize($this->value);
+    }
+
+    /**
+     * Be invoked on unserializing.
+     *
+     * **THIS METHOD CANNOT BE OVERRIDDEN.**
+     *
+     * @param  string $data Serialized value data.
+     * @return void
+     *
+     * @see Tox\Type\Type::validate()
+     */
+    final public function unserialize($data)
+    {
+        $m_data = @unserialize($data);
+        if (false === $m_data && !(is_string($data) && 'b:0;' == $data)) {
+            throw new UnserializationFailureException;
+        }
+        $this->value = $this->validate($m_data);
     }
 }
 

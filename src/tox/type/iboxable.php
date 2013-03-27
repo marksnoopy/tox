@@ -23,6 +23,8 @@
 
 namespace Tox\Type;
 
+use Serializable;
+
 /**
  * Announces the behaviors of boxable objects.
  *
@@ -30,7 +32,7 @@ namespace Tox\Type;
  * @author  Snakevil Zen <zsnakevil@gmail.com>
  * @since   0.2.0
  */
-interface IBoxable
+interface IBoxable extends Serializable
 {
     /**
      * CONSTRUCT FUNCTION
