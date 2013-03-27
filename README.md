@@ -8,26 +8,25 @@ ChangeLog
 
 [v0.1.0-beta1][] released in 25th, March 2013.
 
-Contribution
-------------
-
-**ATTENTION**: After [v0.1.0-beta1][], We wanna every commit having signed by [GPG][] in Pull-Requests.
-
 Credits
 -------
 
-### Developers
+### I. Developers
 
-* @snakevil
-* @trainxy
-* @fuqiang007
+* [@snakevil](https://github.com/snakevil)
+* [@trainxy](https://github.com/trainxy)
+* [@fuqiang007](https://github.com/fuqiang007)
 
-### Documentors
+### II. Documentors
 
-### Quality Assistants
+### III. Quality Assistants
 
-* @marksnoopy2
-* @redrum0003
+* [@redrum0003](https://github.com/redrum0003)
+* [@marksnoopy](https://github.com/marksnoopy)
 
-[v0.1.0-beta1]: https://github.com/php-tox/tox/tree/0.1.0-beta1
-[GPG]: http://gnupg.org
+COPYRIGHT
+---------
+
+Tox is under [The GNU General Public License](http://www.gnu.org/licenses/gpl.html).
+
+[v0.1.0-beta1]: ../../tree/0.1.0-beta1
