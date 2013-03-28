@@ -1,0 +1,8 @@
+* export-ignore
+*.php text eol=lf diff=php
+/gpl.txt -export-ignore
+/LICENSE -export-ignore
+/src/ -export-ignore
+/src/tox/ -export-ignore
+/src/tox/**/ -export-ignore
+/src/tox/**/*.php -export-ignore
