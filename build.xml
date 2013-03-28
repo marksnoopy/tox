@@ -1,0 +1,121 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- vi:se fenc=utf-8 ff=unix tw=80 ai si sw=2 et ts=2 sts=2: -->
+<project name="Tox" default="test">
+  <fileset id="test" dir="share/test">
+    <include name="**/*-test.php" />
+  </fileset>
+  <fileset id="src" dir="src">
+    <include name="**/*.php" />
+  </fileset>
+
+  <target name="clean"
+          description="Cleans all fixures of building progress up."
+  >
+    <delete dir="build" includeemptydirs="false" />
+  </target>
+  <target name="test"
+          depends="phplint,phpcs,phpunit"
+          description="Tests source codes widely."
+  />
+
+  <target name="phpdoc" depends="-mkdir-build-sdk">
+    <condition property="phpdoc.xml"
+               value="phpdoc.xml"
+               else="etc/phpdoc/phpdoc.xml"
+    >
+      <available property="phpdoc.xml" file="phpdoc.xml"/>
+    </condition>
+    <exec executable="phpdoc" failonerror="true" failifexecutionfails="true">
+      <arg value="-c"/>
+      <arg file="${phpdoc.xml}"/>
+    </exec>
+  </target>
+
+  <target name="phpunit" depends="-mkdir-build-code-coverage,composer">
+    <condition property="phpunit.xml"
+               value="phpunit.xml"
+               else="etc/phpunit/phpunit.xml"
+    >
+      <available property="phpunit.xml" file="phpunit.xml"/>
+    </condition>
+    <exec executable="bin/phpunit"
+          failonerror="true"
+          failifexecutionfails="true"
+    >
+      <arg value="-c"/>
+      <arg file="${phpunit.xml}"/>
+    </exec>
+  </target>
+
+  <target name="phpcs" depends="composer">
+    <apply executable="bin/phpcs"
+           failonerror="true"
+           failifexecutionfails="true"
+           parallel="yes"
+    >
+      <arg value="--standard=etc/phpcs/src.xml"/>
+      <arg value="--encoding=UTF-8"/>
+      <arg value="--extensions=php"/>
+      <fileset refid="src"/>
+    </apply>
+    <apply executable="bin/phpcs"
+           failonerror="true"
+           failifexecutionfails="true"
+           parallel="yes"
+    >
+      <arg value="--standard=etc/phpcs/share-test.xml"/>
+      <arg value="--encoding=UTF-8"/>
+      <arg value="--extensions=php"/>
+      <fileset refid="test"/>
+    </apply>
+  </target>
+
+  <target name="phplint">
+    <apply executable="php" failonerror="true">
+      <arg value="-l" />
+      <fileset refid="src"/>
+      <fileset refid="test"/>
+    </apply>
+  </target>
+
+  <target name="composer" depends="-composer-check-up-to-date" if="composer.out-of-date">
+    <condition property="composer.command" value="update" else="install">
+      <available property="composer.command" file="composer.lock"/>
+    </condition>
+    <exec executable="composer" failonerror="true" failifexecutionfails="true">
+      <arg value="${composer.command}"/>
+      <arg value="--dev"/>
+    </exec>
+    <touch file="composer.lock"/>
+  </target>
+  <target name="-composer-check-up-to-date">
+    <tstamp>
+      <format property="composer.update-time"
+              offset="-7"
+              unit="day"
+              pattern="MM/dd/yyyy hh:mm:ss aa"
+      />
+    </tstamp>
+    <condition property="composer.out-of-date">
+      <or>
+        <islastmodified datetime="${composer.update-time}" mode="before">
+          <file file="composer.lock"/>
+        </islastmodified>
+        <uptodate property="composer.foo"
+                  srcfile="composer.lock"
+                  targetfile="composer.json"
+        />
+      </or>
+    </condition>
+  </target>
+
+  <target name="-mkdir-build">
+    <mkdir dir="build" />
+  </target>
+  <target name="-mkdir-build-code-coverage" depends="-mkdir-build">
+    <mkdir dir="build/code-coverage" />
+  </target>
+  <target name="-mkdir-build-sdk" depends="-mkdir-build">
+    <mkdir dir="build/sdk" />
+  </target>
+</project>
