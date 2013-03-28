@@ -102,13 +102,32 @@ class DaoTest extends PHPUnit_Framework_TestCase
             ->method('update')
             ->with(
                 $this->equalTo('111'),
-                $this->equalTo(array('id' => '111', 'title' => 'aaa', 'description' => 'bbb'))
+                $this->equalTo(array('title' => 'new title'))
             );
         $o_mock_dao->expects($this->once())
             ->method('delete')
             ->with($this->equalTo('111'));
 
+        $s_key = md5(get_class($o_mock_dao) . '-' . '111');
         $o_mock_cache = $this->getMock('Tox\\Data\\KV\\Memcache', array('get', 'set', 'delete'));
+        $o_mock_cache->expects($this->once())
+            ->method('get')
+            ->with($this->equalTo($s_key))
+            ->will($this->returnValue(array('id' => '111', 'title' => 'original', 'description' => 'bbb')));
+        $o_mock_cache->expects($this->at(0))
+            ->method('set')
+            ->with(
+                $this->equalTo($s_key),
+                $this->equalTo(array('id' => '111', 'title' => 'hello', 'description' => 'world')),
+                null
+            );
+        $o_mock_cache->expects($this->at(2))
+            ->method('set')
+            ->with(
+                $this->equalTo($s_key),
+                $this->equalTo(array('id' => '111', 'title' => 'new title', 'description' => 'bbb')),
+                null
+            );
 
         $o_cache_dao = $this->getMockBuilder('Tox\\Application\\Dao\\Cache\\Dao')
             ->disableOriginalConstructor()
@@ -119,7 +138,7 @@ class DaoTest extends PHPUnit_Framework_TestCase
         $o_cache_dao->bind($o_mock_dao);
 
         $o_cache_dao->create(array('title' => 'hello', 'description' => 'world'));
-        $o_cache_dao->update('111', array('id' => '111', 'title' => 'aaa', 'description' => 'bbb'));
+        $o_cache_dao->update('111', array('title' => 'new title'));
         $o_cache_dao->delete('111');
     }
 

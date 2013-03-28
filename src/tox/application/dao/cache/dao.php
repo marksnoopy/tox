@@ -178,6 +178,7 @@ abstract class Dao extends Core\Assembly implements Application\IDao
         $s_id = $this->getDao()->create($fields);
 
         $s_key = $this->generateKey($s_id);
+        $fields['id'] = $s_id;
         self::getDomain()->set($s_key, $fields, $this->expire);
     }
 
@@ -205,7 +206,7 @@ abstract class Dao extends Core\Assembly implements Application\IDao
      * Both update from cache and default dao.
      *
      * @param  string   $id         Identity of an entity.
-     * @param  array    $fields     Data of an entity.
+     * @param  array    $fields     Part data of an entity.
      * @return bool
      */
     public function update($id, $fields)
@@ -213,7 +214,9 @@ abstract class Dao extends Core\Assembly implements Application\IDao
         $s_key = $this->generateKey($id);
 
         $this->getDao()->update($id, $fields);
-        self::getDomain()->set($s_key, $fields, $this->expire);
+        $a_original_data = self::getDomain()->get($s_key);
+        $a_updated_data = array_merge($a_original_data, $fields);
+        self::getDomain()->set($s_key, $a_updated_data, $this->expire);
     }
 
     /**
