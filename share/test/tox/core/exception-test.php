@@ -67,7 +67,7 @@ class ExceptionTest extends PHPUnit_Framework_TestCase
     {
         $this->ctx = array(
             'foo' => microtime(),
-            'bar' => microtime(TRUE)
+            'bar' => microtime(true)
         );
         $this->pex = new PHPException;
         $this->ex = new ExceptionMock($this->ctx, $this->pex);

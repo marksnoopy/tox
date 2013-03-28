@@ -55,7 +55,8 @@ class FallbackTest extends PHPUnit_Framework_TestCase
     public function testEachFallbackLivesWithOnlyOneException()
     {
         $o_fb = new Fallback;
-        $this->assertEquals($o_fb->cause(new Exception(microtime()))->render(),
+        $this->assertEquals(
+            $o_fb->cause(new Exception(microtime()))->render(),
             $o_fb->cause(new Exception(microtime()))->render()
         );
     }

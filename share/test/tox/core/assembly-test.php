@@ -47,12 +47,13 @@ class AssemblyTest extends PHPUnit_Framework_TestCase
     {
         try {
             $s_prop = md5(microtime());
-            $o_mock = $this->getMock('Tox\\Core\\AssemblyMockA',
+            $o_mock = $this->getMock(
+                'Tox\\Core\\AssemblyMockA',
                 array('toxIsMagicPropReadable', 'toxGet' . $s_prop)
             );
             $o_mock->expects($this->once())->method('toxIsMagicPropReadable')
                 ->with($this->equalTo($s_prop))
-                ->will($this->returnValue(TRUE));
+                ->will($this->returnValue(true));
             $o_mock->expects($this->once())->method('toxGet' . $s_prop);
             $o_mock->$s_prop;
         } catch (Exception $ex) {
@@ -97,16 +98,6 @@ class AssemblyTest extends PHPUnit_Framework_TestCase
      * @depends testRegularPairOfPropAndGetterWouldWorkFine
      * @expectedException Tox\Core\PropertyReadDeniedException
      */
-    public function testInternalPropWhichLeadingWithUnderlineAgainstGetterMechanism()
-    {
-        $o_obj = new AssemblyMockA;
-        $o_obj->_inProp;
-    }
-
-    /**
-     * @depends testRegularPairOfPropAndGetterWouldWorkFine
-     * @expectedException Tox\Core\PropertyReadDeniedException
-     */
     public function testPrivatePropAgainstGetterMechanism()
     {
         $o_obj = new AssemblyMockA;
@@ -127,11 +118,11 @@ class AssemblyTest extends PHPUnit_Framework_TestCase
     {
         try {
             $s_prop = md5(microtime());
-            $f_value = microtime(TRUE);
+            $f_value = microtime(true);
             $o_mock = $this->getMock('Tox\\Core\\AssemblyMockA', array('toxIsMagicPropWritable', 'toxSet' . $s_prop));
             $o_mock->expects($this->once())->method('toxIsMagicPropWritable')
                 ->with($this->equalTo($s_prop))
-                ->will($this->returnValue(TRUE));
+                ->will($this->returnValue(true));
             $o_mock->expects($this->once())->method('toxSet'. $s_prop)
                 ->with($this->equalTo($f_value));
             $o_mock->$s_prop = $f_value;
@@ -147,7 +138,7 @@ class AssemblyTest extends PHPUnit_Framework_TestCase
     public function testRegularPairOfPropAndSetterWouldWorkFine()
     {
         try {
-            $f_value = microtime(TRUE);
+            $f_value = microtime(true);
             $o_obj = new AssemblyMockA;
             $o_obj->ok = $f_value;
             $this->assertEquals($f_value, $o_obj->ok);
@@ -180,16 +171,6 @@ class AssemblyTest extends PHPUnit_Framework_TestCase
      * @depends testSetterMechanismSupported
      * @expectedException Tox\Core\PropertyWriteDeniedException
      */
-    public function testInternalPropWhichLeadingWithUnderlineAgainstSetterMechanism()
-    {
-        $o_obj = new AssemblyMockA;
-        $o_obj->_inProp = 1;
-    }
-
-    /**
-     * @depends testSetterMechanismSupported
-     * @expectedException Tox\Core\PropertyWriteDeniedException
-     */
     public function testPrivatePropAgainstSetterMechanism()
     {
         $o_obj = new AssemblyMockA;
@@ -212,7 +193,7 @@ class AssemblyTest extends PHPUnit_Framework_TestCase
     public function testDifferentTypesKeepTheirOwnPropertiesInformations()
     {
         try {
-            $f_value = microtime(TRUE);
+            $f_value = microtime(true);
             $o_obj1 = new AssemblyMockA;
             $o_obj2 = new AssemblyMockB;
             $o_obj1->ok = $f_value;
@@ -297,34 +278,6 @@ class AssemblyMockA extends Assembly
      * @var NULL
      */
     protected $noSetter;
-
-    /**
-     * Acts as an illegal property for leading with an underline.
-     *
-     * @var NULL
-     */
-    protected $_inProp;
-
-    /**
-     * Acts as an illegal getter for the corresponding property leading with an
-     * underline.
-     *
-     * @return void
-     */
-    protected function toxGet_inProp()
-    {
-    }
-
-    /**
-     * Acts as an illegal setter for the corresponding property leading with an
-     * underline.
-     *
-     * @param  mixed $value
-     * @return void
-     */
-    protected function toxSet_inProp($value)
-    {
-    }
 
     /**
      * Acts as an illegal property for private visibility.

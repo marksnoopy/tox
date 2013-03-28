@@ -26,15 +26,18 @@ namespace Tox\Application\Configuration;
 use PHPUnit_Framework_TestCase;
 use org\bovigo\vfs\vfsStream;
 
-require_once __DIR__ . '/../../../../../include/mikey179/vfsStream/src/main/php/org/bovigo/vfs/vfsStream.php';
-require_once __DIR__ . '/../../../../../include/mikey179/vfsStream/src/main/php/org/bovigo/vfs/vfsStreamWrapper.php';
-require_once __DIR__ . '/../../../../../include/mikey179/vfsStream/src/main/php/org/bovigo/vfs/Quota.php';
-require_once __DIR__ . '/../../../../../include/mikey179/vfsStream/src/main/php/org/bovigo/vfs/vfsStreamContent.php';
-require_once __DIR__ . '/../../../../../include/mikey179/vfsStream/src/main/php/org/bovigo/vfs/vfsStreamAbstractContent.php';
-require_once __DIR__ . '/../../../../../include/mikey179/vfsStream/src/main/php/org/bovigo/vfs/vfsStreamContainer.php';
-require_once __DIR__ . '/../../../../../include/mikey179/vfsStream/src/main/php/org/bovigo/vfs/vfsStreamDirectory.php';
-require_once __DIR__ . '/../../../../../include/mikey179/vfsStream/src/main/php/org/bovigo/vfs/vfsStreamFile.php';
+if (!defined('DIR_VFSSTREAM')) {
+    define('DIR_VFSSTREAM', __DIR__ . '/../../../../../include/mikey179/vfsStream/src/main/php/org/bovigo/vfs');
+}
 
+require_once DIR_VFSSTREAM . '/vfsStream.php';
+require_once DIR_VFSSTREAM . '/vfsStreamWrapper.php';
+require_once DIR_VFSSTREAM . '/Quota.php';
+require_once DIR_VFSSTREAM . '/vfsStreamContent.php';
+require_once DIR_VFSSTREAM . '/vfsStreamAbstractContent.php';
+require_once DIR_VFSSTREAM . '/vfsStreamContainer.php';
+require_once DIR_VFSSTREAM . '/vfsStreamDirectory.php';
+require_once DIR_VFSSTREAM . '/vfsStreamFile.php';
 
 require_once __DIR__ . '/../../../../../src/tox/core/assembly.php';
 require_once __DIR__ . '/../../../../../src/tox/core/exception.php';
@@ -86,14 +89,18 @@ class ConfigurationTest extends PHPUnit_Framework_TestCase
             0755,
             array(
                 'etc' => array(
-                    'essential.conf.php' => '<?php $a_array = array("domain" => "9apps.mobi", "package-name" => "com.nineapps.android"); ?>',
-                    'import.conf.php' => '<?php $a_array = array("domain" => "google.com", "package-name" => "com.google.android"); ?>',
-                    'constant.conf.php' => '<?php $a_array = array("page-size" => "20", "suffix" => "apk"); ?>',
-                    'db.conf.php' => '<?php $array = array("abc" => "value abc", "bcd" => "value bcd"); ?>',
-                    'memcache.conf.php' => '<?php $a_array = array("memcache" => array("host" => "xxx", "port" => "11211")); ?>',
-                    'default.conf.php' => '<?php $a_array = array("aaa" => "value aaa", "bbb" => "value bbb"); ?>',
-                    'var.conf.php' => '<?php $a_array = "abc"; ?>',
-                    'export.conf.php' => '<?php $a_array = array("abw9j" => "ababsdf2", "cd" => "cdcd", "ab2ee" => "ab2ee", "ee" => "eeee"); ?>',
+                    'essential.conf.php' => '<?php $a_array = array("domain" => "9apps.mobi",' .
+                        ' "package-name" => "com.nineapps.android");',
+                    'import.conf.php' => '<?php $a_array = array("domain" => "google.com",' .
+                        ' "package-name" => "com.google.android");',
+                    'constant.conf.php' => '<?php $a_array = array("page-size" => "20", "suffix" => "apk");',
+                    'db.conf.php' => '<?php $array = array("abc" => "value abc", "bcd" => "value bcd");',
+                    'memcache.conf.php' => '<?php $a_array = array("memcache" => array("host" => "xxx",' .
+                        ' "port" => "11211"));',
+                    'default.conf.php' => '<?php $a_array = array("aaa" => "value aaa", "bbb" => "value bbb");',
+                    'var.conf.php' => '<?php $a_array = "abc";',
+                    'export.conf.php' => '<?php $a_array = array("abw9j" => "ababsdf2", "cd" => "cdcd",' .
+                        ' "ab2ee" => "ab2ee", "ee" => "eeee");',
                 )
             )
         );
@@ -110,20 +117,20 @@ class ConfigurationTest extends PHPUnit_Framework_TestCase
     public function testInitConfigurationWouldBeFine($path, $configs)
     {
         $o_configuration = $this->getMockBuilder('Tox\\Application\\Configuration\\Configuration')
-                                ->setMethods(array('getPath'))
-                                ->disableOriginalConstructor()
-                                ->getMock();
+            ->setMethods(array('getPath'))
+            ->disableOriginalConstructor()
+            ->getMock();
         $o_configuration->expects($this->once())
-                        ->method('getPath')
-                        ->with($this->equalTo($path))
-                        ->will($this->returnValue(vfsStream::url($this->root . $path)));
+            ->method('getPath')
+            ->with($this->equalTo($path))
+            ->will($this->returnValue(vfsStream::url($this->root . $path)));
         $o_configuration->__construct($path);
         $o_expected_config = json_decode($configs, true);
 
         /**
          * @XXX Can not assertEqual an object (implemented ArrayAccess) and an array, use loop to instead.
          */
-        foreach($o_expected_config as $k => $v) {
+        foreach ($o_expected_config as $k => $v) {
             $this->assertEquals($o_expected_config[$k], $o_configuration[$k]);
         }
     }
@@ -134,20 +141,20 @@ class ConfigurationTest extends PHPUnit_Framework_TestCase
     public function testImportConfigurationWouldBeFine($path, $configs)
     {
         $o_configuration = $this->getMockBuilder('Tox\\Application\\Configuration\\Configuration')
-                                ->setMethods(array('getPath'))
-                                ->disableOriginalConstructor()
-                                ->getMock();
+            ->setMethods(array('getPath'))
+            ->disableOriginalConstructor()
+            ->getMock();
         $o_configuration->expects($this->once())
-                        ->method('getPath')
-                        ->with($this->equalTo($path))
-                        ->will($this->returnValue(vfsStream::url($this->root . $path)));
+            ->method('getPath')
+            ->with($this->equalTo($path))
+            ->will($this->returnValue(vfsStream::url($this->root . $path)));
         $o_configuration->import($path);
         $o_expected_config = json_decode($configs, true);
 
         /**
          * @XXX Can not assertEqual an object (implemented ArrayAccess) and an array, use loop to instead.
          */
-        foreach($o_expected_config as $k => $v) {
+        foreach ($o_expected_config as $k => $v) {
             $this->assertEquals($o_expected_config[$k], $o_configuration[$k]);
         }
     }
@@ -160,13 +167,13 @@ class ConfigurationTest extends PHPUnit_Framework_TestCase
     public function testInvalidConfiguratoinFileWouldNotBeInited($path)
     {
         $o_configuration = $this->getMockBuilder('Tox\\Application\\Configuration\\Configuration')
-                                ->setMethods(array('getPath'))
-                                ->disableOriginalConstructor()
-                                ->getMock();
+            ->setMethods(array('getPath'))
+            ->disableOriginalConstructor()
+            ->getMock();
         $o_configuration->expects($this->once())
-                        ->method('getPath')
-                        ->with($this->equalTo($path))
-                        ->will($this->returnValue(vfsStream::url($this->root . $path)));
+            ->method('getPath')
+            ->with($this->equalTo($path))
+            ->will($this->returnValue(vfsStream::url($this->root . $path)));
         $o_configuration->__construct($path);
     }
 
@@ -178,13 +185,13 @@ class ConfigurationTest extends PHPUnit_Framework_TestCase
     public function testInvalidConfiguratoinFileWouldNotBeImported($path)
     {
         $o_configuration = $this->getMockBuilder('Tox\\Application\\Configuration\\Configuration')
-                                ->setMethods(array('getPath'))
-                                ->disableOriginalConstructor()
-                                ->getMock();
+            ->setMethods(array('getPath'))
+            ->disableOriginalConstructor()
+            ->getMock();
         $o_configuration->expects($this->once())
-                        ->method('getPath')
-                        ->with($this->equalTo($path))
-                        ->will($this->returnValue(vfsStream::url($this->root . $path)));
+            ->method('getPath')
+            ->with($this->equalTo($path))
+            ->will($this->returnValue(vfsStream::url($this->root . $path)));
         $o_configuration->import($path);
     }
 
@@ -196,13 +203,13 @@ class ConfigurationTest extends PHPUnit_Framework_TestCase
     {
         $path = '/etc/essential.conf.php';
         $o_configuration = $this->getMockBuilder('Tox\\Application\\Configuration\\Configuration')
-                                ->setMethods(array('getPath'))
-                                ->disableOriginalConstructor()
-                                ->getMock();
+            ->setMethods(array('getPath'))
+            ->disableOriginalConstructor()
+            ->getMock();
         $o_configuration->expects($this->once())
-                        ->method('getPath')
-                        ->with($this->equalTo($path))
-                        ->will($this->returnValue(vfsStream::url($this->root . $path)));
+            ->method('getPath')
+            ->with($this->equalTo($path))
+            ->will($this->returnValue(vfsStream::url($this->root . $path)));
         $o_configuration->__construct($path);
 
         $o_configuration->load(array('domain' => 'abc', 'package-name' => 'bcd'));
@@ -226,18 +233,18 @@ class ConfigurationTest extends PHPUnit_Framework_TestCase
         $import_path = '/etc/import.conf.php';
 
         $o_configuration = $this->getMockBuilder('Tox\\Application\\Configuration\\Configuration')
-                                ->setMethods(array('getPath'))
-                                ->disableOriginalConstructor()
-                                ->getMock();
+            ->setMethods(array('getPath'))
+            ->disableOriginalConstructor()
+            ->getMock();
 
         $o_configuration->expects($this->at(0))
-                        ->method('getPath')
-                        ->with($this->equalTo($path))
-                        ->will($this->returnValue(vfsStream::url($this->root . $path)));
+            ->method('getPath')
+            ->with($this->equalTo($path))
+            ->will($this->returnValue(vfsStream::url($this->root . $path)));
         $o_configuration->expects($this->at(1))
-                        ->method('getPath')
-                        ->with($this->equalTo($import_path))
-                        ->will($this->returnValue(vfsStream::url($this->root . $import_path)));
+            ->method('getPath')
+            ->with($this->equalTo($import_path))
+            ->will($this->returnValue(vfsStream::url($this->root . $import_path)));
 
         $o_configuration->__construct($path);
         $this->assertEquals('9apps.mobi', $o_configuration['domain']);
@@ -261,13 +268,13 @@ class ConfigurationTest extends PHPUnit_Framework_TestCase
     {
         $path = '/etc/export.conf.php';
         $o_configuration = $this->getMockBuilder('Tox\\Application\\Configuration\\Configuration')
-                                ->setMethods(array('getPath'))
-                                ->disableOriginalConstructor()
-                                ->getMock();
+            ->setMethods(array('getPath'))
+            ->disableOriginalConstructor()
+            ->getMock();
         $o_configuration->expects($this->once())
-                        ->method('getPath')
-                        ->with($this->equalTo($path))
-                        ->will($this->returnValue(vfsStream::url($this->root . $path)));
+            ->method('getPath')
+            ->with($this->equalTo($path))
+            ->will($this->returnValue(vfsStream::url($this->root . $path)));
         $o_configuration->import($path);
 
         $a_export = $o_configuration->export('ab*');
@@ -284,22 +291,22 @@ class ConfigurationTest extends PHPUnit_Framework_TestCase
         $import_path_2 = '/etc/memcache.conf.php';
 
         $o_configuration = $this->getMockBuilder('Tox\\Application\\Configuration\\Configuration')
-                                ->setMethods(array('getPath'))
-                                ->disableOriginalConstructor()
-                                ->getMock();
+            ->setMethods(array('getPath'))
+            ->disableOriginalConstructor()
+            ->getMock();
 
         $o_configuration->expects($this->at(0))
-                        ->method('getPath')
-                        ->with($this->equalTo($path))
-                        ->will($this->returnValue(vfsStream::url($this->root . $path)));
+            ->method('getPath')
+            ->with($this->equalTo($path))
+            ->will($this->returnValue(vfsStream::url($this->root . $path)));
         $o_configuration->expects($this->at(1))
-                        ->method('getPath')
-                        ->with($this->equalTo($import_path))
-                        ->will($this->returnValue(vfsStream::url($this->root . $import_path)));
+            ->method('getPath')
+            ->with($this->equalTo($import_path))
+            ->will($this->returnValue(vfsStream::url($this->root . $import_path)));
         $o_configuration->expects($this->at(2))
-                        ->method('getPath')
-                        ->with($this->equalTo($import_path_2))
-                        ->will($this->returnValue(vfsStream::url($this->root . $import_path_2)));
+            ->method('getPath')
+            ->with($this->equalTo($import_path_2))
+            ->will($this->returnValue(vfsStream::url($this->root . $import_path_2)));
 
         $o_configuration->__construct($path);
         $o_configuration->import($import_path);
@@ -328,10 +335,12 @@ class ConfigurationTest extends PHPUnit_Framework_TestCase
         return array(
             array('/etc/constant.conf.php', json_encode(array('page-size' => 20, 'suffix' => 'apk'))),
             array('/etc/default.conf.php', json_encode(array('aaa' => 'value aaa', 'bbb' => 'value bbb'))),
-            array('/etc/essential.conf.php', json_encode(array('domain' => '9apps.mobi', 'package-name' => 'com.nineapps.android')))
+            array(
+                '/etc/essential.conf.php',
+                json_encode(array('domain' => '9apps.mobi', 'package-name' => 'com.nineapps.android'))
+            )
         );
     }
-
 }
 
 // vi:ft=php fenc=utf-8 ff=unix ts=4 sts=4 et sw=4 fen fdm=indent fdl=1 tw=120

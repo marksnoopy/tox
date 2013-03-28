@@ -80,12 +80,12 @@ class MemcacheTest extends PHPUnit_Framework_TestCase
             $o_mockMemcached->Expects($this->once())
                     ->method('set')
                     ->with($this->equalTo($key), $this->equalTo($val), $this->equalTo($expire))
-                    ->will($this->returnValue(True));
+                    ->will($this->returnValue(true));
         } else {
             $o_mockMemcached->Expects($this->once())
                     ->method('set')
                     ->with($this->equalTo($key), $this->equalTo($val), $this->equalTo(300))
-                    ->will($this->returnValue(True));
+                    ->will($this->returnValue(true));
         }
         $o_mem2 = $this->getMockBuilder('ToxTest\\Data\\Kv\\SubMem')
                 ->setMethods(array('defaultMemcached'))
@@ -98,7 +98,7 @@ class MemcacheTest extends PHPUnit_Framework_TestCase
         $o_mem2->init();
 
         $o_mem2->setExpireTime(300);
-        $this->assertTrue($o_mem2->setValue($key, $val, $expire));
+        $this->asserttrue($o_mem2->setValue($key, $val, $expire));
     }
 
     /**
@@ -113,7 +113,7 @@ class MemcacheTest extends PHPUnit_Framework_TestCase
         $o_mockMemcached->Expects($this->once())
                 ->method('set')
                 ->with($this->equalTo($key), $this->equalTo($val), $this->equalTo(0))
-                ->will($this->returnValue(True));
+                ->will($this->returnValue(true));
 
         $o_mem2 = $this->getMockBuilder('ToxTest\\Data\\Kv\\SubMem')
                 ->setMethods(array('defaultMemcached'))
@@ -125,7 +125,7 @@ class MemcacheTest extends PHPUnit_Framework_TestCase
         $o_mem2->setServers($config);
         $o_mem2->init();
 
-        $this->assertTrue($o_mem2->setValue($key, $val, $expire));
+        $this->asserttrue($o_mem2->setValue($key, $val, $expire));
     }
 
     public function configProvideSetValue()
@@ -202,7 +202,7 @@ class MemcacheTest extends PHPUnit_Framework_TestCase
         $o_mockMemcached->Expects($this->once())
                 ->method('get')
                 ->with($this->equalTo('key'))
-                ->will($this->returnValue(True));
+                ->will($this->returnValue(true));
 
         $o_mem2 = $this->getMockBuilder('ToxTest\\Data\\Kv\\SubMem')
                 ->setMethods(array('defaultMemcached'))
@@ -214,7 +214,7 @@ class MemcacheTest extends PHPUnit_Framework_TestCase
         $o_mem2->setServers($config);
         $o_mem2->init();
 
-        $this->assertTrue($o_mem2->getValue('key'));
+        $this->asserttrue($o_mem2->getValue('key'));
     }
 
     /**
@@ -228,7 +228,7 @@ class MemcacheTest extends PHPUnit_Framework_TestCase
         $o_mockMemcached->Expects($this->once())
                 ->method('delete')
                 ->with($this->equalTo('key'), $this->equalTo(0))
-                ->will($this->returnValue(True));
+                ->will($this->returnValue(true));
 
         $o_mem2 = $this->getMockBuilder('ToxTest\\Data\\Kv\\SubMem')
                 ->setMethods(array('defaultMemcached'))
@@ -240,7 +240,7 @@ class MemcacheTest extends PHPUnit_Framework_TestCase
         $o_mem2->setServers($config);
         $o_mem2->init();
 
-        $this->assertTrue($o_mem2->deleteValue('key'));
+        $this->asserttrue($o_mem2->deleteValue('key'));
     }
 
     /**
@@ -254,7 +254,7 @@ class MemcacheTest extends PHPUnit_Framework_TestCase
         $o_mockMemcached->Expects($this->once())
                 ->method('getMulti')
                 ->with($this->equalTo(array('key')))
-                ->will($this->returnValue(True));
+                ->will($this->returnValue(true));
 
         $o_mem2 = $this->getMockBuilder('ToxTest\\Data\\Kv\\SubMem')
                 ->setMethods(array('defaultMemcached'))
@@ -266,7 +266,7 @@ class MemcacheTest extends PHPUnit_Framework_TestCase
         $o_mem2->setServers($config);
         $o_mem2->init();
 
-        $this->assertTrue($o_mem2->getValues(array('key')));
+        $this->asserttrue($o_mem2->getValues(array('key')));
     }
 
     /**
@@ -279,7 +279,7 @@ class MemcacheTest extends PHPUnit_Framework_TestCase
                 ->getMock();
         $o_mockMemcached->Expects($this->once())
                 ->method('flush')
-                ->will($this->returnValue(True));
+                ->will($this->returnValue(true));
 
         $o_mem2 = $this->getMockBuilder('ToxTest\\Data\\Kv\\SubMem')
                 ->setMethods(array('defaultMemcached'))
@@ -291,7 +291,7 @@ class MemcacheTest extends PHPUnit_Framework_TestCase
         $o_mem2->setServers($config);
         $o_mem2->init();
 
-        $this->assertTrue($o_mem2->clearValues());
+        $this->asserttrue($o_mem2->clearValues());
     }
 
     /**
@@ -305,7 +305,7 @@ class MemcacheTest extends PHPUnit_Framework_TestCase
         $o_mockMemcached->Expects($this->once())
                 ->method('add')
                 ->with($this->equalTo('key'), $this->equalTo('sss'), $this->equalTo(0))
-                ->will($this->returnValue(True));
+                ->will($this->returnValue(true));
 
         $o_mem2 = $this->getMockBuilder('ToxTest\\Data\\Kv\\SubMem')
                 ->setMethods(array('defaultMemcached'))
@@ -317,12 +317,12 @@ class MemcacheTest extends PHPUnit_Framework_TestCase
         $o_mem2->setServers($config);
         $o_mem2->init();
 
-        $this->assertTrue($o_mem2->addValue('key', 'sss', 0));
+        $this->asserttrue($o_mem2->addValue('key', 'sss', 0));
     }
 
     public function testConstruct()
     {
-        $this->assertTrue($this->o_mem->useMemcached);
+        $this->asserttrue($this->o_mem->useMemcached);
     }
 
     /**
@@ -412,7 +412,6 @@ class MemcacheTest extends PHPUnit_Framework_TestCase
             )
         );
     }
-
 }
 
 class SubMem extends KV\Memcache
@@ -448,7 +447,6 @@ class SubMem extends KV\Memcache
     {
         return parent::clearValues();
     }
-
 }
 
 // vi:ft=php fenc=utf-8 ff=unix ts=4 sts=4 et sw=4 fen fdm=indent fdl=1 tw=120

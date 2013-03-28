@@ -89,10 +89,11 @@ class ResponseTest extends PHPUnit_Framework_TestCase
     public function testHeadersSentBeforeOutputting()
     {
         $o_out = $this->getMock('Tox\\Web\\Response\\Response', array('getHeaders'));
-        $o_hhp = $this->getMock('Tox\\Web\\Response\\HTTPHeadersProcessor',
-                array('postOutput', 'sendHeader'),
-                array($o_out)
-            );
+        $o_hhp = $this->getMock(
+            'Tox\\Web\\Response\\HTTPHeadersProcessor',
+            array('postOutput', 'sendHeader'),
+            array($o_out)
+        );
         $o_out->setHeadersProcessor($o_hhp)
             ->expects($this->once())->method('getHeaders')->will($this->returnValue(array()));
         ob_start();

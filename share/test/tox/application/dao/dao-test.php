@@ -59,7 +59,8 @@ class DaoTest extends PHPUnit_Framework_TestCase
     {
         $o_dd1 = $this->getMock('Tox\\Data\\ISource');
         Dao::bindDomain($o_dd1);
-        $o_dao1 = $this->getMockForAbstractClass('Tox\\Application\\Dao\\DaoMock',
+        $o_dao1 = $this->getMockForAbstractClass(
+            'Tox\\Application\\Dao\\DaoMock',
             array(),
             'c' . md5(microtime()),
             false
@@ -67,7 +68,8 @@ class DaoTest extends PHPUnit_Framework_TestCase
         $o_dd2 = $this->getMock('Tox\\Data\\ISource');
         call_user_func(array(get_class($o_dao1), 'bindDomain'), $o_dd2);
         $this->assertSame($o_dd2, $o_dao1->getDomainTest());
-        $o_dao2 = $this->getMockForAbstractClass('Tox\\Application\\Dao\\DaoMock',
+        $o_dao2 = $this->getMockForAbstractClass(
+            'Tox\\Application\\Dao\\DaoMock',
             array(),
             'c' . md5(microtime()),
             false

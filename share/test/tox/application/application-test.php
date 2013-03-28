@@ -182,9 +182,9 @@ class ApplicationTest extends PHPUnit_Framework_TestCase
         $this->ocfg->expects($this->atLeastOnce())->method('offsetExists')
             ->will($this->returnValue(false));
         $o_app = $this->getMockBuilder('Tox\\Application\\Application')
-            ->setMethods(array('getInstance', 'dispatch', 'getDefaultConfiguration', 'getDefaultRouter',
-                'getDefaultFallback'
-            ))->disableOriginalConstructor()
+            ->setMethods(
+                array('getInstance', 'dispatch', 'getDefaultConfiguration', 'getDefaultRouter', 'getDefaultFallback')
+            )->disableOriginalConstructor()
             ->getMockForAbstractClass();
         $o_app->staticExpects($this->once())->method('getInstance')
             ->will($this->returnValue($o_app));
@@ -213,9 +213,9 @@ class ApplicationTest extends PHPUnit_Framework_TestCase
         $this->ocfg->expects($this->atLeastOnce())->method('offsetExists')
             ->will($this->returnValue(false));
         $o_app = $this->getMockBuilder('Tox\\Application\\Application')
-            ->setMethods(array('getInstance', 'dispatch', 'getDefaultConfiguration', 'getDefaultRouter',
-                'getDefaultFallback'
-            ))->disableOriginalConstructor()
+            ->setMethods(
+                array('getInstance', 'dispatch', 'getDefaultConfiguration', 'getDefaultRouter', 'getDefaultFallback')
+            )->disableOriginalConstructor()
             ->getMockForAbstractClass();
         $o_app->staticExpects($this->once())->method('getInstance')
             ->will($this->returnValue($o_app));
