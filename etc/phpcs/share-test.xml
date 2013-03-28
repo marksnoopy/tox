@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- vi:se fenc=utf-8 ff=unix tw=80 ai si sw=2 et ts=2 sts=2: -->
+<ruleset name="Tox">
+  <description>PSR-2 standard excluding sniffs for unit-tests.</description>
+  <rule ref="PSR2">
+    <exclude name="PSR1.Files.SideEffects.FoundWithSymbols"/>
+    <exclude name="PSR1.Classes.ClassDeclaration.MultipleClasses"/>
+  </rule>
+</ruleset>

@@ -50,10 +50,7 @@ class RouterTest extends PHPUnit_Framework_TestCase
     {
         $o_in = $this->getMock('Tox\\Application\\IInput');
         $o_in->expects($this->once())->method('getCommandLine')->will($this->returnValue('--help -- a b'));
-        $o_router = new Router(array(
-                '--help -- (.) (.)' => array('foo', 'bar', 'blah')
-            )
-        );
+        $o_router = new Router(array('--help -- (.) (.)' => array('foo', 'bar', 'blah')));
         $o_token = $o_router->analyse($o_in);
         $this->assertEquals('foo', $o_token->getController());
         $this->assertEquals('a', $o_token['bar']);
@@ -79,15 +76,9 @@ class RouterTest extends PHPUnit_Framework_TestCase
     {
         $o_in = $this->getMock('Tox\\Application\\IInput');
         $o_in->expects($this->once())->method('getCommandLine')->will($this->returnValue('--help -- a b'));
-        $o_router = new Router(array(
-                '--help -- (.) (.)' => array('foo', 'bar', 'blah')
-            )
-        );
-        $o_token = $o_router->import(array(
-                    '--help -- (.*) (.*)' => array('foo2', 'bar2', 'blah2')
-                ),
-                true
-            )->analyse($o_in);
+        $o_router = new Router(array('--help -- (.) (.)' => array('foo', 'bar', 'blah')));
+        $o_token = $o_router->import(array('--help -- (.*) (.*)' => array('foo2', 'bar2', 'blah2')), true)
+            ->analyse($o_in);
         $this->assertEquals('foo2', $o_token->getController());
         $this->assertEquals('a', $o_token['bar2']);
         $this->assertEquals('b', $o_token['blah2']);

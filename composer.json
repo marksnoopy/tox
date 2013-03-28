@@ -38,6 +38,8 @@
     "squizlabs/php_codesniffer": "1.*"
   },
   "config": {
-    "vendor-dir": "include"
+    "vendor-dir": "include",
+    "bin-dir": "bin",
+    "notify-on-install": false
   }
 }

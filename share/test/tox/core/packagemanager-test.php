@@ -27,14 +27,18 @@ use PHPUnit_Framework_TestCase;
 
 use org\bovigo\vfs\vfsStream;
 
-require_once __DIR__ . '/../../../../include/mikey179/vfsStream/src/main/php/org/bovigo/vfs/vfsStream.php';
-require_once __DIR__ . '/../../../../include/mikey179/vfsStream/src/main/php/org/bovigo/vfs/vfsStreamWrapper.php';
-require_once __DIR__ . '/../../../../include/mikey179/vfsStream/src/main/php/org/bovigo/vfs/Quota.php';
-require_once __DIR__ . '/../../../../include/mikey179/vfsStream/src/main/php/org/bovigo/vfs/vfsStreamContent.php';
-require_once __DIR__ . '/../../../../include/mikey179/vfsStream/src/main/php/org/bovigo/vfs/vfsStreamAbstractContent.php';
-require_once __DIR__ . '/../../../../include/mikey179/vfsStream/src/main/php/org/bovigo/vfs/vfsStreamContainer.php';
-require_once __DIR__ . '/../../../../include/mikey179/vfsStream/src/main/php/org/bovigo/vfs/vfsStreamDirectory.php';
-require_once __DIR__ . '/../../../../include/mikey179/vfsStream/src/main/php/org/bovigo/vfs/vfsStreamFile.php';
+if (!defined('DIR_VFSSTREAM')) {
+    define('DIR_VFSSTREAM', __DIR__ . '/../../../../include/mikey179/vfsStream/src/main/php/org/bovigo/vfs');
+}
+
+require_once DIR_VFSSTREAM . '/vfsStream.php';
+require_once DIR_VFSSTREAM . '/vfsStreamWrapper.php';
+require_once DIR_VFSSTREAM . '/Quota.php';
+require_once DIR_VFSSTREAM . '/vfsStreamContent.php';
+require_once DIR_VFSSTREAM . '/vfsStreamAbstractContent.php';
+require_once DIR_VFSSTREAM . '/vfsStreamContainer.php';
+require_once DIR_VFSSTREAM . '/vfsStreamDirectory.php';
+require_once DIR_VFSSTREAM . '/vfsStreamFile.php';
 
 require_once __DIR__ . '/../../../../src/tox/core/assembly.php';
 require_once __DIR__ . '/../../../../src/tox/core/packagemanager.php';
@@ -101,7 +105,10 @@ class PackageManagerTest extends PHPUnit_Framework_TestCase
         self::$log = array();
         $this->pman = new PackageManager;
         $this->root = md5(microtime());
-        $this->vfs = vfsStream::setUp($this->root, 0755, array(
+        $this->vfs = vfsStream::setUp(
+            $this->root,
+            0755,
+            array(
                 'include' => array(
                     'core' => array(
                         '@bootstrap.php' => '<?php Tox\\Core\\PackageManagerTest::log("Tox\\Core");',
@@ -135,8 +142,14 @@ class PackageManagerTest extends PHPUnit_Framework_TestCase
 
     public function testRegisteringAndLocating()
     {
-        $this->assertSame($this->pman, $this->pman->register('tox.core', vfsStream::url($this->root . '/include/core')));
-        $this->assertEquals(vfsStream::url($this->root . '/include/core/blah.php'), $this->pman->locate('Tox\\Core\\Blah'));
+        $this->assertSame(
+            $this->pman,
+            $this->pman->register('tox.core', vfsStream::url($this->root . '/include/core'))
+        );
+        $this->assertEquals(
+            vfsStream::url($this->root . '/include/core/blah.php'),
+            $this->pman->locate('Tox\\Core\\Blah')
+        );
     }
 
     /**
@@ -174,7 +187,8 @@ class PackageManagerTest extends PHPUnit_Framework_TestCase
     public function testCorePackageUsedForLocatingToxFolder()
     {
         $this->pman->register('TOX\\CORE', vfsStream::url($this->root . '/include/core'));
-        $this->assertEquals(vfsStream::url($this->root . '/include/type/foo/bar/blah.php'),
+        $this->assertEquals(
+            vfsStream::url($this->root . '/include/type/foo/bar/blah.php'),
             $this->pman->locate('Tox\\Type\\Foo\\Bar\\Blah')
         );
         $this->pman = new PackageManager;
@@ -219,7 +233,8 @@ class PackageManagerTest extends PHPUnit_Framework_TestCase
     {
         $this->pman->register('TOX\\CORE', vfsStream::url($this->root . '/include/core'))
             ->register('Tox\\Type\\Foo', vfsStream::url($this->root . '/include/type/bar'));
-        $this->assertEquals(vfsStream::url($this->root . '/include/type/bar/blah.php'),
+        $this->assertEquals(
+            vfsStream::url($this->root . '/include/type/bar/blah.php'),
             $this->pman->locate('Tox\\Type\\Foo\\Blah')
         );
     }
@@ -242,7 +257,8 @@ class PackageManagerTest extends PHPUnit_Framework_TestCase
     {
         $this->pman->register('Tox.Type.Foo', vfsStream::url($this->root . '/include/foo'))
             ->register('Tox\\Core', vfsStream::url($this->root . '/include/core'));
-        $this->assertEquals(vfsStream::url($this->root . '/include/foo/blah.php'),
+        $this->assertEquals(
+            vfsStream::url($this->root . '/include/foo/blah.php'),
             $this->pman->locate('Tox\\Type\\Foo\\Blah')
         );
     }
@@ -288,10 +304,12 @@ class PackageManagerTest extends PHPUnit_Framework_TestCase
     {
         $this->pman->register('In\\SZen\\App', vfsStream::url($this->root . '/include/type'))
             ->register('in.szen.app2.api.new', vfsStream::url($this->root . '/include/type'));
-        $this->assertEquals(vfsStream::url($this->root . '/include/type/foo/bar/blah.php'),
+        $this->assertEquals(
+            vfsStream::url($this->root . '/include/type/foo/bar/blah.php'),
             $this->pman->locate('In\\SZen\\App\\Foo\\Bar\\Blah')
         );
-        $this->assertEquals(vfsStream::url($this->root . '/include/type/foo/bar/blah.php'),
+        $this->assertEquals(
+            vfsStream::url($this->root . '/include/type/foo/bar/blah.php'),
             $this->pman->locate('In\\SZen\\App2\\API\\New\\Foo\\Bar\\Blah')
         );
     }
@@ -322,7 +340,8 @@ class PackageManagerTest extends PHPUnit_Framework_TestCase
     public function testExceptionsSeparatedFromClassesAndInterfaces()
     {
         $this->pman->register('Tox\\Core', vfsStream::url($this->root . '/include/core'));
-        $this->assertEquals(vfsStream::url($this->root . '/include/core/@exception/blah.php'),
+        $this->assertEquals(
+            vfsStream::url($this->root . '/include/core/@exception/blah.php'),
             $this->pman->locate('Tox\\Core\\BlahException')
         );
     }

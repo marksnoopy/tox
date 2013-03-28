@@ -101,7 +101,8 @@ class ClassManagerTest extends PHPUnit_Framework_TestCase
     {
         $s_class1 = 'c' . md5(microtime());
         $s_class2 = 'c' . md5(microtime());
-        $this->assertEquals(__CLASS__,
+        $this->assertEquals(
+            __CLASS__,
             $this->cman->alias(__CLASS__, $s_class1)->alias($s_class1, $s_class2)->transform($s_class2)
         );
     }

@@ -5,4 +5,5 @@ php:
 before_script:
   - phpenv config-add etc/travis/php.ini
   - composer install --dev
-  - include/bin/phpcs --standard=etc/phpcs/ruleset.xml -p src
+  - bin/phpcs --standard=etc/phpcs/share-test.xml -p share/test
+  - bin/phpcs --standard=etc/phpcs/src.xml -p src

@@ -126,7 +126,8 @@ class OutputTest extends PHPUnit_Framework_TestCase
         ob_start();
         $o_out->addTask($o_task2)->close();
         ob_end_clean();
-        $this->assertEquals(array(
+        $this->assertEquals(
+            array(
                 $o_task1->name . '::preOutput()',
                 $o_task2->name . '::preOutput()',
                 $o_task2->name . '::postOutput()',
@@ -239,7 +240,8 @@ class OutputTest extends PHPUnit_Framework_TestCase
         ob_start();
         $o_out->write('foo')->write('bar');
         ob_end_clean();
-        $this->assertEquals(array(
+        $this->assertEquals(
+            array(
                 $o_task1->name . '::preOutput()',
                 $o_task2->name . '::preOutput()',
                 $o_task2->name . '::postOutput()',

@@ -55,8 +55,11 @@ class KvTest extends PHPUnit_Framework_TestCase
 
         $o_mockKv->expects($this->once())
                 ->method('setValue')
-                ->with($this->equalTo(md5($prefixString . $key)), $this->equalTo(serialize(array($value))), $this->equalTo($expire))
-                ->will($this->returnValue($expectResult));
+                ->with(
+                    $this->equalTo(md5($prefixString . $key)),
+                    $this->equalTo(serialize(array($value))),
+                    $this->equalTo($expire)
+                )->will($this->returnValue($expectResult));
 
         $this->assertEquals($result, $o_mockKv->set($key, $value, $expire));
     }
@@ -135,9 +138,9 @@ class KvTest extends PHPUnit_Framework_TestCase
     public function dataProvider()
     {
         return array(
-            array('key1', 'sss', 500, 'memcached', TRUE, TRUE),
-            array('key2', 'valuetest', 500, 'memcached', TRUE, TRUE),
-            array('key3', 'valuetest22', 500, 'memcached', FALSE, FALSE),
+            array('key1', 'sss', 500, 'memcached', true, true),
+            array('key2', 'valuetest', 500, 'memcached', true, true),
+            array('key3', 'valuetest22', 500, 'memcached', false, false),
         );
     }
 
@@ -161,7 +164,7 @@ class KvTest extends PHPUnit_Framework_TestCase
         $o_mockKv[$key] = $value;
         $this->assertEquals($value, $o_mockKv[$key]);
     }
-    
+
     /**
      * @dataProvider dataProviderOffset
      */
@@ -180,11 +183,14 @@ class KvTest extends PHPUnit_Framework_TestCase
     {
 
         $o_mockKv = $this->getMockBuilder('Tox\\Data\\Kv\\kv')
-                ->getMockForAbstractClass();
+            ->getMockForAbstractClass();
         $o_mockKv->expects($this->any())
-                ->method('setValue')
-                ->with($this->equalTo(md5($prefixString . $key)), $this->equalTo(serialize(array($value))), $this->equalTo($expire))
-        ;
+            ->method('setValue')
+            ->with(
+                $this->equalTo(md5($prefixString . $key)),
+                $this->equalTo(serialize(array($value))),
+                $this->equalTo($expire)
+            );
 
         $o_mockKv[$key] = $value;
     }
@@ -215,19 +221,18 @@ class KvTest extends PHPUnit_Framework_TestCase
         $o_mockKv->expects($this->once())
                 ->method('deleteValue')
                 ->with($this->equalTo(md5($prefixString . $key)))
-                ->will($this->returnValue(TRUE));
+                ->will($this->returnValue(true));
         unset($o_mockKv[$key]);
     }
 
     public function dataProviderOffset()
     {
         return array(
-            array('key1', 'sss', 0, 'memcached', TRUE),
-            array('key2', 'valuetest', 0, 'memcached', TRUE),
-            array('key3', 'valuetest22', 0, 'memcached', TRUE),
+            array('key1', 'sss', 0, 'memcached', true),
+            array('key2', 'valuetest', 0, 'memcached', true),
+            array('key3', 'valuetest22', 0, 'memcached', true),
         );
     }
-
 }
 
 class Subkv extends KV\KV
@@ -257,7 +262,6 @@ class Subkv extends KV\KV
     {
         unset($this->container);
     }
-
 }
 
 // vi:ft=php fenc=utf-8 ff=unix ts=4 sts=4 et sw=4 fen fdm=indent fdl=1 tw=120
