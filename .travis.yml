@@ -4,6 +4,4 @@ php:
   - "5.3"
 before_script:
   - phpenv config-add etc/travis/php.ini
-  - composer install --dev
-  - bin/phpcs --standard=etc/phpcs/share-test.xml -p share/test
-  - bin/phpcs --standard=etc/phpcs/src.xml -p src
+script: ant

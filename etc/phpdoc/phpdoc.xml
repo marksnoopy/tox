@@ -4,7 +4,7 @@
   <title>Tox</title>
   <parser>
     <encoding>UTF-8</encoding>
-    <target>share/doc/sdk</target>
+    <target>../../build/sdk</target>
     <default-package-name>tox.core</default-package-name>
     <markers>
       <item>DEBUG</item>
@@ -18,9 +18,9 @@
     <visibility>public,protected</visibility>
   </parser>
   <transformer>
-    <target>share/doc/sdk</target>
+    <target>../../build/sdk</target>
   </transformer>
   <files>
-    <directory>src</directory>
+    <directory>../../src</directory>
   </files>
 </phpdoc>
