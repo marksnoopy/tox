@@ -1,7 +1,32 @@
 .*
-!.ctags
+/*.*
+/include/
+/share/doc/*.*
+/share/doc/report/
+/share/doc/sdk/
+/share/test/**/*.*
+/src/**/*.*
+
+# git configurations
+!.gitattributes
 !.gitignore
-include/
-*.sublime-*
-*.xml
-composer.lock
+
+# functional files
+!/.ctags
+!/.travis.yml
+!/composer.json
+!/CONTRIBUTING.md
+!/gpl.txt
+!/phpdoc.dist.xml
+!/phpunit.xml.dist
+!/README.md
+
+# documentation
+!/share/doc/*.md
+!/share/doc/*.pdf
+
+# unit-tests
+!/share/test/tox/**/*-test.php
+
+# source
+!/src/tox/**/*.php
