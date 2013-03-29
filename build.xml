@@ -8,7 +8,16 @@
     <include name="**/*.php" />
   </fileset>
 
+  <property name="bin.composer" value="composer"/>
+  <property name="bin.php" value="php"/>
+  <property name="bin.phpcs" location="bin/phpcs"/>
+  <property name="bin.phpdoc" value="phpdoc"/>
+  <property name="bin.phpunit" location="bin/phpunit"/>
   <property file="build.properties"/>
+
+  <target name="-greeting">
+    <echo>THANK YOU for your CONTRIBUTION to ${ant.project.name}</echo>
+  </target>
 
   <!-- suites operations {{{1 -->
   <target name="clean"
@@ -23,7 +32,7 @@
   <!-- }}}1 -->
 
   <target name="phpdoc"
-          depends="-mkdir-build-sdk"
+          depends="-greeting,-mkdir-build-sdk"
           description="       Generates SDK documentation."
   >
     <condition property="phpdoc.xml"
@@ -32,14 +41,17 @@
     >
       <available property="phpdoc.xml" file="phpdoc.xml"/>
     </condition>
-    <exec executable="phpdoc" failonerror="true" failifexecutionfails="true">
+    <exec executable="${bin.phpdoc}"
+          failonerror="true"
+          failifexecutionfails="true"
+    >
       <arg value="-c"/>
       <arg file="${phpdoc.xml}"/>
     </exec>
   </target>
 
   <target name="phpunit"
-    depends="-mkdir-build-code-coverage,-composer-install"
+    depends="-greeting,-mkdir-build-code-coverage,-composer-install"
     description="       Runs unit-tests."
   >
     <condition property="phpunit.xml"
@@ -48,7 +60,7 @@
     >
       <available property="phpunit.xml" file="phpunit.xml"/>
     </condition>
-    <exec executable="bin/phpunit"
+    <exec executable="${bin.phpunit}"
           failonerror="true"
           failifexecutionfails="true"
     >
@@ -58,10 +70,10 @@
   </target>
 
   <target name="phpcs"
-    depends="-composer-install"
+    depends="-greeting,-composer-install"
     description="       Validates with `PSR-2'."
   >
-    <apply executable="bin/phpcs"
+    <apply executable="${bin.phpcs}"
            failonerror="true"
            failifexecutionfails="true"
            parallel="yes"
@@ -71,7 +83,7 @@
       <arg value="--extensions=php"/>
       <fileset refid="src"/>
     </apply>
-    <apply executable="bin/phpcs"
+    <apply executable="${bin.phpcs}"
            failonerror="true"
            failifexecutionfails="true"
            parallel="yes"
@@ -84,9 +96,10 @@
   </target>
 
   <target name="phplint"
+          depends="-greeting"
           description="       Checks PHP syntax."
   >
-    <apply executable="php" failonerror="true">
+    <apply executable="${bin.php}" failonerror="true">
       <arg value="-l" />
       <fileset refid="src"/>
       <fileset refid="test"/>
@@ -101,7 +114,10 @@
     <condition property="composer.command" value="update" else="install">
       <available property="composer.command" file="composer.lock"/>
     </condition>
-    <exec executable="composer" failonerror="true" failifexecutionfails="true">
+    <exec executable="${bin.composer}"
+          failonerror="true"
+          failifexecutionfails="true"
+    >
       <arg value="${composer.command}"/>
       <arg value="--dev"/>
     </exec>
