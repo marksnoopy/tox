@@ -8,17 +8,24 @@
     <include name="**/*.php" />
   </fileset>
 
+  <property file="build.properties"/>
+
+  <!-- suites operations {{{1 -->
   <target name="clean"
-          description="Cleans all fixures of building progress up."
-  >
-    <delete dir="build" includeemptydirs="false" />
-  </target>
+          depends="-rm-build"
+          description="[main] Cleans fixures of building progress up."
+  />
   <target name="test"
           depends="phplint,phpcs,phpunit"
-          description="Tests source codes widely."
+          description="[main] Verifies widely. ( phplint, phpcs, phpunit )"
   />
+  <target name="travis" depends="-travis-composer,test"/>
+  <!-- }}}1 -->
 
-  <target name="phpdoc" depends="-mkdir-build-sdk">
+  <target name="phpdoc"
+          depends="-mkdir-build-sdk"
+          description="       Generates SDK documentation."
+  >
     <condition property="phpdoc.xml"
                value="phpdoc.xml"
                else="etc/phpdoc/phpdoc.xml"
@@ -31,7 +38,10 @@
     </exec>
   </target>
 
-  <target name="phpunit" depends="-mkdir-build-code-coverage,composer">
+  <target name="phpunit"
+    depends="-mkdir-build-code-coverage,-composer-install"
+    description="       Runs unit-tests."
+  >
     <condition property="phpunit.xml"
                value="phpunit.xml"
                else="etc/phpunit/phpunit.xml"
@@ -47,7 +57,10 @@
     </exec>
   </target>
 
-  <target name="phpcs" depends="composer">
+  <target name="phpcs"
+    depends="-composer-install"
+    description="       Validates with `PSR-2'."
+  >
     <apply executable="bin/phpcs"
            failonerror="true"
            failifexecutionfails="true"
@@ -70,7 +83,9 @@
     </apply>
   </target>
 
-  <target name="phplint">
+  <target name="phplint"
+          description="       Checks PHP syntax."
+  >
     <apply executable="php" failonerror="true">
       <arg value="-l" />
       <fileset refid="src"/>
@@ -78,7 +93,11 @@
     </apply>
   </target>
 
-  <target name="composer" depends="-composer-check-up-to-date" if="composer.out-of-date">
+  <!-- composer preparations {{{1 -->
+  <target name="-composer-install"
+    depends="-composer-check-up-to-date"
+    if="composer.out-of-date"
+  >
     <condition property="composer.command" value="update" else="install">
       <available property="composer.command" file="composer.lock"/>
     </condition>
@@ -101,14 +120,16 @@
         <islastmodified datetime="${composer.update-time}" mode="before">
           <file file="composer.lock"/>
         </islastmodified>
-        <uptodate property="composer.foo"
+        <uptodate property=""
                   srcfile="composer.lock"
                   targetfile="composer.json"
         />
       </or>
     </condition>
   </target>
+  <!-- }}}1 -->
 
+  <!-- file-system operations {{{1 -->
   <target name="-mkdir-build">
     <mkdir dir="build" />
   </target>
@@ -118,4 +139,19 @@
   <target name="-mkdir-build-sdk" depends="-mkdir-build">
     <mkdir dir="build/sdk" />
   </target>
+
+  <target name="-rm-build">
+    <delete dir="build" includeemptydirs="false" />
+  </target>
+  <!-- }}}1 -->
+
+  <!-- travis-ci operations {{{1 -->
+  <target name="-travis-composer">
+    <copy file="etc/travis/composer.json"
+          tofile="composer.json"
+          overwrite="true"
+          failonerror="true"
+    />
+  </target>
+  <!-- }}}1 -->
 </project>

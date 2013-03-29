@@ -1,0 +1,16 @@
+{
+  "name": "php-tox/tox",
+  "description": "An experimental PHP framework based on v5.3.0 or later.",
+  "license": "GPL-3.0+",
+  "require": {
+    "php": ">=5.3.0"
+  },
+  "require-dev": {
+    "mikey179/vfsStream": "1.*@stable"
+  },
+  "config": {
+    "vendor-dir": "include",
+    "bin-dir": "bin",
+    "notify-on-install": false
+  }
+}
