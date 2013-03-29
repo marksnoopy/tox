@@ -107,6 +107,19 @@ class HTTPHeadersProcessorTest extends PHPUnit_Framework_TestCase
         $o_out->close();
         ob_end_clean();
     }
+
+    /**
+     * @depends testSendingParsedHeaders
+     * @expectedException PHPUnit_Framework_Error
+     */
+    public function testHeadersReallySent()
+    {
+        $o_out = new Response;
+        $o_out->setHeadersProcessor(new HTTPHeadersProcessor($o_out))->addHeader('X-Foo', microtime());
+        ob_start();
+        $o_out->close();
+        ob_end_clean();
+    }
 }
 
 // vi:ft=php fenc=utf-8 ff=unix ts=4 sts=4 et sw=4 fen fdm=indent fdl=1 tw=120
