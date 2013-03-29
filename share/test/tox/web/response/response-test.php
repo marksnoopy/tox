@@ -111,6 +111,16 @@ class ResponseTest extends PHPUnit_Framework_TestCase
         $o_out->setHeaders(array());
     }
 
+    public function testHeadersAccessableViaMagicMethods()
+    {
+        $a_values = array(microtime());
+        $o_out = $this->getMock('Tox\\Web\\Response\\Response', array('getHeaders', 'setHeaders'));
+        $o_out->expects($this->once())->method('getHeaders');
+        $o_out->headers;
+        $o_out->expects($this->once())->method('setHeaders')->with($this->equalTo($a_values));
+        $o_out->headers = $a_values;
+    }
+
     public function testPageCacheSetAfterOutputting()
     {
         $o_out = new Response;
