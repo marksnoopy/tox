@@ -8,11 +8,8 @@
     <include name="**/*.php" />
   </fileset>
 
-  <property name="bin.composer" value="composer"/>
-  <property name="bin.php" value="php"/>
-  <property name="bin.phpcs" location="bin/phpcs"/>
-  <property name="bin.phpdoc" value="phpdoc"/>
-  <property name="bin.phpunit" location="bin/phpunit"/>
+  <property name="bin.phpcs.0" location="bin/phpcs"/>
+  <property name="bin.phpunit.0" location="bin/phpunit"/>
   <property file="build.properties"/>
 
   <target name="-greeting">
@@ -28,13 +25,17 @@
           depends="phplint,phpcs,phpunit"
           description="[main] Verifies widely. ( phplint, phpcs, phpunit )"
   />
-  <target name="travis" depends="-travis-composer,test"/>
+  <target name="travis" depends="-travis-composer,test,-travis-checkout"/>
   <!-- }}}1 -->
 
   <target name="phpdoc"
           depends="-greeting,-mkdir-build-sdk"
           description="       Generates SDK documentation."
   >
+    <condition property="bin.phpdoc" value="${bin.phpdoc.0}" else="phpdoc">
+      <isset property="bin.phpdoc.0"/>
+    </condition>
+    <echo>'${bin.phpdoc}' used</echo>
     <condition property="phpdoc.xml"
                value="phpdoc.xml"
                else="etc/phpdoc/phpdoc.xml"
@@ -54,6 +55,10 @@
     depends="-greeting,-mkdir-build-code-coverage,-composer-install"
     description="       Runs unit-tests."
   >
+    <condition property="bin.phpunit" value="${bin.phpunit.0}" else="phpunit">
+      <isset property="bin.phpunit.0"/>
+    </condition>
+    <echo>'${bin.phpunit}' used</echo>
     <condition property="phpunit.xml"
                value="phpunit.xml"
                else="etc/phpunit/phpunit.xml"
@@ -73,6 +78,10 @@
     depends="-greeting,-composer-install"
     description="       Validates with `PSR-2'."
   >
+    <condition property="bin.phpcs" value="${bin.phpcs.0}" else="phpcs">
+      <isset property="bin.phpcs.0"/>
+    </condition>
+    <echo>'${bin.phpcs}' used</echo>
     <apply executable="${bin.phpcs}"
            failonerror="true"
            failifexecutionfails="true"
@@ -99,6 +108,10 @@
           depends="-greeting"
           description="       Checks PHP syntax."
   >
+    <condition property="bin.php" value="${bin.php.0}" else="php">
+      <isset property="bin.php.0"/>
+    </condition>
+    <echo>'${bin.php}' used</echo>
     <apply executable="${bin.php}" failonerror="true">
       <arg value="-l" />
       <fileset refid="src"/>
@@ -111,6 +124,13 @@
     depends="-composer-check-up-to-date"
     if="composer.out-of-date"
   >
+    <condition property="bin.composer"
+               value="${bin.composer.0}"
+               else="composer"
+    >
+      <isset property="bin.composer.0"/>
+    </condition>
+    <echo>'${bin.composer}' used</echo>
     <condition property="composer.command" value="update" else="install">
       <available property="composer.command" file="composer.lock"/>
     </condition>
@@ -169,6 +189,13 @@
           failonerror="true"
     />
     <property name="bin.phpunit" value="phpunit"/>
+  </target>
+  <target name="-travis-checkout">
+    <exec executable="git" failonerror="true" failifexecutionfails="true">
+      <arg value="checkout"/>
+      <arg value="--"/>
+      <arg value="composer.json"/>
+    </exec>
   </target>
   <!-- }}}1 -->
 </project>
