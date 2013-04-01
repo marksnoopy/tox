@@ -103,6 +103,11 @@ class ExceptionTest extends PHPUnit_Framework_TestCase
         $this->assertSame($this->pex, $o_ex->getPrevious());
     }
 
+    public function testStringCasting()
+    {
+        $this->assertEquals(sprintf('0x%08X: %s', ExceptionMock::CODE, $this->ex->getMessage()), (string) $this->ex);
+    }
+
     /**
      * Be used to repeat a test 10 times.
      */

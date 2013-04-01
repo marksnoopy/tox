@@ -8,37 +8,64 @@
     <include name="**/*.php" />
   </fileset>
 
-  <target name="clean"
-          description="Cleans all fixures of building progress up."
-  >
-    <delete dir="build" includeemptydirs="false" />
+  <property name="bin.phpcs.0" location="bin/phpcs"/>
+  <property name="bin.phpunit.0" location="bin/phpunit"/>
+  <property file="build.properties"/>
+
+  <target name="-greeting">
+    <echo>THANK YOU for your CONTRIBUTION to ${ant.project.name}</echo>
   </target>
+
+  <!-- suites operations {{{1 -->
+  <target name="clean"
+          depends="-rm-build"
+          description="[main] Cleans fixures of building progress up."
+  />
   <target name="test"
           depends="phplint,phpcs,phpunit"
-          description="Tests source codes widely."
+          description="[main] Verifies widely. ( phplint, phpcs, phpunit )"
   />
+  <target name="travis" depends="-travis-composer,test,-travis-checkout"/>
+  <!-- }}}1 -->
 
-  <target name="phpdoc" depends="-mkdir-build-sdk">
+  <target name="phpdoc"
+          depends="-greeting,-mkdir-build-sdk"
+          description="       Generates SDK documentation."
+  >
+    <condition property="bin.phpdoc" value="${bin.phpdoc.0}" else="phpdoc">
+      <isset property="bin.phpdoc.0"/>
+    </condition>
+    <echo>'${bin.phpdoc}' used</echo>
     <condition property="phpdoc.xml"
                value="phpdoc.xml"
                else="etc/phpdoc/phpdoc.xml"
     >
       <available property="phpdoc.xml" file="phpdoc.xml"/>
     </condition>
-    <exec executable="phpdoc" failonerror="true" failifexecutionfails="true">
+    <exec executable="${bin.phpdoc}"
+          failonerror="true"
+          failifexecutionfails="true"
+    >
       <arg value="-c"/>
       <arg file="${phpdoc.xml}"/>
     </exec>
   </target>
 
-  <target name="phpunit" depends="-mkdir-build-code-coverage,composer">
+  <target name="phpunit"
+    depends="-greeting,-mkdir-build-code-coverage,-composer-install"
+    description="       Runs unit-tests."
+  >
+    <condition property="bin.phpunit" value="${bin.phpunit.0}" else="phpunit">
+      <isset property="bin.phpunit.0"/>
+    </condition>
+    <echo>'${bin.phpunit}' used</echo>
     <condition property="phpunit.xml"
                value="phpunit.xml"
                else="etc/phpunit/phpunit.xml"
     >
       <available property="phpunit.xml" file="phpunit.xml"/>
     </condition>
-    <exec executable="bin/phpunit"
+    <exec executable="${bin.phpunit}"
           failonerror="true"
           failifexecutionfails="true"
     >
@@ -47,8 +74,15 @@
     </exec>
   </target>
 
-  <target name="phpcs" depends="composer">
-    <apply executable="bin/phpcs"
+  <target name="phpcs"
+    depends="-greeting,-composer-install"
+    description="       Validates with `PSR-2'."
+  >
+    <condition property="bin.phpcs" value="${bin.phpcs.0}" else="phpcs">
+      <isset property="bin.phpcs.0"/>
+    </condition>
+    <echo>'${bin.phpcs}' used</echo>
+    <apply executable="${bin.phpcs}"
            failonerror="true"
            failifexecutionfails="true"
            parallel="yes"
@@ -58,7 +92,7 @@
       <arg value="--extensions=php"/>
       <fileset refid="src"/>
     </apply>
-    <apply executable="bin/phpcs"
+    <apply executable="${bin.phpcs}"
            failonerror="true"
            failifexecutionfails="true"
            parallel="yes"
@@ -70,19 +104,40 @@
     </apply>
   </target>
 
-  <target name="phplint">
-    <apply executable="php" failonerror="true">
+  <target name="phplint"
+          depends="-greeting"
+          description="       Checks PHP syntax."
+  >
+    <condition property="bin.php" value="${bin.php.0}" else="php">
+      <isset property="bin.php.0"/>
+    </condition>
+    <echo>'${bin.php}' used</echo>
+    <apply executable="${bin.php}" failonerror="true">
       <arg value="-l" />
       <fileset refid="src"/>
       <fileset refid="test"/>
     </apply>
   </target>
 
-  <target name="composer" depends="-composer-check-up-to-date" if="composer.out-of-date">
+  <!-- composer preparations {{{1 -->
+  <target name="-composer-install"
+    depends="-composer-check-up-to-date"
+    if="composer.out-of-date"
+  >
+    <condition property="bin.composer"
+               value="${bin.composer.0}"
+               else="composer"
+    >
+      <isset property="bin.composer.0"/>
+    </condition>
+    <echo>'${bin.composer}' used</echo>
     <condition property="composer.command" value="update" else="install">
       <available property="composer.command" file="composer.lock"/>
     </condition>
-    <exec executable="composer" failonerror="true" failifexecutionfails="true">
+    <exec executable="${bin.composer}"
+          failonerror="true"
+          failifexecutionfails="true"
+    >
       <arg value="${composer.command}"/>
       <arg value="--dev"/>
     </exec>
@@ -101,14 +156,16 @@
         <islastmodified datetime="${composer.update-time}" mode="before">
           <file file="composer.lock"/>
         </islastmodified>
-        <uptodate property="composer.foo"
+        <uptodate property=""
                   srcfile="composer.lock"
                   targetfile="composer.json"
         />
       </or>
     </condition>
   </target>
+  <!-- }}}1 -->
 
+  <!-- file-system operations {{{1 -->
   <target name="-mkdir-build">
     <mkdir dir="build" />
   </target>
@@ -118,4 +175,27 @@
   <target name="-mkdir-build-sdk" depends="-mkdir-build">
     <mkdir dir="build/sdk" />
   </target>
+
+  <target name="-rm-build">
+    <delete dir="build" includeemptydirs="false" />
+  </target>
+  <!-- }}}1 -->
+
+  <!-- travis-ci operations {{{1 -->
+  <target name="-travis-composer">
+    <copy file="etc/travis/composer.json"
+          tofile="composer.json"
+          overwrite="true"
+          failonerror="true"
+    />
+    <property name="bin.phpunit" value="phpunit"/>
+  </target>
+  <target name="-travis-checkout">
+    <exec executable="git" failonerror="true" failifexecutionfails="true">
+      <arg value="checkout"/>
+      <arg value="--"/>
+      <arg value="composer.json"/>
+    </exec>
+  </target>
+  <!-- }}}1 -->
 </project>

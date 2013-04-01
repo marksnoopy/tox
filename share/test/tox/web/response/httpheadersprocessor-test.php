@@ -44,6 +44,8 @@ require_once __DIR__ . '/../../../../../src/tox/application/view/view.php';
 require_once __DIR__ . '/../../../../../src/tox/application/istreamingview.php';
 require_once __DIR__ . '/../../../../../src/tox/application/view/streamingview.php';
 
+use Exception;
+use PHPUnit_Framework_Error;
 
 /**
  * Tests Tox\Web\Response\HTTPHeadersProcessor.
@@ -106,6 +108,28 @@ class HTTPHeadersProcessorTest extends PHPUnit_Framework_TestCase
         ob_start();
         $o_out->close();
         ob_end_clean();
+    }
+
+    /**
+     * @depends testSendingParsedHeaders
+     */
+    public function testHeadersReallySent()
+    {
+        $m_value = microtime();
+        $o_out = new Response;
+        $o_out->addHeader('X-Foo', $m_value);
+        try {
+            ob_start();
+            $o_out->close();
+            ob_end_clean();
+            $this->assertEquals(array('X-Foo: ' . $m_value), xdebug_get_headers());
+        } catch (PHPUnit_Framework_Error $ex) {
+            // XXX Uses `Tox\Core\ClassManager' to recognise whether in
+            // `processIsolation' mode.
+            $this->assertTrue(class_exists('Tox\\Core\\ClassManager'));
+        } catch (Exception $ex) {
+            $this->fail();
+        }
     }
 }
 

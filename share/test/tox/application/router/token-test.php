@@ -58,6 +58,7 @@ class TokenTest extends PHPUnit_Framework_TestCase
         $o_token = new Token($a_opts);
         $this->assertSame($o_token, $o_token->assign($a_values));
         for ($ii = 1; $ii < 9; $ii++) {
+            $this->assertTrue(isset($o_token[$a_opts[$ii]]));
             $this->assertEquals($a_values[$ii], $o_token[$a_opts[$ii]]);
         }
     }

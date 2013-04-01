@@ -54,6 +54,23 @@ use Tox\Application;
  */
 class OutputTest extends PHPUnit_Framework_TestCase
 {
+    public function testMagicMethods()
+    {
+        $o_out = $this->getMockBuilder('Tox\\Application\\Output\\Output')
+            ->setMethods(array('setBuffer', 'getBuffer', 'setView', 'getView'))
+            ->getMockForAbstractClass();
+        $o_view = $this->getMock('Tox\\Application\\IView');
+        $s_buff = microtime();
+        $o_out->expects($this->once())->method('getBuffer');
+        $o_out->buffer;
+        $o_out->expects($this->once())->method('setBuffer')->with($this->equalTo($s_buff));
+        $o_out->buffer = $s_buff;
+        $o_out->expects($this->once())->method('getView');
+        $o_out->view;
+        $o_out->expects($this->once())->method('setView')->with($this->equalTo($o_view));
+        $o_out->view = $o_view;
+    }
+
     public function testOutputtingOnceWithAnyTimesWritings()
     {
         $o_out = $this->getMockForAbstractClass('Tox\\Application\\Output\\Output');

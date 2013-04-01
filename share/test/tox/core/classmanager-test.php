@@ -114,8 +114,10 @@ class ClassManagerTest extends PHPUnit_Framework_TestCase
     {
         $s_class1 = 'c' . md5(microtime());
         $s_class2 = 'c' . md5(microtime());
-        $this->cman->alias(__CLASS__, $s_class1)->alias($s_class1, $s_class2)->register(__CLASS__, __FILE__);
-        $this->assertTrue(class_exists($s_class1));
+        $this->cman->alias($s_class1, $s_class2);
+        // XXX Uses `getMock()` to declare a new class
+        $this->getMock('Tox\\Core\\ClassManager', array(), array(), $s_class1);
+        $this->cman->register($s_class1, '');
         $this->assertTrue(class_exists($s_class2));
     }
 }

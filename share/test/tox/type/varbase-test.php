@@ -130,6 +130,27 @@ class VarbaseTest extends PHPUnit_Framework_TestCase
         $o_value = & $o_var::box(microtime());
         $o_vb[$s_ref] = $this->getMockForAbstractClass('Tox\\Type\\Type', array(microtime()), $s_cvar, false);
     }
+
+    public function testNullReturnedForRetrievingNonExistatntObject()
+    {
+        $o_vb = VarbaseMock::getInstance();
+        $s_id = sha1(microtime());
+        $this->assertNull($o_vb[$s_id]);
+    }
+
+    /**
+     * @depends testAutoBoxing
+     */
+    public function testNothingRemovedForUnsetting()
+    {
+        $s_cvar = 'c6_' . md5(microtime());
+        $o_var = $this->getMockForAbstractClass('Tox\\Type\\Type', array(), $s_cvar, false);
+        $o_vb = VarbaseMock::getInstance();
+        $o_value = & $o_var::box(microtime());
+        $s_ref = $o_value->getRef();
+        unset($o_vb[$s_ref]);
+        $this->assertTrue(isset($o_vb[$s_ref]));
+    }
 }
 
 /**
@@ -161,6 +182,19 @@ class VarbaseMock extends Varbase
     public static function setInstance(VarbaseMock $varbase)
     {
         self::$instance = $varbase;
+    }
+
+    /**
+     * Retrieves the instance.
+     *
+     * @return self
+     */
+    public static function getInstance()
+    {
+        if (!self::$instance instanceof self) {
+            self::$instance = new static;
+        }
+        return self::$instance;
     }
 
     /**
