@@ -130,7 +130,9 @@ abstract class View extends Core\Assembly implements Application\IView
         if (!is_array($metas)) {
             $metas = array($metas);
         }
-        $this->metas = array_merge($this->metas, $metas);
+        foreach ($metas as $m_key => $m_value) {
+            $this->metas[$m_key] = $m_value;
+        }
         return $this;
     }
 

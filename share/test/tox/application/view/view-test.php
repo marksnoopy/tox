@@ -48,6 +48,7 @@ class ViewTest extends PHPUnit_Framework_TestCase
     {
         $o_view = $this->getMockForAbstractClass('Tox\\Application\\View\\View');
         $this->assertFalse(isset($o_view[$key]));
+        $this->assertNull($o_view[$key]);
         $o_view[$key] = $value;
         $this->assertTrue(isset($o_view[$key]));
         $this->assertSame($value, $o_view[$key]);
@@ -97,6 +98,19 @@ class ViewTest extends PHPUnit_Framework_TestCase
         foreach ($a_metas as $ii => $jj) {
             $this->assertSame($jj, $o_view[$ii]);
         }
+    }
+
+    /**
+     * @depends testArrayAccessImplementation
+     */
+    public function testNonArrayMetas()
+    {
+        $m_meta = microtime();
+        $o_view = $this->getMockForAbstractClass('Tox\\Application\\View\\View', array($m_meta));
+        $this->assertSame($m_meta, $o_view[0]);
+        $m_meta = microtime();
+        $o_view->import($m_meta);
+        $this->assertSame($m_meta, $o_view[0]);
     }
 
     public function provideMetas()
