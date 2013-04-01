@@ -7,6 +7,7 @@
          processIsolation="true"
          stopOnError="true"
          stopOnFailure="true"
+         stopOnIncomplete="true"
          stopOnSkipped="true"
          strict="true"
 >
@@ -26,6 +27,9 @@
     <testsuite name="tox.data.kv">
       <directory suffix="-test.php">../../share/test/tox/data/kv</directory>
     </testsuite>
+    <testsuite name="tox.type">
+      <directory suffix="-test.php">../../share/test/tox/type</directory>
+    </testsuite>
   </testsuites>
   <filter>
     <whitelist addUncoveredFilesFromWhitelist="true">
@@ -33,10 +37,19 @@
     </whitelist>
   </filter>
   <logging>
-    <log type="testdox-text" target="../../build/phpunit-testdox.log"/>
-    <log type="coverage-text" target="../../build/code-coverage/brief.log"/>
-    <log type="coverage-html" target="../../build/code-coverage" charset="UTF-8"
-         yui="true" highlight="true" lowUpperBound="50" highLowerBound="80"
+    <log type="tap" target="../../build/phpunit/phpunit.tap"/>
+    <log type="testdox-text" target="../../build/phpunit/phpunit.log"/>
+    <log type="coverage-text"
+         target="../../build/code-coverage/brief.log"
+         showUncoveredFiles="true"
+    />
+    <log type="coverage-html"
+         target="../../build/code-coverage"
+         charset="UTF-8"
+         yui="true"
+         highlight="true"
+         lowUpperBound="50"
+         highLowerBound="80"
          showUncoveredFiles="true"
     />
   </logging>
