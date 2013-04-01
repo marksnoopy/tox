@@ -106,6 +106,19 @@ class TypeTest extends PHPUnit_Framework_TestCase
         $s_var2 = str_replace(serialize($m_value), serialize(microtime(true)), serialize($o_var1));
         unserialize($s_var2);
     }
+
+    public function testSettingThroughMagicMethods()
+    {
+        $m_value = microtime();
+        $s_cvar = 'c3_' . md5(microtime());
+        $o_var = $this->getMockBuilder('Tox\\Type\\Type')
+            ->setConstructorArgs(array(microtime()))
+            ->setMockClassName($s_cvar)
+            ->setMethods(array('validate'))
+            ->getMockForAbstractClass();
+        $o_var->expects($this->once())->method('validate')->with($this->equalTo($m_value));
+        $o_var->value = $m_value;
+    }
 }
 
 /**
