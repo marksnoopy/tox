@@ -168,6 +168,7 @@
           overwrite="true"
           failonerror="true"
     />
+    <property name="bin.phpunit" value="phpunit"/>
   </target>
   <!-- }}}1 -->
 </project>
