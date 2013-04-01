@@ -13,38 +13,38 @@
 >
   <testsuites>
     <testsuite name="tox">
-      <directory suffix="-test.php">../../share/test</directory>
+      <directory suffix="-test.php">../share/test</directory>
     </testsuite>
     <testsuite name="tox.core">
-      <directory suffix="-test.php">../../share/test/tox/core</directory>
+      <directory suffix="-test.php">../share/test/tox/core</directory>
     </testsuite>
     <testsuite name="tox.application">
-      <directory suffix="-test.php">../../share/test/tox/application</directory>
+      <directory suffix="-test.php">../share/test/tox/application</directory>
     </testsuite>
     <testsuite name="tox.web">
-      <directory suffix="-test.php">../../share/test/tox/web</directory>
+      <directory suffix="-test.php">../share/test/tox/web</directory>
     </testsuite>
     <testsuite name="tox.data.kv">
-      <directory suffix="-test.php">../../share/test/tox/data/kv</directory>
+      <directory suffix="-test.php">../share/test/tox/data/kv</directory>
     </testsuite>
     <testsuite name="tox.type">
-      <directory suffix="-test.php">../../share/test/tox/type</directory>
+      <directory suffix="-test.php">../share/test/tox/type</directory>
     </testsuite>
   </testsuites>
   <filter>
     <whitelist addUncoveredFilesFromWhitelist="true">
-      <directory suffix=".php">../../src</directory>
+      <directory suffix=".php">../src</directory>
     </whitelist>
   </filter>
   <logging>
-    <log type="tap" target="../../build/phpunit/phpunit.tap"/>
-    <log type="testdox-text" target="../../build/phpunit/phpunit.log"/>
+    <log type="tap" target="../build/phpunit.tap"/>
+    <log type="testdox-text" target="../build/phpunit.log"/>
     <log type="coverage-text"
-         target="../../build/code-coverage/brief.log"
+         target="../build/code-coverage/brief.log"
          showUncoveredFiles="true"
     />
     <log type="coverage-html"
-         target="../../build/code-coverage"
+         target="../build/code-coverage"
          charset="UTF-8"
          yui="true"
          highlight="true"
