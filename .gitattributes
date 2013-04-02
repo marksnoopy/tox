@@ -3,6 +3,5 @@
 /gpl.txt -export-ignore
 /LICENSE -export-ignore
 /src/ -export-ignore
-/src/tox/ -export-ignore
-/src/tox/**/ -export-ignore
-/src/tox/**/*.php -export-ignore
+/src/**/ -export-ignore
+/src/**/*.php -export-ignore

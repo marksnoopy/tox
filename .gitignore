@@ -27,7 +27,7 @@
 !/share/doc/*.pdf
 
 # unit-tests
-!/share/test/tox/**/*-test.php
+!/share/test/**/*-test.php
 
 # source
-!/src/tox/**/*.php
+!/src/**/*.php

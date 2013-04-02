@@ -16,19 +16,19 @@
       <directory suffix="-test.php">../share/test</directory>
     </testsuite>
     <testsuite name="tox.core">
-      <directory suffix="-test.php">../share/test/tox/core</directory>
+      <directory suffix="-test.php">../share/test/core</directory>
     </testsuite>
     <testsuite name="tox.application">
-      <directory suffix="-test.php">../share/test/tox/application</directory>
+      <directory suffix="-test.php">../share/test/application</directory>
     </testsuite>
     <testsuite name="tox.web">
-      <directory suffix="-test.php">../share/test/tox/web</directory>
+      <directory suffix="-test.php">../share/test/web</directory>
     </testsuite>
     <testsuite name="tox.data.kv">
-      <directory suffix="-test.php">../share/test/tox/data/kv</directory>
+      <directory suffix="-test.php">../share/test/data/kv</directory>
     </testsuite>
     <testsuite name="tox.type">
-      <directory suffix="-test.php">../share/test/tox/type</directory>
+      <directory suffix="-test.php">../share/test/type</directory>
     </testsuite>
   </testsuites>
   <filter>
