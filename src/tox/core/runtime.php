@@ -201,12 +201,12 @@ final class Runtime
      *
      * @internal
      *
-     * @param  Exception $ex Error occured.
+     * @param  Exception $exception Error occured.
      * @return void
      */
-    protected static function halt(Exception $ex)
+    protected static function halt(Exception $exception)
     {
-        trigger_error('Tox: ' . $ex->getMessage(), E_USER_ERROR);
+        trigger_error('Tox: ' . $exception->getMessage(), E_USER_ERROR);
     }
 
     /**

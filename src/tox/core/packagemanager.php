@@ -42,6 +42,13 @@ class PackageManager extends Assembly
     protected $packages;
 
     /**
+     * Stores the package level of the locating assembly.
+     *
+     * @var string
+     */
+    protected $level;
+
+    /**
      * CONSTRUCT FUNCTION
      */
     public function __construct()
@@ -61,46 +68,49 @@ class PackageManager extends Assembly
     public function locate($class)
     {
         $s_class = ltrim(str_replace('.', '\\', strtolower($class)), '\\');
-        $a_class = explode('\\', $s_class);
-        $p_file = array_pop($a_class);
-        if (2 > count($a_class)) {
+        $i_pos = strrpos($s_class, '\\');
+        $s_name = substr($s_class, 1 + $i_pos);
+        $s_ns = substr($s_class, 0, $i_pos);
+        if (!$this->confirm($s_ns) || 1 > $this->level || !isset($this->packages[$s_ns])) {
             return false;
         }
-        if (strrpos($p_file, 'exception')) {
-            $p_file = '@exception/' . substr($p_file, 0, -9);
+        $p_file = "{$this->packages[$s_ns][0]}/{$s_name}.php";
+        if (!is_file($p_file) && strrpos($s_name, 'exception')) {
+            $s_name = '@exception/' . substr($s_name, 0, -9);
+            $p_file = "{$this->packages[$s_ns][0]}/{$s_name}.php";
         }
-        $p_file .= '.php';
-        $a_extra = array();
-        $i_offs = ('tox' == $a_class[0]) ? 1 : 2;
-        $s_class = implode('\\', array_splice($a_class, 0, $i_offs));
-        for ($ii = 0, $jj = count($a_class); $ii < $jj; $ii++) {
-            $s_new = "{$s_class}\\{$a_class[$ii]}";
-            if (!isset($this->packages[$s_new])) {
-                if (!isset($this->packages[$s_class])) {
-                    if (2 == $i_offs) {
-                        // Higher-ups of registered 3rd-party package MAY not
-                        // exist.
-                        $s_class = $s_new;
-                        continue;
-                    }
-                    return false;
-                }
-                if (2 == $i_offs) {
-                    // Lower-downs of the root registered 3rd-party package MUST
-                    // work as similarly as Tox packages.
-                    $i_offs = 1;
-                }
-                $this->packages[$s_new] = array(
-                    $this->packages[$s_class][0] . DIRECTORY_SEPARATOR . $a_class[$ii],
-                    false
-                );
+        return $p_file;
+    }
+
+    /**
+     * Confirms every higher-up of the namespace.
+     *
+     * @internal
+     *
+     * @param  string $namespace Target namespace.
+     * @return self
+     */
+    protected function confirm($namespace)
+    {
+        $i_pos = strrpos($namespace, '\\');
+        $s_ns = substr($namespace, 0, $i_pos);
+        if (!$s_ns) {
+            $this->level = ('tox' == $namespace) ? 0 : -1;
+            return $this;
+        } elseif (!$this->confirm($s_ns)) {
+            return false;
+        }
+        $this->level++;
+        if (!isset($this->packages[$namespace])) {
+            if (!isset($this->packages[$s_ns])) {
+                return $this;
             }
-            $s_class = $s_new;
+            $this->packages[$namespace] = array(
+                $this->packages[$s_ns][0] . DIRECTORY_SEPARATOR . substr($namespace, 1 + $i_pos),
+                false
+            );
         }
-        if (!isset($this->packages[$s_class]) || !$this->bootstrap($s_class)) {
-            return false;
-        }
-        return $this->packages[$s_class][0] . DIRECTORY_SEPARATOR . $p_file;
+        return $this->bootstrap($namespace);
     }
 
     /**
@@ -174,7 +184,7 @@ class PackageManager extends Assembly
     }
 
     /**
-     * Bootstraps the namespace and all its higher-ups.
+     * Bootstraps the namespace.
      *
      * @internal
      *
@@ -183,21 +193,21 @@ class PackageManager extends Assembly
      */
     protected function bootstrap($namespace)
     {
-        $a_ns = explode('\\', $namespace);
-        for ($ii = 0, $jj = count($a_ns); $ii < $jj; $ii++) {
-            $s_ns = $ii ? "{$s_ns}\\{$a_ns[$ii]}" : $a_ns[0];
-            if (!isset($this->packages[$s_ns]) || $this->packages[$s_ns][1]) {
-                continue;
-            }
-            if (!is_dir($this->packages[$s_ns][0]) || !is_readable($this->packages[$s_ns][0])) {
-                return false;
-            }
-            $p_bs = "{$this->packages[$s_ns][0]}/@bootstrap.php";
-            if (is_file($p_bs) && is_readable($p_bs)) {
-                require_once $p_bs;
-            }
-            $this->packages[$s_ns][1] = true;
+        if (!isset($this->packages[$namespace])) {
+            return false;
         }
+        if ($this->packages[$namespace][1]) {
+            return $this;
+        }
+        $p_bs = $this->packages[$namespace][0];
+        if (!is_dir($p_bs) || !is_readable($p_bs)) {
+            return false;
+        }
+        $p_bs .= '/@bootstrap.php';
+        if (is_file($p_bs) && is_readable($p_bs)) {
+            require_once $p_bs;
+        }
+        $this->packages[$namespace][1] = true;
         return $this;
     }
 }
