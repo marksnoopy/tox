@@ -1,14 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!-- vi:se fenc=utf-8 ff=unix tw=80 ai si sw=2 et ts=2 sts=2: -->
 <project name="Tox" default="test">
-  <fileset id="test" dir="share/test">
-    <include name="**/*-test.php" />
-  </fileset>
-  <fileset id="src" dir="src">
-    <include name="**/*.php" />
-  </fileset>
-
   <property name="bin.phpcs.0" location="bin/phpcs"/>
+  <property name="bin.phpmd.0" location="bin/phpmd"/>
   <property name="bin.phpunit.0" location="bin/phpunit"/>
   <property file="build.properties"/>
 
@@ -22,13 +16,25 @@
           description="[main] Cleans fixures of building progress up."
   />
   <target name="test"
-          depends="phplint,phpcs,phpunit"
-          description="[main] Verifies widely. ( phplint, phpcs, phpunit )"
+          depends="lint,unit,cs,md"
+          description="[main] Verifies widely. ( lint + unit + cs + md )"
   />
-  <target name="travis" depends="-travis-composer,test,-travis-checkout"/>
+  <target name="travis" depends="-travis-setup,test,-travis-teardown"/>
   <!-- }}}1 -->
 
-  <target name="phpdoc"
+  <target name="phpmd" depends="md"/>
+  <target name="md"
+          depends="-greeting,-composer-install"
+          description="       Detects mess codes of PHP source."
+  >
+    <condition property="bin.phpmd" value="${bin.phpmd.0}" else="phpmd">
+      <isset property="bin.phpmd.0"/>
+    </condition>
+    <echo>'${bin.phpmd}' used</echo>
+  </target>
+
+  <target name="phpdoc" depends="doc"/>
+  <target name="doc"
           depends="-greeting,-mkdir-build-sdk"
           description="       Generates SDK documentation."
   >
@@ -38,7 +44,7 @@
     <echo>'${bin.phpdoc}' used</echo>
     <condition property="phpdoc.xml"
                value="phpdoc.xml"
-               else="etc/phpdoc/phpdoc.xml"
+               else="etc/phpdoc.xml"
     >
       <available property="phpdoc.xml" file="phpdoc.xml"/>
     </condition>
@@ -51,9 +57,10 @@
     </exec>
   </target>
 
-  <target name="phpunit"
-    depends="-greeting,-mkdir-build-code-coverage,-composer-install"
-    description="       Runs unit-tests."
+  <target name="phpunit" depends="unit"/>
+  <target name="unit"
+          depends="-greeting,-mkdir-build-code-coverage,-composer-install"
+          description="       Runs unit-tests."
   >
     <condition property="bin.phpunit" value="${bin.phpunit.0}" else="phpunit">
       <isset property="bin.phpunit.0"/>
@@ -61,7 +68,7 @@
     <echo>'${bin.phpunit}' used</echo>
     <condition property="phpunit.xml"
                value="phpunit.xml"
-               else="etc/phpunit/phpunit.xml"
+               else="etc/phpunit.xml"
     >
       <available property="phpunit.xml" file="phpunit.xml"/>
     </condition>
@@ -72,41 +79,44 @@
       <arg value="-c"/>
       <arg file="${phpunit.xml}"/>
     </exec>
+    <concat>
+      <path path="build/code-coverage/brief.log"/>
+    </concat>
   </target>
 
-  <target name="phpcs"
-    depends="-greeting,-composer-install"
-    description="       Validates with `PSR-2'."
+  <target name="phpcs" depends="cs"/>
+  <target name="cs"
+          depends="-greeting,-composer-install,-mkdir-build"
+          description="       Validates with code standard `PSR-2'."
   >
     <condition property="bin.phpcs" value="${bin.phpcs.0}" else="phpcs">
       <isset property="bin.phpcs.0"/>
     </condition>
     <echo>'${bin.phpcs}' used</echo>
-    <apply executable="${bin.phpcs}"
-           failonerror="true"
-           failifexecutionfails="true"
-           parallel="yes"
+    <exec executable="${bin.phpcs}"
+          failonerror="true"
+          failifexecutionfails="true"
     >
       <arg value="--standard=etc/phpcs/src.xml"/>
       <arg value="--encoding=UTF-8"/>
       <arg value="--extensions=php"/>
-      <fileset refid="src"/>
-    </apply>
-    <apply executable="${bin.phpcs}"
-           failonerror="true"
-           failifexecutionfails="true"
-           parallel="yes"
+      <arg path="src"/>
+    </exec>
+    <exec executable="${bin.phpcs}"
+          failonerror="true"
+          failifexecutionfails="true"
     >
       <arg value="--standard=etc/phpcs/share-test.xml"/>
       <arg value="--encoding=UTF-8"/>
       <arg value="--extensions=php"/>
-      <fileset refid="test"/>
-    </apply>
+      <arg path="share/test"/>
+    </exec>
   </target>
 
-  <target name="phplint"
-          depends="-greeting"
-          description="       Checks PHP syntax."
+  <target name="phplint" depends="lint"/>
+  <target name="lint"
+          depends="-greeting,-mkdir-build"
+          description="       Checks PHP source codes syntax."
   >
     <condition property="bin.php" value="${bin.php.0}" else="php">
       <isset property="bin.php.0"/>
@@ -114,8 +124,14 @@
     <echo>'${bin.php}' used</echo>
     <apply executable="${bin.php}" failonerror="true">
       <arg value="-l" />
-      <fileset refid="src"/>
-      <fileset refid="test"/>
+      <fileset dir="share/test">
+        <include name="**/*-test.php" />
+        <modified delayupdate="false"/>
+      </fileset>
+      <fileset dir="src">
+        <include name="**/*.php" />
+        <modified delayupdate="false"/>
+      </fileset>
     </apply>
   </target>
 
@@ -182,7 +198,7 @@
   <!-- }}}1 -->
 
   <!-- travis-ci operations {{{1 -->
-  <target name="-travis-composer">
+  <target name="-travis-setup">
     <copy file="etc/travis/composer.json"
           tofile="composer.json"
           overwrite="true"
@@ -190,7 +206,7 @@
     />
     <property name="bin.phpunit" value="phpunit"/>
   </target>
-  <target name="-travis-checkout">
+  <target name="-travis-teardown">
     <exec executable="git" failonerror="true" failifexecutionfails="true">
       <arg value="checkout"/>
       <arg value="--"/>

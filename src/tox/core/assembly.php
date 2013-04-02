@@ -24,7 +24,7 @@
 namespace Tox\Core;
 
 use ReflectionClass;
-use ReflectionException;
+use ReflectionProperty;
 
 /**
  * Represents as the root class of all components to provide essential
@@ -138,35 +138,54 @@ abstract class Assembly
     final protected function toxGetMagicProps()
     {
         $s_class = get_class($this);
-        if (!isset(self::$toxProperties[$s_class])) {
-            self::$toxProperties[$s_class] = array();
-            $o_rclass = new ReflectionClass($this);
-            foreach ($o_rclass->getProperties() as $o_rprop) {
-                if (!$o_rprop->isDefault() || !$o_rprop->isProtected() || $o_rprop->isStatic() ||
-                    0 === strpos($o_rprop->name, '_')
-                ) {
-                    continue;
-                }
-                try {
-                    $o_rfunc = $o_rclass->getMethod('toxGet' . $o_rprop->name);
-                    if ($o_rfunc->isProtected() && !$o_rfunc->isStatic()) {
-                        self::$toxProperties[$s_class][$o_rprop->name] = self::TOX_PROPERTY_READONLY;
-                    }
-                } catch (ReflectionException $ex) {
-                }
-                try {
-                    $o_rfunc = $o_rclass->getMethod('toxSet' . $o_rprop->name);
-                    if ($o_rfunc->isProtected() && !$o_rfunc->isStatic()) {
-                        self::$toxProperties[$s_class][$o_rprop->name] =
-                            isset(self::$toxProperties[$s_class][$o_rprop->name]) ?
-                            self::TOX_PROPERTY_PUBLIC :
-                            self::TOX_PROPERTY_WRITEONLY;
-                    }
-                } catch (ReflectionException $ex) {
-                }
+        if (isset(self::$toxProperties[$s_class])) {
+            return self::$toxProperties[$s_class];
+        }
+        self::$toxProperties[$s_class] = array();
+        $o_rclass = new ReflectionClass($this);
+        foreach ($o_rclass->getProperties() as $o_rprop) {
+            if (!$o_rprop->isDefault() || !$o_rprop->isProtected() || $o_rprop->isStatic() ||
+                0 === strpos($o_rprop->name, '_')
+            ) {
+                continue;
             }
+            self::$toxProperties[$s_class][$o_rprop->name] = $this->toxDetectMagicProp($o_rprop);
         }
         return self::$toxProperties[$s_class];
+    }
+
+    /**
+     * Detects whether a magic property readable and/or writable.
+     *
+     * **THIS METHOD CANNOT BE OVERRIDDEN.**
+     *
+     * @internal
+     *
+     * @param  ReflectionProperty $prop Magic property.
+     * @return const
+     */
+    final protected function toxDetectMagicProp(ReflectionProperty $prop)
+    {
+        $o_rclass = $prop->getDeclaringClass();
+        $s_getter = 'toxGet' . $prop->name;
+        $b_getter = $o_rclass->hasMethod($s_getter) &&
+            $o_rclass->getMethod($s_getter)->isProtected() &&
+            !$o_rclass->getMethod($s_getter)->isStatic();
+        $s_setter = 'toxSet' . $prop->name;
+        $b_setter = $o_rclass->hasMethod($s_setter) &&
+            $o_rclass->getMethod($s_setter)->isProtected() &&
+            !$o_rclass->getMethod($s_setter)->isStatic();
+        $i_ret = self::TOX_PROPERTY_DENIED;
+        if ($b_getter) {
+            $i_ret = self::TOX_PROPERTY_READONLY;
+        }
+        if ($b_setter) {
+            $i_ret =
+                self::TOX_PROPERTY_READONLY == $i_ret ?
+                self::TOX_PROPERTY_PUBLIC :
+                self::TOX_PROPERTY_WRITEONLY;
+        }
+        return $i_ret;
     }
 
     /**
