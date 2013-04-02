@@ -119,6 +119,9 @@ class PackageManagerTest extends PHPUnit_Framework_TestCase
                     ),
                     'type' => array(
                         '@bootstrap.php' => '<?php Tox\\Core\\PackageManagerTest::log("Tox\\Type");',
+                        '@exception' => array(
+                            'blah.php' => ''
+                        ),
                         'foo' => array(
                             'bar' => array(
                                 '@bootstrap.php' => '<?php Tox\\Core\\PackageManagerTest::log("Tox\\Type\\Foo\\Bar");',
@@ -127,7 +130,8 @@ class PackageManagerTest extends PHPUnit_Framework_TestCase
                         ),
                         'bar' => array(
                             'blah.php' => ''
-                        )
+                        ),
+                        'blahexception.php' => ''
                     ),
                     'foo' => array(
                         '@bootstrap.php' => '<?php Tox\\Core\\PackageManagerTest::log("Tox\\Foo");'
@@ -336,6 +340,8 @@ class PackageManagerTest extends PHPUnit_Framework_TestCase
 
     /**
      * @depends testRegisteringAndLocating
+     *
+     * @deprecated
      */
     public function testExceptionsSeparatedFromClassesAndInterfaces()
     {
@@ -354,6 +360,18 @@ class PackageManagerTest extends PHPUnit_Framework_TestCase
         $this->assertFalse($this->pman->locate('Smarty'));
         $this->pman->register('Tox\\Core', vfsStream::url($this->root . '/include/core'));
         $this->assertFalse($this->pman->locate('Tox\\Blah'));
+    }
+
+    /**
+     * @depends testRegisteringAndLocating
+     */
+    public function testExceptionsFollowingPSR0()
+    {
+        $this->pman->register('Tox\\Core', vfsStream::url($this->root . '/include/core'));
+        $this->assertEquals(
+            vfsStream::url($this->root . '/include/type/blahexception.php'),
+            $this->pman->locate('Tox\\Type\\BlahException')
+        );
     }
 }
 
