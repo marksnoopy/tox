@@ -30,7 +30,16 @@ require_once __DIR__ . '/../../../../src/data/isource.php';
 require_once __DIR__ . '/../../../../src/data/ikv.php';
 require_once __DIR__ . '/../../../../src/data/kv/kv.php';
 require_once __DIR__ . '/../../../../src/data/kv/memcacheserverconfiguration.php';
+
+
+
+require_once __DIR__ . '/../../../../src/core/exception.php';
+require_once __DIR__ . '/../../../../src/data/kv/@exception/memcachevaluenotstring.php';
+require_once __DIR__ . '/../../../../src/data/kv/@exception/memcachekeytoolong.php';
+require_once __DIR__ . '/../../../../src/data/kv/@exception/emptyhost.php';
+require_once __DIR__ . '/../../../../src/data/kv/@exception/memcacheconfignotarray.php';
 require_once __DIR__ . '/../../../../src/data/kv/memcache.php';
+
 
 use Tox\Data\KV;
 use Tox;
@@ -67,7 +76,323 @@ class MemcacheTest extends PHPUnit_Framework_TestCase
         $this->assertEquals($port2, $a_config[1]->port);
     }
 
+    /**
+     * @dataProvider dataProvideinit
+     */
+    public function testinit($config, $compressionstat, $field)
+    {
 
+
+        $o_mockMemcached = $this->getMockBuilder('Memcached')
+                ->getMock();
+        $o_mockMemcached->Expects($this->any())
+                ->method('getServerList')
+                ->will($this->returnValue(array(
+                            array(
+                                'host' => '127.0.0.1',
+                                'port' => '11212',
+                                'field' => 'data',)
+                        )));
+
+        $o_mem2 = $this->getMockBuilder('Tox\\Data\\Kv\\Memcache')
+                ->setMethods(array('defaultMemcached'))
+                ->getMockForAbstractClass();
+
+        $o_mem2->Expects($this->any())
+                ->method('defaultMemcached')
+                ->will($this->returnValue($o_mockMemcached));
+        $o_mem2->setServers($config);
+
+        $o_mem2->setCompression($compressionstat);
+        $o_mem2->__construct($field);
+        $o_mem2->init();
+    }
+
+    /**
+     * @dataProvider dataProvideinit2  
+     * @expectedException  Tox\Data\Kv\MemcacheConfigNotArrayException
+     */
+    public function testinitWithServerConfigIsError($config, $compressionstat, $field)
+    {
+        $o_mockMemcached = $this->getMockBuilder('Memcached')
+                ->getMock();
+
+        $o_mem2 = $this->getMockBuilder('Tox\\Data\\Kv\\Memcache')
+                ->setMethods(array('defaultMemcached'))
+                ->getMockForAbstractClass();
+
+        $o_mem2->Expects($this->any())
+                ->method('defaultMemcached')
+                ->will($this->returnValue($o_mockMemcached));
+        $o_mem2->setServers($config);
+
+        $o_mem2->setCompression($compressionstat);
+        $o_mem2->__construct($field);
+        $o_mem2->init();
+    }
+
+    /**
+     * @dataProvider dataProvideinit3
+     */
+    public function testinitMemcache($config, $compressionstat, $field)
+    {
+        $o_mockMemcache = $this->getMockBuilder('Memcache')
+                ->setMethods(array('addServer'))
+                ->getMock();
+        $o_mockMemcache->Expects($this->any())
+                ->method('addServer')
+                ->will($this->returnValue(true
+                        ));
+
+        $o_mem2 = $this->getMockBuilder('Tox\\Data\\Kv\\Memcache')
+                ->setMethods(array('defaultMemcache'))
+                ->getMockForAbstractClass();
+
+        $o_mem2->Expects($this->any())
+                ->method('defaultMemcache')
+                ->will($this->returnValue($o_mockMemcache));
+        $o_mem2->setServers($config);
+
+        $o_mem2->__construct($field);
+        $o_mem2->init();
+    }
+
+    public function dataProvideinit()
+    {
+        return array(
+            array(
+                array(
+                    //是否使用memcached
+                    'useMemcached' => true,
+                    // memcache相关配置。
+                    'memcache' => array(
+                        array(
+                            'host' => '127.0.0.1',
+                            'port' => '11211',
+                        ),
+                    ),
+                    // memcached相关配置。
+                    'memcached' => array(
+                        array(
+                            'host' => '127.0.0.1',
+                            'port' => '11211',
+                            'field' => 'page',
+                        ),
+                        array(
+                            'host' => '127.0.0.1',
+                            'port' => '11212',
+                            'field' => 'data',
+                        ),
+                    )
+                ),
+                true,
+                'page',
+            ),
+            array(
+                array(
+                    //是否使用memcached
+                    'useMemcached' => true,
+                    // memcache相关配置。
+                    'memcache' => array(
+                        array(
+                            'host' => '127.0.0.1',
+                            'port' => '11211',
+                        ),
+                    ),
+                    // memcached相关配置。
+                    'memcached' => array(
+                        array(
+                            'host' => '127.0.0.1',
+                            'port' => '11211',
+                            'field' => 'page',
+                        ),
+                        array(
+                            'host' => '127.0.0.1',
+                            'port' => '11212',
+                            'field' => 'data',
+                        ),
+                    )
+                ),
+                false,
+                null,
+            ),
+            array(
+                array(
+                    //是否使用memcached
+                    'useMemcached' => true,
+                    // memcache相关配置。
+                    'memcache' => array(
+                        array(
+                            'host' => '127.0.0.1',
+                            'port' => '11211',
+                        ),
+                    ),
+                    // memcached相关配置。
+                    'memcached' => array(
+                        array(
+                            'host' => '127.0.0.1',
+                            'port' => '11211',
+                            'field' => 'page',
+                        ),
+                        array(
+                            'host' => '127.0.0.1',
+                            'port' => '11212',
+                            'field' => 'data',
+                        ),
+                    )
+                ),
+                false,
+                'data',
+            ),
+        );
+    }
+
+    public function dataProvideinit2()
+    {
+        return array(
+            array(
+                array(
+                    //是否使用memcached
+                    'useMemcached' => true,
+                    // memcache相关配置。
+                    'memcache' => array(
+                    ),
+                    // memcached相关配置。
+                    'memcached' => array(
+                    )
+                ),
+                false,
+                'data',
+            ),
+        );
+    }
+
+    public function dataProvideinit3()
+    {
+        return array(
+            array(
+                array(
+                    //是否使用memcached
+                    'useMemcached' => false,
+                    // memcache相关配置。
+                    'memcache' => array(
+                        array(
+                            'host' => '127.0.0.1',
+                            'port' => '11211',
+                        ),
+                    ),
+                    // memcached相关配置。
+                    'memcached' => array(
+                        array(
+                            'host' => '127.0.0.1',
+                            'port' => '11211',
+                            'field' => 'page',
+                        ),
+                        array(
+                            'host' => '127.0.0.1',
+                            'port' => '11212',
+                            'field' => 'data',
+                        ),
+                    )
+                ),
+                true,
+                null,
+            ),
+        );
+    }
+    /**
+     * @dataProvider dataProvideDefaultMemcached
+     */
+    public function testDefaultMemcached($config,$compressionstat,$field)
+    {
+        $o_mockMemcached = $this->getMockBuilder('Memcached')
+                ->getMock();
+
+
+        $o_mem2 = $this->getMockBuilder('ToxTest\\Data\\Kv\\SubMem')
+                ->getMockForAbstractClass();
+
+        $o_mem2->setServers($config);
+        $o_mem2->__construct($field);
+        $o_mem2->setCompression($compressionstat);
+        $z =$o_mem2->defaultMemcached();
+     //   var_dump($z);die;
+        $this->assertTrue(true);
+        
+        
+    }
+
+    public function dataProvideDefaultMemcached()
+    {
+        return array(
+            array(
+                array(
+                    //是否使用memcached
+                    'useMemcached' => true,
+                    // memcache相关配置。
+                    'memcache' => array(
+                        array(
+                            'host' => '127.0.0.1',
+                            'port' => '11211',
+                        ),
+                    ),
+                    'memcached' => array(
+                        array(
+                            'host' => '127.0.0.1',
+                            'port' => '11211',
+                            'field' => 'data',
+                        ),
+                    )
+                ),
+                true,
+                'data'
+            ),
+            array(
+                array(
+                    //是否使用memcached
+                    'useMemcached' => true,
+                    // memcache相关配置。
+                    'memcache' => array(
+                        array(
+                            'host' => '127.0.0.1',
+                            'port' => '11211',
+                        ),
+                    ),
+                    'memcached' => array(
+                        array(
+                            'host' => '127.0.0.1',
+                            'port' => '11211',
+                            'field' => 'data',
+                        ),
+                    )
+                ),
+                true,
+                'data'
+            ),
+            array(
+                array(
+                    //是否使用memcached
+                    'useMemcached' => true,
+                    // memcache相关配置。
+                    'memcache' => array(
+                        array(
+                            'host' => '127.0.0.1',
+                            'port' => '11211',
+                        ),
+                    ),
+                    'memcached' => array(
+                        array(
+                            'host' => '127.0.0.1',
+                            'port' => '11211',
+                            'field' => 'data',
+                        ),
+                    )
+                ),
+                false,
+                'page',
+            ),
+        );
+    }
     /**
      * @dataProvider configProvideSetValue
      * @depends testServerConfigset
@@ -112,7 +437,7 @@ class MemcacheTest extends PHPUnit_Framework_TestCase
 
         $o_mockMemcached->Expects($this->once())
                 ->method('set')
-                ->with($this->equalTo($key), $this->equalTo($val), $this->equalTo(0))
+                ->with($this->equalTo($key), $this->equalTo($val), $this->equalTo($expire))
                 ->will($this->returnValue(true));
 
         $o_mem2 = $this->getMockBuilder('ToxTest\\Data\\Kv\\SubMem')
@@ -149,7 +474,7 @@ class MemcacheTest extends PHPUnit_Framework_TestCase
                     )
                 ), 'key', 'ssss', 500),
             array(array(//是否使用memcached
-                    'useMemcached' => false,
+                    'useMemcached' => true,
                     // memcache相关配置。
                     'memcache' => array(
                         array(
@@ -172,7 +497,7 @@ class MemcacheTest extends PHPUnit_Framework_TestCase
     {
         return array(
             array(array(//是否使用memcached
-                    'useMemcached' => false,
+                    'useMemcached' => true,
                     // memcache相关配置。
                     'memcache' => array(
                         array(
@@ -188,6 +513,23 @@ class MemcacheTest extends PHPUnit_Framework_TestCase
                         ),
                     )
                 ), 'key', 'ssss', 0),
+            array(array(//是否使用memcached
+                    'useMemcached' => true,
+                    // memcache相关配置。
+                    'memcache' => array(
+                        array(
+                            'host' => '127.0.0.1',
+                            'port' => '11211',
+                        ),
+                    ),
+                    // memcached相关配置。
+                    'memcached' => array(
+                        array(
+                            'host' => '127.0.0.1',
+                            'port' => '11211',
+                        ),
+                    )
+                ), 'key', 'ssss', 500),
         );
     }
 
@@ -295,16 +637,16 @@ class MemcacheTest extends PHPUnit_Framework_TestCase
     }
 
     /**
-     * @dataProvider configProvide
+     * @dataProvider configProvideSetValue2
      * @depends testServerConfigset
      */
-    public function testAddValue($config)
+    public function testAddValue($config, $key, $val, $expire)
     {
         $o_mockMemcached = $this->getMockBuilder('Memcached')
                 ->getMock();
         $o_mockMemcached->Expects($this->once())
                 ->method('add')
-                ->with($this->equalTo('key'), $this->equalTo('sss'), $this->equalTo(0))
+                ->with($this->equalTo($key), $this->equalTo($val), $this->lessThanOrEqual($expire + 10 + time()))
                 ->will($this->returnValue(true));
 
         $o_mem2 = $this->getMockBuilder('ToxTest\\Data\\Kv\\SubMem')
@@ -317,12 +659,35 @@ class MemcacheTest extends PHPUnit_Framework_TestCase
         $o_mem2->setServers($config);
         $o_mem2->init();
 
-        $this->asserttrue($o_mem2->addValue('key', 'sss', 0));
+        $this->asserttrue($o_mem2->addValue($key, $val, $expire));
     }
 
     public function testConstruct()
     {
+        $o_mem2 = $this->getMockBuilder('Tox\\Data\\Kv\\memcache')
+                ->setMethods(array('__construct'))
+                ->getMockForAbstractClass();
+        $o_mem2->Expects($this->any())
+                ->method('__construct')
+                ->with($this->equalTo('field'))
+                ->will($this->returnValue(true));
+
+        $this->assertEquals(null, $o_mem2->__construct('field'));
+    }
+
+    public function testConstruct2()
+    {
         $this->asserttrue($this->o_mem->useMemcached);
+    }
+
+    public function testSetCompression()
+    {
+        $this->o_mem->setCompression(false);
+        
+        $this->assertFalse($this->o_mem->getCompression());
+        $this->o_mem->setCompression(true);
+        
+         $this->assertTrue($this->o_mem->getCompression());
     }
 
     /**
@@ -333,6 +698,156 @@ class MemcacheTest extends PHPUnit_Framework_TestCase
     {
         $this->o_mem->setExpireTime(555);
         $this->assertEquals(555, $this->o_mem->getExpireTime());
+    }
+
+
+
+  
+
+    /**
+     * @dataProvider configProvideSetValue2
+     * @depends testServerConfigset
+     */
+    public function testSetNginxValue($config, $key, $val, $expire)
+    {
+        $o_mockMemcached = $this->getMockBuilder('Memcached')
+                ->getMock();
+
+        $o_mockMemcached->Expects($this->once())
+                ->method('set')
+                ->with($this->equalTo($key), $this->equalTo($val), $this->lessThanOrEqual($expire + time()))
+                ->will($this->returnValue(true));
+
+        $o_mem2 = $this->getMockBuilder('ToxTest\\Data\\Kv\\SubMem')
+                ->setMethods(array('defaultMemcached'))
+                ->getMockForAbstractClass();
+
+        $o_mem2->Expects($this->once())
+                ->method('defaultMemcached')
+                ->will($this->returnValue($o_mockMemcached));
+        $o_mem2->setServers($config);
+        $o_mem2->init();
+
+        $this->asserttrue($o_mem2->setNginxMemcacheValue($key, $val, $expire));
+    }
+
+    /**
+     * @dataProvider configProvideSetNginxValue
+
+     * @expectedException Tox\Data\Kv\MemcacheValueNotStringException
+     */
+    public function testSetNginxValue3($config, $key, $val, $expire)
+    {
+        $o_mockMemcached = $this->getMockBuilder('Memcached')
+                ->getMock();
+
+        $o_mem2 = $this->getMockBuilder('ToxTest\\Data\\Kv\\SubMem')
+                ->setMethods(array('defaultMemcached'))
+                ->getMockForAbstractClass();
+
+        $o_mem2->Expects($this->once())
+                ->method('defaultMemcached')
+                ->will($this->returnValue($o_mockMemcached));
+        $o_mem2->setServers($config);
+        $o_mem2->init();
+
+        $this->asserttrue($o_mem2->setNginxMemcacheValue($key, $val, $expire));
+    }
+
+    /**
+     * @dataProvider configProvideSetNginxValue2
+     * @expectedException   Tox\Data\Kv\MemcacheKeyTooLongException
+     */
+    public function testSetNginxValue2($config, $key, $val, $expire)
+    {
+        $o_mockMemcached = $this->getMockBuilder('Memcached')
+                ->getMock();
+
+        $o_mem2 = $this->getMockBuilder('ToxTest\\Data\\Kv\\SubMem')
+                ->setMethods(array('defaultMemcached'))
+                ->getMockForAbstractClass();
+
+        $o_mem2->Expects($this->once())
+                ->method('defaultMemcached')
+                ->will($this->returnValue($o_mockMemcached));
+        $o_mem2->setServers($config);
+        $o_mem2->init();
+
+        $this->asserttrue($o_mem2->setNginxMemcacheValue($key, $val, $expire));
+    }
+
+    public function configProvideSetNginxValue()
+    {
+        return array(
+            array(array(//是否使用memcached
+                    'useMemcached' => true,
+                    // memcache相关配置。
+                    'memcache' => array(
+                        array(
+                            'host' => '127.0.0.1',
+                            'port' => '11211',
+                        ),
+                    ),
+                    // memcached相关配置。
+                    'memcached' => array(
+                        array(
+                            'host' => '127.0.0.1',
+                            'port' => '11211',
+                        ),
+                    )
+                ), 'key', array(), 0),
+        );
+    }
+
+    public function configProvideSetNginxValue2()
+    {
+        return array(
+            array(array(//是否使用memcached
+                    'useMemcached' => true,
+                    // memcache相关配置。
+                    'memcache' => array(
+                        array(
+                            'host' => '127.0.0.1',
+                            'port' => '11211',
+                        ),
+                    ),
+                    // memcached相关配置。
+                    'memcached' => array(
+                        array(
+                            'host' => '127.0.0.1',
+                            'port' => '11211',
+                        ),
+                    )
+                ),
+                'keysdjfoasjdfioasd;fncv;zjoidfj;ajfijfs;kjbiasjiui3ij;fladfj;kjasoifu[apjf ;jdfoijaugfij;ajgodiuf;ajkfjdfjaoi;jefkdjasp;ifjaoijkljafkldjoaisfje;lija;dkjfkja;iej;fkjdaksjfi;ldaifje;kj;lsjkdfjijuiag;kjadksfjiej;asljfkdjskljdfkdajsfkljasijef;jdakfjkljadfl;jakfjdl',
+                'ssss', 500),
+        );
+    }
+
+    /**
+     * @dataProvider configProvide
+     * @depends testServerConfigset
+     */
+    public function testGetNginxValue($config)
+    {
+        $o_mockMemcached = $this->getMockBuilder('Memcached')
+                ->getMock();
+        $o_mockMemcached->Expects($this->once())
+                ->method('get')
+                ->with($this->equalTo('key'))
+                ->will($this->returnValue(true));
+
+        $o_mem2 = $this->getMockBuilder('ToxTest\\Data\\Kv\\SubMem')
+                ->setMethods(array('defaultMemcached'))
+                ->getMockForAbstractClass();
+
+        $o_mem2->Expects($this->once())
+                ->method('defaultMemcached')
+                ->will($this->returnValue($o_mockMemcached));
+        $o_mem2->setServers($config);
+        $o_mem2->init();
+
+        $this->asserttrue($o_mem2->getNginxMemcacheValue('key'));
     }
 
     public function configProvideExpireTime()
@@ -381,7 +896,7 @@ class MemcacheTest extends PHPUnit_Framework_TestCase
             array(
                 array(
                     //是否使用memcached
-                    'useMemcached' => false,
+                    'useMemcached' => true,
                     // memcache相关配置。
                     'memcache' => array(
                         array(
@@ -412,6 +927,7 @@ class MemcacheTest extends PHPUnit_Framework_TestCase
             )
         );
     }
+
 }
 
 class SubMem extends KV\Memcache
@@ -447,6 +963,16 @@ class SubMem extends KV\Memcache
     {
         return parent::clearValues();
     }
+
+    public function defaultMemcache()
+    {
+        return parent::defaultMemcache();
+    }
+    public function defaultMemcached()
+    {
+        return parent::defaultMemcached();
+    }
+
 }
 
 // vi:ft=php fenc=utf-8 ff=unix ts=4 sts=4 et sw=4 fen fdm=indent fdl=1 tw=120
