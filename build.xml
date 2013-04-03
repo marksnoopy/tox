@@ -207,6 +207,9 @@
     <property name="bin.phpunit" value="phpunit"/>
   </target>
   <target name="-travis-teardown">
+    <condition property="bin.git" value="${bin.git.0}" else="git">
+      <isset property="bin.git.0"/>
+    </condition>
     <exec executable="git" failonerror="true" failifexecutionfails="true">
       <arg value="checkout"/>
       <arg value="--"/>
