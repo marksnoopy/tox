@@ -255,8 +255,8 @@ abstract class Application extends Core\Assembly
      */
     final public static function run($config = null, IRouter $router = null, IFallback $fallback = null)
     {
+        $o_app = static::getInstance();
         try {
-            $o_app = static::getInstance();
             $o_app->config =
             $config = ($config instanceof IConfiguration) ? $config : $o_app->getDefaultConfiguration($config);
             $o_app->fallback =
@@ -284,11 +284,11 @@ abstract class Application extends Core\Assembly
                 throw $ex;
             }
             if (null === $fallback) {
-                $fallback = self::$instance->getDefaultFallback();
+                $fallback = $o_app->getDefaultFallback();
             }
-            $o_out = (self::$instance->output instanceof IOutput) ?
-                self::$instance->output :
-                self::$instance->getDefaultOutput();
+            $o_out = ($o_app->output instanceof IOutput) ?
+                $o_app->output :
+                $o_app->getDefaultOutput();
             $o_out->setView($fallback->cause($ex))->close();
         }
     }
@@ -301,7 +301,7 @@ abstract class Application extends Core\Assembly
      * @throws MultipleApplicationRuntimeException If there is already another
      *                                             appliance is running.
      */
-    protected static function getInstance()
+    public static function getInstance()
     {
         if (self::$instance instanceof self) {
             throw new MultipleApplicationRuntimeException(array('existant' => self::$instance));
