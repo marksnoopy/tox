@@ -41,12 +41,13 @@ use Tox;
  * @package tox.data.kv
  * @author  Qiang Fu <fuqiang007enter@gmail.com>
  */
-class KvTest extends PHPUnit_Framework_TestCase {
-
+class KvTest extends PHPUnit_Framework_TestCase
+{
     /**
      * @dataProvider dataProvider
      */
-    public function testSetting($key, $value, $expire, $prefixString, $expectResult, $result) {
+    public function testSetting($key, $value, $expire, $prefixString, $expectResult, $result)
+    {
         $o_mockKv = $this->getMockBuilder('Tox\\Data\\Kv\\kv')
                 //     ->disableOriginalConstructor()
                 ->setMethods(array('setValue'))
@@ -55,13 +56,16 @@ class KvTest extends PHPUnit_Framework_TestCase {
         $o_mockKv->expects($this->once())
                 ->method('setValue')
                 ->with(
-                        $this->equalTo(md5($prefixString . $key)), $this->equalTo(serialize(array($value))), $this->equalTo($expire)
+                    $this->equalTo(md5($prefixString . $key)),
+                    $this->equalTo(serialize(array($value))),
+                    $this->equalTo($expire)
                 )->will($this->returnValue($expectResult));
 
         $this->assertEquals($result, $o_mockKv->set($key, $value, $expire));
     }
 
-    public function testIncrease() {
+    public function testIncrease()
+    {
         $o_mockKv = $this->getMockBuilder('Tox\\Data\\Kv\\kv')
                 ->getMockForAbstractClass();
 
@@ -73,7 +77,8 @@ class KvTest extends PHPUnit_Framework_TestCase {
         $this->assertFalse($o_mockKv->increase('aaa'));
     }
 
-    public function testDecrease() {
+    public function testDecrease()
+    {
         $o_mockKv = $this->getMockBuilder('Tox\\Data\\Kv\\kv')
                 ->getMockForAbstractClass();
 
@@ -85,7 +90,8 @@ class KvTest extends PHPUnit_Framework_TestCase {
         $this->assertFalse($o_mockKv->decrease('aaa'));
     }
 
-    public function testPush() {
+    public function testPush()
+    {
         $o_mockKv = $this->getMockBuilder('Tox\\Data\\Kv\\kv')
                 ->getMockForAbstractClass();
 
@@ -97,7 +103,8 @@ class KvTest extends PHPUnit_Framework_TestCase {
         $this->assertFalse($o_mockKv->push('aaa'));
     }
 
-    public function testPop() {
+    public function testPop()
+    {
         $o_mockKv = $this->getMockBuilder('Tox\\Data\\Kv\\kv')
                 ->getMockForAbstractClass();
 
@@ -109,7 +116,8 @@ class KvTest extends PHPUnit_Framework_TestCase {
         $this->assertFalse($o_mockKv->pop('aaa'));
     }
 
-    public function testShift() {
+    public function testShift()
+    {
         $o_mockKv = $this->getMockBuilder('Tox\\Data\\Kv\\kv')
                 ->getMockForAbstractClass();
 
@@ -121,7 +129,8 @@ class KvTest extends PHPUnit_Framework_TestCase {
         $this->assertFalse($o_mockKv->shift('aaa'));
     }
 
-    public function testUnShift() {
+    public function testUnShift()
+    {
         $o_mockKv = $this->getMockBuilder('Tox\\Data\\Kv\\kv')
                 ->getMockForAbstractClass();
 
@@ -137,7 +146,8 @@ class KvTest extends PHPUnit_Framework_TestCase {
      * @dataProvider dataProvider
      * @depends testSetting
      */
-    public function testGetting($key, $value, $expire, $prefixString, $expectResult, $result) {
+    public function testGetting($key, $value, $expire, $prefixString, $expectResult, $result)
+    {
 
         $o_mockKv = $this->getMockBuilder('Tox\\Data\\Kv\\kv')
                 ->setMethods(array('getValue'))
@@ -155,7 +165,8 @@ class KvTest extends PHPUnit_Framework_TestCase {
      * @dataProvider dataProvider
      * @depends testSetting
      */
-    public function testGetting2($key, $value, $expire, $prefixString, $expectResult, $result) {
+    public function testGetting2($key, $value, $expire, $prefixString, $expectResult, $result)
+    {
 
         $o_mockKv = $this->getMockBuilder('Tox\\Data\\Kv\\kv')
                 ->setMethods(array('getValue'))
@@ -173,7 +184,8 @@ class KvTest extends PHPUnit_Framework_TestCase {
      * @dataProvider dataProvider
      * @depends testSetting
      */
-    public function testGetting3($key, $value, $expire, $prefixString, $expectResult, $result) {
+    public function testGetting3($key, $value, $expire, $prefixString, $expectResult, $result)
+    {
 
         $o_mockKv = $this->getMockBuilder('Tox\\Data\\Kv\\kv')
                 ->setMethods(array('getValue'))
@@ -187,7 +199,8 @@ class KvTest extends PHPUnit_Framework_TestCase {
         $this->assertEquals(false, $o_mockKv->get($key));
     }
 
-    public function testClear() {
+    public function testClear()
+    {
         $o_mockKv = $this->getMockBuilder('Tox\\Data\\Kv\\kv')
                 ->setMethods(array('clearValues'))
                 ->getMockForAbstractClass();
@@ -199,7 +212,8 @@ class KvTest extends PHPUnit_Framework_TestCase {
         $this->assertEquals(false, $o_mockKv->clear());
     }
 
-    public function dataProvider() {
+    public function dataProvider()
+    {
         return array(
             array('key1', 'sss', 500, 'memcached', true, true),
             array('key2', 'valuetest', 500, 'memcached', true, true),
@@ -207,7 +221,8 @@ class KvTest extends PHPUnit_Framework_TestCase {
         );
     }
 
-    public function testConstruct() {
+    public function testConstruct()
+    {
         $o_mockKv = $this->getMockBuilder('Tox\\Data\\Kv\\kv')
                 ->getMockForAbstractClass();
 
@@ -219,7 +234,8 @@ class KvTest extends PHPUnit_Framework_TestCase {
     /**
      * @dataProvider dataProviderOffset
      */
-    public function testoffsetSet($key, $value, $expire, $prefixString, $expectResult) {
+    public function testoffsetSet($key, $value, $expire, $prefixString, $expectResult)
+    {
         $o_mockKv = new Subkv();
 
         $o_mockKv[$key] = $value;
@@ -229,7 +245,8 @@ class KvTest extends PHPUnit_Framework_TestCase {
     /**
      * @dataProvider dataProviderOffset
      */
-    public function testoffsetExists($key, $value, $expire, $prefixString, $expectResult) {
+    public function testoffsetExists($key, $value, $expire, $prefixString, $expectResult)
+    {
         $o_mockKv = new Subkv();
 
         $o_mockKv[$key] = $value;
@@ -239,15 +256,18 @@ class KvTest extends PHPUnit_Framework_TestCase {
     /**
      * @dataProvider dataProviderOffset
      */
-    public function testoffsetSet2($key, $value, $expire, $prefixString, $expectResult) {
+    public function testoffsetSet2($key, $value, $expire, $prefixString, $expectResult)
+    {
 
         $o_mockKv = $this->getMockBuilder('Tox\\Data\\Kv\\kv')
                 ->getMockForAbstractClass();
         $o_mockKv->expects($this->any())
                 ->method('setValue')
                 ->with(
-                        $this->equalTo(md5($prefixString . $key)), $this->equalTo(serialize(array($value))), $this->equalTo($expire)
-        );
+                    $this->equalTo(md5($prefixString . $key)),
+                    $this->equalTo(serialize(array($value))),
+                    $this->equalTo($expire)
+                );
 
         $o_mockKv[$key] = $value;
     }
@@ -255,7 +275,8 @@ class KvTest extends PHPUnit_Framework_TestCase {
     /**
      * @dataProvider dataProviderOffset
      */
-    public function testoffsetGet($key, $value, $expire, $prefixString, $expectResult) {
+    public function testoffsetGet($key, $value, $expire, $prefixString, $expectResult)
+    {
 
         $o_mockKv = $this->getMockBuilder('Tox\\Data\\Kv\\kv')
                 ->getMockForAbstractClass();
@@ -269,7 +290,8 @@ class KvTest extends PHPUnit_Framework_TestCase {
     /**
      * @dataProvider dataProviderOffset
      */
-    public function testoffsetUnset($key, $value, $expire, $prefixString, $expectResult) {
+    public function testoffsetUnset($key, $value, $expire, $prefixString, $expectResult)
+    {
 
         $o_mockKv = $this->getMockBuilder('Tox\\Data\\Kv\\kv')
                 ->getMockForAbstractClass();
@@ -280,25 +302,27 @@ class KvTest extends PHPUnit_Framework_TestCase {
         unset($o_mockKv[$key]);
     }
 
-    public function dataProviderOffset() {
+    public function dataProviderOffset()
+    {
         return array(
             array('key1', 'sss', 0, 'memcached', true),
             array('key2', 'valuetest', 0, 'memcached', true),
             array('key3', 'valuetest22', 0, 'memcached', true),
         );
     }
-
 }
 
-class Subkv extends KV\KV {
-
+class Subkv extends KV\KV
+{
     private $container = array();
 
-    protected function getValue($key) {
+    protected function getValue($key)
+    {
         return isset($this->container[$key]) ? $this->container[$key] : null;
     }
 
-    protected function setValue($key, $val, $expire = 0) {
+    protected function setValue($key, $val, $expire = 0)
+    {
         if (is_null($key)) {
             $this->container[] = $val;
         } else {
@@ -306,14 +330,15 @@ class Subkv extends KV\KV {
         }
     }
 
-    protected function deleteValue($key) {
+    protected function deleteValue($key)
+    {
         unset($this->container[$key]);
     }
 
-    protected function clearValues() {
+    protected function clearValues()
+    {
         unset($this->container);
     }
-
 }
 
 // vi:ft=php fenc=utf-8 ff=unix ts=4 sts=4 et sw=4 fen fdm=indent fdl=1 tw=120

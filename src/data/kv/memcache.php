@@ -23,7 +23,6 @@
 
 namespace Tox\Data\KV;
 
-
 /**
  * Represents as the memcache data source.
  *
@@ -98,7 +97,7 @@ class Memcache extends KV
 
     /**
      * Sets the memcache default expire time
-     * 
+     *
      * @param booler $option
      */
     public function setCompression($option)
@@ -120,7 +119,6 @@ class Memcache extends KV
         return $this->compression;
     }
 
-    
     /**
      * Gets the memcache default expire time
      *
@@ -177,7 +175,13 @@ class Memcache extends KV
                             }
                         } else {
                             $cache->addServer(
-                                    $server->host, $server->port, $server->persistent, $server->weight, $server->timeout, $server->retryInterval, $server->status
+                                $server->host,
+                                $server->port,
+                                $server->persistent,
+                                $server->weight,
+                                $server->timeout,
+                                $server->retryInterval,
+                                $server->status
                             );
                         }
                     }
@@ -304,9 +308,6 @@ class Memcache extends KV
     {
 
         if ($expire > 0) {
-//            if ($expire > 2592000) {
-//                $expire = 2592000 - 1;
-//            }
         } elseif (null !== $this->expireTime) {
             $expire = $this->expireTime;
         } else {
@@ -397,7 +398,6 @@ class Memcache extends KV
     {
         return $this->cache->get($key);
     }
-
 }
 
 // vi:ft=php fenc=utf-8 ff=unix ts=4 sts=4 et sw=4 fen fdm=indent fdl=1 tw=120

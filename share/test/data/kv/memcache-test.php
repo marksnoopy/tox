@@ -40,7 +40,6 @@ require_once __DIR__ . '/../../../../src/data/kv/@exception/emptyhost.php';
 require_once __DIR__ . '/../../../../src/data/kv/@exception/memcacheconfignotarray.php';
 require_once __DIR__ . '/../../../../src/data/kv/memcache.php';
 
-
 use Tox\Data\KV;
 use Tox;
 
@@ -87,12 +86,17 @@ class MemcacheTest extends PHPUnit_Framework_TestCase
                 ->getMock();
         $o_mockMemcached->Expects($this->any())
                 ->method('getServerList')
-                ->will($this->returnValue(array(
+                ->will(
+                    $this->returnValue(
+                        array(
                             array(
                                 'host' => '127.0.0.1',
                                 'port' => '11212',
-                                'field' => 'data',)
-                        )));
+                                'field' => 'data'
+                            )
+                        )
+                    )
+                );
 
         $o_mem2 = $this->getMockBuilder('Tox\\Data\\Kv\\Memcache')
                 ->setMethods(array('defaultMemcached'))
@@ -109,7 +113,7 @@ class MemcacheTest extends PHPUnit_Framework_TestCase
     }
 
     /**
-     * @dataProvider dataProvideinit2  
+     * @dataProvider dataProvideinit2
      * @expectedException  Tox\Data\Kv\MemcacheConfigNotArrayException
      */
     public function testinitWithServerConfigIsError($config, $compressionstat, $field)
@@ -141,8 +145,11 @@ class MemcacheTest extends PHPUnit_Framework_TestCase
                 ->getMock();
         $o_mockMemcache->Expects($this->any())
                 ->method('addServer')
-                ->will($this->returnValue(true
-                        ));
+                ->will(
+                    $this->returnValue(
+                        true
+                    )
+                );
 
         $o_mem2 = $this->getMockBuilder('Tox\\Data\\Kv\\Memcache')
                 ->setMethods(array('defaultMemcache'))
@@ -300,10 +307,11 @@ class MemcacheTest extends PHPUnit_Framework_TestCase
             ),
         );
     }
+
     /**
      * @dataProvider dataProvideDefaultMemcached
      */
-    public function testDefaultMemcached($config,$compressionstat,$field)
+    public function testDefaultMemcached($config, $compressionstat, $field)
     {
         $o_mockMemcached = $this->getMockBuilder('Memcached')
                 ->getMock();
@@ -315,11 +323,9 @@ class MemcacheTest extends PHPUnit_Framework_TestCase
         $o_mem2->setServers($config);
         $o_mem2->__construct($field);
         $o_mem2->setCompression($compressionstat);
-        $z =$o_mem2->defaultMemcached();
-     //   var_dump($z);die;
+        $z = $o_mem2->defaultMemcached();
+        //   var_dump($z);die;
         $this->assertTrue(true);
-        
-        
     }
 
     public function dataProvideDefaultMemcached()
@@ -393,6 +399,7 @@ class MemcacheTest extends PHPUnit_Framework_TestCase
             ),
         );
     }
+
     /**
      * @dataProvider configProvideSetValue
      * @depends testServerConfigset
@@ -683,11 +690,11 @@ class MemcacheTest extends PHPUnit_Framework_TestCase
     public function testSetCompression()
     {
         $this->o_mem->setCompression(false);
-        
+
         $this->assertFalse($this->o_mem->getCompression());
         $this->o_mem->setCompression(true);
-        
-         $this->assertTrue($this->o_mem->getCompression());
+
+        $this->assertTrue($this->o_mem->getCompression());
     }
 
     /**
@@ -699,10 +706,6 @@ class MemcacheTest extends PHPUnit_Framework_TestCase
         $this->o_mem->setExpireTime(555);
         $this->assertEquals(555, $this->o_mem->getExpireTime());
     }
-
-
-
-  
 
     /**
      * @dataProvider configProvideSetValue2
@@ -819,7 +822,10 @@ class MemcacheTest extends PHPUnit_Framework_TestCase
                         ),
                     )
                 ),
-                'keysdjfoasjdfioasd;fncv;zjoidfj;ajfijfs;kjbiasjiui3ij;fladfj;kjasoifu[apjf ;jdfoijaugfij;ajgodiuf;ajkfjdfjaoi;jefkdjasp;ifjaoijkljafkldjoaisfje;lija;dkjfkja;iej;fkjdaksjfi;ldaifje;kj;lsjkdfjijuiag;kjadksfjiej;asljfkdjskljdfkdajsfkljasijef;jdakfjkljadfl;jakfjdl',
+                'keysdjfoasjdfioasd;fncv;zjoidfj;ajfijfs;kjbiasjiui3ij;fladfj;kja
+                    soifu[apjf ;jdfoijaugfij;ajgodiuf;ajkfjdfjaoi;jefkdjasp;ifjaoijkljafkldjoaisfje
+                    ;lija;dkjfkja;iej;fkjdaksjfi;ldaifje;kj;lsjkdf
+                    jijuiag;kjadksfjiej;asljfkdjskljdfkdajsfkljasijef;jdakfjkljadfl;jakfjdl',
                 'ssss', 500),
         );
     }
@@ -927,7 +933,6 @@ class MemcacheTest extends PHPUnit_Framework_TestCase
             )
         );
     }
-
 }
 
 class SubMem extends KV\Memcache
@@ -968,11 +973,11 @@ class SubMem extends KV\Memcache
     {
         return parent::defaultMemcache();
     }
+
     public function defaultMemcached()
     {
         return parent::defaultMemcached();
     }
-
 }
 
 // vi:ft=php fenc=utf-8 ff=unix ts=4 sts=4 et sw=4 fen fdm=indent fdl=1 tw=120
