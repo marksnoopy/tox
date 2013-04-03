@@ -5,23 +5,39 @@ It is very expected and appriciated to contribute your intelligence on [**ISSUIN
 
 These valuable works make our lives easier by reporting bugs through [issues](../../issues) and sending your contributions through [pull requests](../../pulls).
 
+TOC
+---
+
+* [Issuing](#issuing)
+    1. [For Bugs Reports](#issuing-bugs-reports)
+    1. [For Features Requests](#issuing-features-requests)
+* [Implementing](#implementing)
+    1. [Commits Security](#implementing-commits-security)
+    1. [Semi-Auto Building](#implementing-semi-auto-building)
+    1. [Dependences](#implementing-dependences)
+    1. [Coding Standard](#implementing-coding-standard)
+    1. [Messes Detection](#implementing-messes-detection)
+    1. [Unit Testing](#implementing-unit-testing)
+    1. [Documentation](#implementing-documentation)
+    1. [Auto Integration](#implementing-auto-integration)
+
 <a name="issuing"></a>ISSUING
 -----------------------------
 
 Bugs reports and features requests are both welcomed. One make our work more trusty. And the other make us grown up faster and stronger.
 
-### For Bugs Reports ###
+### <a name="issuing-bugs-reports"></a>For Bugs Reports ###
 
-It is advised to give us a briefing on the title, and the bug context in the main content. *See [this example](../../issues/39) for more visualized details (Thanks to [**@redrum0003**](/redrum0003) for his pretty bug report).*
+It is advised to give us a briefing on the title, and the bug context in the main content. *See [this example](../../issues/39) for more visualized details (Thanks to [**@redrum0003**](https://github.com/redrum0003) for his pretty bug report).*
 
-### For Features Requests ###
+### <a name="issuing-features-requests"></a>For Features Requests ###
 
 For our semantization purpose, the imagined sample codes of the request feature are highly expected.
 
 <a name="implementing"></a>IMPLEMENTING
 ---------------------------------------
 
-### 0 Commits Security ###
+### <a name="implementing-commits-security"></a>0 Commits Security ###
 
 For more reliability, Tox requests all later commits *MUST* have signed with the contributor's [**GPG**][GnuPG] key since the version [0.1.0-beta1](../../tree/0.1.0-beta1) released.
 
@@ -29,11 +45,11 @@ For more reliability, Tox requests all later commits *MUST* have signed with the
 
 Your [GPG][GnuPG] key *WOULD* be signed by the official [GPG][GnuPG] key `ED417AB8` after an approved source contribution.
 
-### I Semi-Auto Building ###
+### <a name="implementing-semi-auto-building"></a>I Semi-Auto Building ###
 
 For focusing on developing, a semi-auto building toolkit was made with [**Ant**][Ant].
 
-We hope that would make your work simpler on syntax checking, [coding standard validating](#implementing-coding-standard), [mess detecting](#implementing-messes-detection), [unit tesing](#implementing-unit-testing) and a full combined progress of each task before.
+We hope that would make your work simpler on syntax checking, [coding standard validating (3)](#implementing-coding-standard), [mess detecting (4)](#implementing-messes-detection), [unit tesing (5)](#implementing-unit-testing) and [a full combined progress of each task before (10)](#implementing-auto-integration).
 
 For more details, try the following command in your root working directory.
 
@@ -49,7 +65,7 @@ To customize the executable commands of utilities, you *SHOULD* create a Java pr
 * `bin.phpmd` - `bin/phpmd` defaults
 * `bin.phpunit` - `bin/phpunit` defaults
 
-### II Dependences ###
+### <a name="implementing-dependences"></a>II Dependences ###
 
 [**Composer**][Composer] is chosen to manage above developing utilities. The installation and upgrading progresses have already integrated into the semi-auto building toolkit.
 
@@ -89,7 +105,7 @@ The default configuration [`etc/phpunit.xml`](etc/phpunit.xml) *WOULD* make [PHP
 
 *You can copy it to the root working directory and disable the `processIsolation` mode to run tests quite faster. However, DO NOT forget to modify the paths of source codes and outputting reports.*
 
-### VI Documentation ###
+### <a name="implementing-documentation"></a>VI Documentation ###
 
 Tox uses [**phpDocumentor2**][phpDocumentor2] to generate the SDK documentation from PHPDocs.
 
@@ -99,6 +115,16 @@ The generated documentation can be found in the directory `build/sdk`.
 
 *For more information, see the default [phpDocumentor2][] configuration [`etc/phpdoc.xml`](etc/phpdoc.xml).*
 
+### <a name="implementing-auto-integration"></a>X Auto Integration ###
+
+Thanks to [**Travis-CI**][Travis-CI], Tox COULD keep its quality easily without any hand-work.
+
+The task *WOULD* be run in [Travis-CI][] is:
+
+    ant
+
+So, you *SHOULD* do it by hand before pulling requests to ensure those qualities.
+
 [GnuPG]: http://gnupg.org
 [Ant]: http://ant.apache.org
 [Composer]: http://getcomposer.org
@@ -107,3 +133,4 @@ The generated documentation can be found in the directory `build/sdk`.
 [PHPMD]: http://phpmd.org
 [PHPUnit]: https://github.com/sebastianbergmann/phpunit
 [phpDocumentor2]: https://github.com/phpDocumentor/phpDocumentor2
+[Travis-CI]: https://travis-ci.org
