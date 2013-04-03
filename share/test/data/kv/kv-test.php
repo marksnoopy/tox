@@ -64,6 +64,84 @@ class KvTest extends PHPUnit_Framework_TestCase
         $this->assertEquals($result, $o_mockKv->set($key, $value, $expire));
     }
 
+    public function testIncrease()
+    {
+        $o_mockKv = $this->getMockBuilder('Tox\\Data\\Kv\\kv')
+                ->getMockForAbstractClass();
+
+        $o_mockKv->expects($this->any())
+                ->method('increase')
+                ->with($this->equalTo('aaa'))
+                ->will($this->returnValue(false));
+
+        $this->assertFalse($o_mockKv->increase('aaa'));
+    }
+
+    public function testDecrease()
+    {
+        $o_mockKv = $this->getMockBuilder('Tox\\Data\\Kv\\kv')
+                ->getMockForAbstractClass();
+
+        $o_mockKv->expects($this->any())
+                ->method('decrease')
+                ->with($this->equalTo('aaa'))
+                ->will($this->returnValue(false));
+
+        $this->assertFalse($o_mockKv->decrease('aaa'));
+    }
+
+    public function testPush()
+    {
+        $o_mockKv = $this->getMockBuilder('Tox\\Data\\Kv\\kv')
+                ->getMockForAbstractClass();
+
+        $o_mockKv->expects($this->any())
+                ->method('push')
+                ->with($this->equalTo('aaa'))
+                ->will($this->returnValue(false));
+
+        $this->assertFalse($o_mockKv->push('aaa'));
+    }
+
+    public function testPop()
+    {
+        $o_mockKv = $this->getMockBuilder('Tox\\Data\\Kv\\kv')
+                ->getMockForAbstractClass();
+
+        $o_mockKv->expects($this->any())
+                ->method('pop')
+                ->with($this->equalTo('aaa'))
+                ->will($this->returnValue(false));
+
+        $this->assertFalse($o_mockKv->pop('aaa'));
+    }
+
+    public function testShift()
+    {
+        $o_mockKv = $this->getMockBuilder('Tox\\Data\\Kv\\kv')
+                ->getMockForAbstractClass();
+
+        $o_mockKv->expects($this->any())
+                ->method('shift')
+                ->with($this->equalTo('aaa'))
+                ->will($this->returnValue(false));
+
+        $this->assertFalse($o_mockKv->shift('aaa'));
+    }
+
+    public function testUnShift()
+    {
+        $o_mockKv = $this->getMockBuilder('Tox\\Data\\Kv\\kv')
+                ->getMockForAbstractClass();
+
+        $o_mockKv->expects($this->any())
+                ->method('unshift')
+                ->with($this->equalTo('aaa'))
+                ->will($this->returnValue(false));
+
+        $this->assertFalse($o_mockKv->unshift('aaa'));
+    }
+
     /**
      * @dataProvider dataProvider
      * @depends testSetting
@@ -134,7 +212,6 @@ class KvTest extends PHPUnit_Framework_TestCase
         $this->assertEquals(false, $o_mockKv->clear());
     }
 
-
     public function dataProvider()
     {
         return array(
@@ -183,14 +260,14 @@ class KvTest extends PHPUnit_Framework_TestCase
     {
 
         $o_mockKv = $this->getMockBuilder('Tox\\Data\\Kv\\kv')
-            ->getMockForAbstractClass();
+                ->getMockForAbstractClass();
         $o_mockKv->expects($this->any())
-            ->method('setValue')
-            ->with(
-                $this->equalTo(md5($prefixString . $key)),
-                $this->equalTo(serialize(array($value))),
-                $this->equalTo($expire)
-            );
+                ->method('setValue')
+                ->with(
+                    $this->equalTo(md5($prefixString . $key)),
+                    $this->equalTo(serialize(array($value))),
+                    $this->equalTo($expire)
+                );
 
         $o_mockKv[$key] = $value;
     }

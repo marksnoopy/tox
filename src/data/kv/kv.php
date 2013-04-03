@@ -170,6 +170,7 @@ abstract class KV extends Tox\Core\Assembly implements Tox\Data\IKV
     public function increase($key)
     {
         //ToDo
+        return false;
     }
 
     /**
@@ -184,6 +185,7 @@ abstract class KV extends Tox\Core\Assembly implements Tox\Data\IKV
     public function decrease($key)
     {
         //todo
+        return false;
     }
 
     /**
@@ -195,6 +197,7 @@ abstract class KV extends Tox\Core\Assembly implements Tox\Data\IKV
     public function push($key)
     {
         //todo
+        return false;
     }
 
     /**
@@ -206,6 +209,7 @@ abstract class KV extends Tox\Core\Assembly implements Tox\Data\IKV
     public function pop($key)
     {
         //todo
+        return false;
     }
 
     /**
@@ -217,6 +221,7 @@ abstract class KV extends Tox\Core\Assembly implements Tox\Data\IKV
     public function shift($key)
     {
         //todo
+        return false;
     }
 
     /**
@@ -228,6 +233,7 @@ abstract class KV extends Tox\Core\Assembly implements Tox\Data\IKV
     public function unshift($key)
     {
         //todo
+        return false;
     }
 
     /**
