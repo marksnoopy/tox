@@ -34,6 +34,20 @@
   <filter>
     <whitelist addUncoveredFilesFromWhitelist="true">
       <directory suffix=".php">../src</directory>
+      <exclude>
+        <directory suffix="exception.php">../src</directory>
+        <directory>../src/application/@exception</directory>
+        <directory>../src/application/configuration/@exception</directory>
+        <directory>../src/application/dao/cache/@exception</directory>
+        <directory>../src/application/model/@exception</directory>
+        <directory>../src/application/output/@exception</directory>
+        <directory>../src/application/router/@exception</directory>
+        <directory>../src/core/@exception</directory>
+        <directory>../src/data/kv/@exception</directory>
+        <directory>../src/type/@exception</directory>
+        <directory>../src/web/@exception</directory>
+        <directory>../src/web/response/@exception</directory>
+      </exclude>
     </whitelist>
   </filter>
   <logging>
