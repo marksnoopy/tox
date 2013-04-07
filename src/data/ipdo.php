@@ -17,7 +17,7 @@
  * You should have received a copy of the GNU General Public License
  * along with Tox.  If not, see <http://www.gnu.org/licenses/>.
  *
- * @copyright © 2012-2013 SZen.in
+ * @copyright © 2012-2013 PHP-Tox.org
  * @license   GNU General Public License, version 3
  */
 
@@ -32,7 +32,7 @@ use PDO as PHPPdo;
  * @author  Snakevil Zen <zsnakevil@gmail.com>
  * @since   0.1.0-beta1
  */
-interface IPdo extends ISource, IPartition
+interface IPdo extends ISource
 {
     /**
      * Represents a boolean data type.
@@ -595,6 +595,13 @@ interface IPdo extends ISource, IPartition
     const PARAM_EVT_NORMALIZE = PHPPdo::PARAM_EVT_NORMALIZE;
 
     /**
+     * Use buffered queries.
+     *
+     * @var int
+     */
+    const MYSQL_ATTR_USE_BUFFERED_QUERY = PHPPdo::MYSQL_ATTR_USE_BUFFERED_QUERY;
+
+    /**
      * Initiates a transaction.
      *
      * @return bool
@@ -667,6 +674,14 @@ interface IPdo extends ISource, IPartition
     public function query($statement);
 
     /**
+     * Realizes a statement to a PHP statement object.
+     *
+     * @param  IPdoStatement $stmt Statement.
+     * @return \PDOStatement
+     */
+    public function realize(IPdoStatement $stmt);
+
+    /**
      * Quotes a string for use in a query.
      *
      * @param  string $string    The string to be quoted.
@@ -685,11 +700,39 @@ interface IPdo extends ISource, IPartition
 
     /**
      * Set an attribute.
+     *
      * @param  const $attribute Attribute name.
      * @param  mixed $value     New value.
      * @return bool
      */
     public function setAttribute($attribute, $value);
+
+    /**
+     * Retrieves the data source name.
+     *
+     * @return string
+     */
+    public function getDsn();
+
+    /**
+     * Retrieves the account name.
+     *
+     * @return string
+     */
+    public function getUsername();
+
+    /**
+     * Retrieve a data object to the specified data source.
+     *
+     * @param  string $dsn           Data source name.
+     * @param  string $username      OPTIONAL. User name to communicate the data
+     *                               source.
+     * @param  string $password      OPTIONAL. Password to communicate the data
+     *                               source.
+     * @param  array  $driverOptions OPTIONAL. Connection options.
+     * @return self
+     */
+    public static function getInstance($dsn, $username = '', $password = '', $driverOptions = array());
 }
 
 // vi:ft=php fenc=utf-8 ff=unix ts=4 sts=4 et sw=4 fen fdm=indent fdl=1 tw=120

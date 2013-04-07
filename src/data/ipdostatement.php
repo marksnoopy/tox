@@ -30,11 +30,35 @@ namespace Tox\Data;
  * @author  Snakevil Zen <zsnakevil@gmail.com>
  * @since   0.1.0-beta1
  */
-interface IStatement
+interface IPdoStatement
 {
+    /**
+     * Represents a statement by `Tox\Data\IPdo::prepare()`.
+     *
+     * @var string
+     */
     const TYPE_PREPARE = 'prepare';
 
+    /**
+     * Represents a statement by `Tox\Data\IPdo::query()`.
+     *
+     * @var string
+     */
     const TYPE_QUERY = 'query';
+
+    /**
+     * Retrieves the unique identifier.
+     *
+     * @return string
+     */
+    public function getId();
+
+    /**
+     * Retrieves the type.
+     *
+     * @return const
+     */
+    public function getType();
 
     /**
      * Bind a column to a PHP variable.
@@ -116,7 +140,13 @@ interface IStatement
      */
     public function columnCount();
 
-    public function __construct(IPdo $pdo, $type, ISql $queryString, $driverOptions = array());
+    /**
+     * CONSTRUCT FUNCTION
+     * @param IPdo   $pdo  Hosting data object.
+     * @param const  $type Type
+     * @param string $sql  Statement SQL.
+     */
+    public function __construct(IPdo $pdo, $type, $sql);
 
     /**
      * Dump an SQL prepared command.
