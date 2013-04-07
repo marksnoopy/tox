@@ -1,6 +1,6 @@
 <?php
 /**
- * Represents as an improved PDO.
+ * Defines the extended PHP data object.
  *
  * This file is part of Tox.
  *
@@ -17,11 +17,8 @@
  * You should have received a copy of the GNU General Public License
  * along with Tox.  If not, see <http://www.gnu.org/licenses/>.
  *
- * @package    Tox
- * @subpackage Tox\Data
- * @author     Snakevil Zen <zsnakevil@gmail.com>
- * @copyright  © 2012 szen.in
- * @license    http://www.gnu.org/licenses/gpl.html
+ * @copyright © 2012-2013 PHP-Tox.org
+ * @license   GNU General Public License, version 3
  */
 
 namespace Tox\Data\Pdo;
@@ -31,101 +28,189 @@ use PDO as PHPPdo;
 use Tox\Core;
 use Tox\Data;
 
+/**
+ * Represents as an extended PHP data object.
+ *
+ * __*ALIAS*__ as `Tox\Data\Pdo`.
+ *
+ * @package tox.data.pdo
+ * @author  Snakevil Zen <zsnakevil@gmail.com>
+ * @since   0.1.0-beta1
+ */
 class Pdo extends Core\Assembly implements Data\IPdo
 {
+    /**
+     * Stores the data source name.
+     *
+     * @var string
+     */
     protected $dsn;
 
+    /**
+     * Stores the instances.
+     *
+     * @var Pdo[]
+     */
     protected static $instances;
 
+    /**
+     * Stores the connection options.
+     *
+     * @var mixed[]
+     */
     protected $options;
 
-    protected $partitions;
-
+    /**
+     * Stores the user password to communicate the data source.
+     *
+     * @var string
+     */
     protected $password;
 
+    /**
+     * Stores the PHP data object.
+     *
+     * @var PHPPdo
+     */
     protected $pdo;
 
+    /**
+     * Stores the seed to generate connection ID.
+     *
+     * @var string
+     */
     protected static $seed;
 
-    protected $statementMetas;
+    /**
+     * Stores the status of whether in a transaction.
+     *
+     * @var bool
+     */
+    protected $inTransaction;
 
-    protected $tables;
-
-    protected $transaction;
-
+    /**
+     * Stores the username to communicate the data source.
+     *
+     * @var string
+     */
     protected $username;
 
+    /**
+     * Stores the statements options.
+     *
+     * @var array[]
+     */
+    protected $stmtOptions;
+
+    /**
+     * {@inheritdoc}
+     *
+     * @return bool
+     */
     public function beginTransaction()
     {
-        if ($this->connect()->beginTransaction())
-        {
-            $this->transaction = TRUE;
+        if ($this->inTransaction) {
+            throw new NestedTransactionUnsupportedException;
         }
-        return TRUE;
+        $this->inTransaction = true;
+        if (!$this->isConnected()) {
+            return true;
+        }
+        return $this->pdo->beginTransaction();
     }
 
+    /**
+     * {@inheritdoc}
+     *
+     * @return bool
+     */
     public function commit()
     {
-        if (!$this->transaction)
-        {
-            return FALSE;
+        if (!$this->inTransaction) {
+            throw new NoActiveTransactionException;
         }
-        if ($this->connect()->commit())
-        {
-            $this->transaction = FALSE;
+        $this->inTransaction = false;
+        if (!$this->isConnected()) {
+            return true;
         }
-        return TRUE;
+        return $this->pdo->commit();
     }
 
+    /**
+     * Generates a real PHP data object.
+     *
+     * @return PHPPdo
+     */
+    protected function newPHPPdo()
+    {
+        return new PHPPdo($this->dsn, $this->username, $this->password, $this->options);
+    }
+
+    /**
+     * Connects to the data source.
+     *
+     * @return PHPPdo
+     */
     protected function connect()
     {
-        if (!$this->connected())
+        if (!$this->isConnected())
         {
-            $this->pdo = new PHPPdo($this->dsn, $this->username, $this->password, $this->options);
-            $s_func = 'on' . $this->pdo->getAttribute(PHPPdo::ATTR_DRIVER_NAME) . 'Connected';
-            if (!method_exists($this, $s_func))
-            {
-                throw new UnsupportedDriverToListTablesException(array('driver' => substr($s_func, 2, -9)));
-            }
-            $this->tables = $this->$s_func();
-            if (!is_array($this->tables) || empty($this->tables))
-            {
-                throw new EmptyDataSourceException(array('source' => $this->dsn));
+            $this->pdo = $this->newPHPPdo();
+            if ($this->inTransaction) {
+                $this->pdo->beginTransaction();
             }
         }
         return $this->pdo;
     }
 
-    public function connected()
+    /**
+     * Checks whether connected to the data source.
+     *
+     * @return bool
+     */
+    final public function isConnected()
     {
-        return $this->pdo instanceof PHPPdo;
+        return $this->pdo instanceof PHPPdo || $this->pdo instanceof Data\IPdo;
     }
 
-    protected function __construct($dsn, $username, $password, $driver_options)
+    /**
+     * CONSTRUCT FUNCTION
+     *
+     * @param string $dsn           Data source name.
+     * @param string $username      User name to communicate the data source.
+     * @param string $password      Password to communicate the data source.
+     * @param array  $driverOptions Connection options.
+     */
+    protected function __construct($dsn, $username, $password, $driverOptions)
     {
-        settype($dsn, 'string');
-        settype($username, 'string');
-        settype($password, 'string');
-        settype($driver_options, 'array');
         $this->dsn = $dsn;
-        $this->options = $driver_options;
+        $this->password = $password;
+        $this->username = $username;
+        $this->options = $driverOptions;
         $this->options[static::ATTR_CASE] = static::CASE_NATURAL;
         $this->options[static::ATTR_ERRMODE] = static::ERRMODE_EXCEPTION;
         $this->options[static::ATTR_DEFAULT_FETCH_MODE] = static::FETCH_ASSOC;
-        $this->partitions =
-        $this->statementMetas = array();
-        $this->password = $password;
-        $this->transaction = FALSE;
-        $this->username = $username;
+        $this->inTransaction = false;
+        $this->stmtOptions = array();
     }
 
-    public function exec($statement, $partitions = array())
+    /**
+     * {@inheritdoc}
+     *
+     * @param  string $statement SQL statement.
+     * @return int
+     */
+    public function exec($statement)
     {
-        settype($partitions, 'array');
-        $o_sql = $statement instanceof Sql ? $statement : new Sql($statement);
-        return $this->connect()->exec($o_sql->identifyPartitions($this, $partitions));
+        return $this->connect()->exec($statement);
     }
 
+    /**
+     * {@inheritdoc}
+     *
+     * @param  const $attribute Attribute name.
+     * @return mixed
+     */
     public function getAttribute($attribute)
     {
         if (array_key_exists($attribute, $this->options))
@@ -135,20 +220,77 @@ class Pdo extends Core\Assembly implements Data\IPdo
         return $this->connect()->getAttribute($attribute);
     }
 
+    /**
+     * {@inheritdoc}
+     *
+     * @return string[]
+     */
     public static function getAvailableDrivers()
     {
         return PHPPdo::getAvailableDrivers();
     }
 
-    protected function __getDsn()
+    /**
+     * {@inheritdoc}
+     *
+     * @return string
+     */
+    public function getDsn()
     {
         return $this->dsn;
     }
 
-    public static function getInstance($dsn, $username = '', $password = '', $driver_options = array())
+    /**
+     * Be invoked on retrieving the data source name.
+     *
+     * **THIS METHOD CANNOT BE OVERRIDDEN.**
+     *
+     * @internal
+     *
+     * @return string
+     */
+    final protected function toxGetDsn()
     {
-        settype($dsn, 'string');
-        settype($username, 'string');
+        return $this->getDsn();
+    }
+
+    /**
+     * {@inheritdoc}
+     *
+     * @return string
+     */
+    public function getUsername()
+    {
+        return $this->username;
+    }
+
+    /**
+     * Be invoked on retrieving the username.
+     *
+     * **THIS METHOD CANNOT BE OVERRIDDEN.**
+     *
+     * @internal
+     *
+     * @return string
+     */
+    final protected function toxGetUsername()
+    {
+        return $this->getUsername();
+    }
+
+    /**
+     * {@inheritdoc}
+     *
+     * @param  string $dsn           Data source name.
+     * @param  string $username      OPTIONAL. User name to communicate the data
+     *                               source.
+     * @param  string $password      OPTIONAL. Password to communicate the data
+     *                               source.
+     * @param  array  $driverOptions OPTIONAL. Connection options.
+     * @return self
+     */
+    public static function getInstance($dsn, $username = '', $password = '', $driverOptions = array())
+    {
         if (!is_array(static::$instances))
         {
             static::$seed = microtime();
@@ -157,130 +299,135 @@ class Pdo extends Core\Assembly implements Data\IPdo
         $s_id = sha1($dsn . static::$seed . $username);
         if (!array_key_exists($s_id, static::$instances))
         {
-            static::$instances[$s_id] = new static($dsn, $username, $password, $driver_options);
+            static::$instances[$s_id] = new static(
+                (string) $dsn,
+                (string) $username,
+                (string) $password,
+                (array) $driverOptions
+            );
         }
         return static::$instances[$s_id];
     }
 
-    protected function __getPartitions()
-    {
-        return $this->partitions;
-    }
-
-    protected function __getTables()
-    {
-        return $this->tables;
-    }
-
-    protected function __getUsername()
-    {
-        return $this->username;
-    }
-
-    public function identifyPartition($table, $id)
-    {
-        settype($table, 'string');
-        if (isset($this->partitions[$table]))
-        {
-            return call_user_func($this->partitions[$table], $table, $id);
-        }
-        return $table;
-    }
-
+    /**
+     * {@inheritdoc}
+     *
+     * @return bool
+     */
     public function inTransaction()
     {
-        if ($this->connected())
-        {
-            return $this->pdo->inTransaction();
-        }
-        return FALSE;
+        return $this->inTransaction;
     }
 
-    public function lastInsertId($name = NULL)
+    /**
+     * {@inheritdoc}
+     *
+     * @param  string $name OPTIONAL. Name of the sequence object from which the
+     *                      ID should be returned.
+     * @return string
+     */
+    public function lastInsertId($name = null)
     {
-        if ($this->connected())
+        if ($this->isConnected())
         {
             return $this->pdo->lastInsertId($name);
         }
         return '';
     }
 
-    protected function onMySqlConnected()
+    /**
+     * {@inheritdoc}
+     *
+     * @param  string    $sql           SQL statement.
+     * @param  array     $driverOptions OPTIONAL. Attribute values for the
+     *                                  `Tox\Data\Pdo\Statement` object. An
+     *                                  empty array defaults.
+     * @return Statement
+     */
+    public function prepare($sql, $driverOptions = array())
     {
-        $o_stmt = $this->pdo->query('SHOW TABLES');
-        $a_tables = $o_stmt->fetchAll(PHPPdo::FETCH_COLUMN, 0);
-        $o_stmt->closeCursor();
-        $this->pdo->exec('SET NAMES \'utf8\'');
-        return $a_tables;
-    }
-
-    protected function onSQLiteConnected()
-    {
-        $o_stmt = $this->pdo->query('SELECT `name` FROM `sqlite_master` WHERE `type` = \'table\' ORDER BY `name`');
-        $a_tables = $o_stmt->fetchAll(PHPPdo::FETCH_COLUMN, 0);
-        $o_stmt->closeCursor();
-        return $a_tables;
-    }
-
-    public function partitionTable($table, $method)
-    {
-        settype($table, 'string');
-        if (!is_callable($method))
-        {
-            throw new InvalidPartitionStrategyException(array('strategy' => $method));
-        }
-        $this->partitions[$table] = $method;
-        return $this;
-    }
-
-    public function prepare($statement, $partitions = array(), $driver_options = array())
-    {
-        if ($statement instanceof Statement)
-        {
-            $a_args = $this->statementMetas[$statement->id];
-            unset($this->statementMetas[$statement->id]);
-            return $this->connect()->prepare($statement, $a_args);
-        }
-        $o_sql = $statement instanceof Sql ? $statement : new Sql($statement);
-        $o_stmt = new Statement($this, Statement::TYPE_PREPARE, $o_sql->identifyPartitions($this, $partitions));
-        $this->statementMetas[$o_stmt->id] = $driver_options;
+        $o_stmt = $this->newStatement($sql, Data\IPdoStatement::TYPE_PREPARE);
+        $this->stmtOptions[$o_stmt->getId()] = $driverOptions;
         return $o_stmt;
     }
 
-    public function query($statement, $partitions = array())
+    /**
+     * Generates a statement object.
+     *
+     * @param  string    $sql  SQL statement.
+     * @param  const     $type Statement type.
+     * @return Statement
+     */
+    protected function newStatement($sql, $type)
     {
-        if ($statement instanceof Statement)
-        {
-            $a_args = $this->statementMetas[$statement->id];
-            unset($this->statementMetas[$statement->id]);
-            $a_args[0] = $statement;
-            return call_user_func_array(array($this->connect(), 'query'), $a_args);
+        return new Statement($this, $type, $sql);
+    }
+
+    /**
+     * {@inheritdoc}
+     *
+     * @param  string    $statement SQL statement.
+     * @return Statement
+     */
+    public function query($sql)
+    {
+        return $this->newStatement($sql, Data\IPdoStatement::TYPE_QUERY);
+    }
+
+    /**
+     * {@inheritdoc}
+     *
+     * @param  IPdoStatement $stmt Statement.
+     * @return \PDOStatement
+     */
+    public function realize(Data\IPdoStatement $stmt)
+    {
+        if (Data\IPdoStatement::TYPE_PREPARE == $stmt->getType()) {
+            $options = isset($this->stmtOptions[$stmt->getId()]) ?
+                $this->stmtOptions[$stmt->getId()] :
+                array();
+            return $this->connect()->prepare($stmt, $options);
         }
-        $o_sql = $statement instanceof Sql ? $statement : new Sql($statement);
-        $o_stmt = new Statement($this, Statement::TYPE_QUERY, $o_sql->identifyPartitions($this, $partitions));
-        $this->statementMetas[$o_stmt->id] = func_get_args();
-        array_splice($this->statementMetas[$o_stmt->id], 1, 1);
-        return $o_stmt;
+        return $this->connect()->query($stmt);
     }
 
-    public function quote($string, $parameter_type = self::PARAM_STR)
+    /**
+     * {@inheritdoc}
+     *
+     * @param  string $string    The string to be quoted.
+     * @param  const  $paramType OPTIONAL. Provides a data type hint for drivers
+     *                           that have alternate quoting styles.
+     * @return string
+     */
+    public function quote($string, $paramType = self::PARAM_STR)
     {
-        return $this->connect()->quote($string, $parameter_type);
+        return $this->connect()->quote($string, $paramType);
     }
 
+    /**
+     * {@inheritdoc}
+     *
+     * @return bool
+     */
     public function rollBack()
     {
-        if (!$this->connected())
-        {
+        if (!$this->inTransaction) {
             throw new NoActiveTransactionException;
         }
-        if ($this->connect()->rollBack())
-        {
-            $this->transaction = FALSE;
+        $this->inTransaction = false;
+        if (!$this->isConnected()) {
+            return true;
         }
-        return TRUE;
+        return $this->pdo->rollBack();
     }
 
+    /**
+     * {@inheritdoc}
+     *
+     * @param  const $attribute Attribute name.
+     * @param  mixed $value     New value.
+     * @return bool
+     */
     public function setAttribute($attribute, $value)
     {
         switch ($attribute)
@@ -288,7 +435,7 @@ class Pdo extends Core\Assembly implements Data\IPdo
             case static::ATTR_CASE:
             case static::ATTR_ERRMODE:
             case static::ATTR_DEFAULT_FETCH_MODE:
-                return TRUE;
+                return true;
             case static::ATTR_ORACLE_NULLS:
             case static::ATTR_STRINGIFY_FETCHES:
             case static::ATTR_STATEMENT_CLASS:
@@ -298,16 +445,21 @@ class Pdo extends Core\Assembly implements Data\IPdo
             case static::MYSQL_ATTR_USE_BUFFERED_QUERY:
                 break;
             default:
-                return FALSE;
+                return false;
         }
         $this->options[$attribute] = $value;
-        if ($this->connected())
+        if ($this->isConnected())
         {
             $this->pdo->setAttribute($attribute, $value);
         }
-        return TRUE;
+        return true;
     }
 
+    /**
+     * Be invoked on string casting.
+     *
+     * @return string
+     */
     public function __toString()
     {
         $s_lob = get_class($this) . ':';
@@ -319,4 +471,4 @@ class Pdo extends Core\Assembly implements Data\IPdo
     }
 }
 
-// vi:se ft=php fenc=utf-8 ff=unix ts=4 sts=4 et sw=4 fen fdm=indent fdl=1 tw=120:
+// vi:ft=php fenc=utf-8 ff=unix ts=4 sts=4 et sw=4 fen fdm=indent fdl=1 tw=120

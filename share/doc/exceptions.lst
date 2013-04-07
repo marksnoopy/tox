@@ -67,7 +67,8 @@
 ;0x800400??
 
 [Tox\Data\Pdo]
-;0x800401??
+0x80040101 = NestedTransactionUnsupportedException
+0x80040102 = NoActiveTransactionException
 
 [Tox\Data\Kv]
 0x80040201 = EmptyHostException
