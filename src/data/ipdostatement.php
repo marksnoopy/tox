@@ -61,6 +61,13 @@ interface IPdoStatement
     public function getType();
 
     /**
+     * Retrieves the generator data object.
+     *
+     * @return IPdo
+     */
+    public function getPdo();
+
+    /**
      * Bind a column to a PHP variable.
      *
      * @param  mixed $column     Number of the column (1-indexed) or name of the

@@ -48,6 +48,7 @@
 ;0x800208??
 0x80020801 = DataSourceExpectedException
 0x80020802 = InvalidCachingDataDomainException
+0x80020803 = DismatchedStatementException
 
 [Tox\Application\Type]
 ;0x800209??

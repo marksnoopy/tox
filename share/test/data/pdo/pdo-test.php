@@ -33,6 +33,7 @@ require_once __DIR__ . '/../../../../src/data/pdo/pdo.php';
 require_once __DIR__ . '/../../../../src/core/exception.php';
 require_once __DIR__ . '/../../../../src/data/pdo/nestedtransactionunsupportedexception.php';
 require_once __DIR__ . '/../../../../src/data/pdo/noactivetransactionexception.php';
+require_once __DIR__ . '/../../../../src/data/pdo/dismatchedstatementexception.php';
 
 require_once __DIR__ . '/../../../../src/data/ipdostatement.php';
 
@@ -444,6 +445,8 @@ class PdoTest extends PHPUnit_Framework_TestCase
         );
         $o_stmt->expects($this->once())->method('getType')
             ->will($this->returnValue(Data\IPdoStatement::TYPE_PREPARE));
+        $o_stmt->expects($this->once())->method('getPdo')
+            ->will($this->returnValue($this->pdoMock));
         $this->pdo->expects($this->once())->method('prepare')
             ->with($this->equalTo($o_stmt), $this->equalTo(array()));
         $this->pdoMock->expects($this->once())->method('newPHPPdo')
@@ -461,10 +464,33 @@ class PdoTest extends PHPUnit_Framework_TestCase
         );
         $o_stmt->expects($this->once())->method('getType')
             ->will($this->returnValue(Data\IPdoStatement::TYPE_QUERY));
+        $o_stmt->expects($this->once())->method('getPdo')
+            ->will($this->returnValue($this->pdoMock));
         $this->pdo->expects($this->once())->method('query')
             ->with($this->equalTo($o_stmt));
         $this->pdoMock->expects($this->once())->method('newPHPPdo')
             ->will($this->returnValue($this->pdo));
+        $this->pdoMock->realize($o_stmt);
+    }
+
+    /**
+     * @expectedException Tox\Data\Pdo\DismatchedStatementException
+     */
+    public function testGeneratedStatementExpectedForRealizing()
+    {
+        $o_pdo = $this->getMock(
+            'Tox\\Data\\Pdo\\PdoStub',
+            array('newPHPPdo', 'newStatement'),
+            array($this->dsn, $this->username, $this->password, $this->options),
+            'c' . sha1(microtime())
+        );
+        $o_stmt = $this->getMock(
+            'Tox\\Data\\IPdoStatement',
+            array(),
+            array($o_pdo, Data\IPdoStatement::TYPE_QUERY, microtime())
+        );
+        $o_stmt->expects($this->once())->method('getPdo')
+            ->will($this->returnValue($o_pdo));
         $this->pdoMock->realize($o_stmt);
     }
 
