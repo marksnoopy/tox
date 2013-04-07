@@ -119,14 +119,14 @@ class DaoTest extends PHPUnit_Framework_TestCase
             ->with(
                 $this->equalTo($s_key),
                 $this->equalTo(array('id' => '111', 'title' => 'hello', 'description' => 'world')),
-                null
+                60
             );
         $o_mock_cache->expects($this->at(2))
             ->method('set')
             ->with(
                 $this->equalTo($s_key),
                 $this->equalTo(array('id' => '111', 'title' => 'new title', 'description' => 'bbb')),
-                null
+                60
             );
 
         $o_cache_dao = $this->getMockBuilder('Tox\\Application\\Dao\\Cache\\Dao')
@@ -136,6 +136,7 @@ class DaoTest extends PHPUnit_Framework_TestCase
         $o_cache_dao::bindDomain($o_mock_cache);
         $o_cache_dao::getInstance();
         $o_cache_dao->bind($o_mock_dao);
+        $o_cache_dao->setExpire(60);
 
         $o_cache_dao->create(array('title' => 'hello', 'description' => 'world'));
         $o_cache_dao->update('111', array('title' => 'new title'));
