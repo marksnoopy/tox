@@ -36,6 +36,9 @@ use Tox\Data;
  * @package tox.data.pdo
  * @author  Snakevil Zen <zsnakevil@gmail.com>
  * @since   0.1.0-beta1
+ *
+ * @SuppressWarnings(PHPMD.TooManyMethods)
+ * @SuppressWarnings(PHPMD.CouplingBetweenObjects)
  */
 class Pdo extends Core\Assembly implements Data\IPdo
 {
@@ -103,6 +106,23 @@ class Pdo extends Core\Assembly implements Data\IPdo
     protected $stmtOptions;
 
     /**
+     * Calls the real PHP data object if connected.
+     * @param  string  $method   Method name.
+     * @param  mixed   $defaults Defaults value which would be return if not
+     *                           connected.
+     * @param  mixed[] $args     OPTIONAL. Parameters to the method. An empty
+     *                           array defaults.
+     * @return mixed
+     */
+    protected function callOnDemand($method, $defaults, $args = array())
+    {
+        if (!$this->isConnected()) {
+            return $defaults;
+        }
+        return call_user_func_array(array($this->connect(), $method), $args);
+    }
+
+    /**
      * {@inheritdoc}
      *
      * @return bool
@@ -117,10 +137,7 @@ class Pdo extends Core\Assembly implements Data\IPdo
             throw new NestedTransactionUnsupportedException;
         }
         $this->inTransaction = true;
-        if (!$this->isConnected()) {
-            return true;
-        }
-        return $this->pdo->beginTransaction();
+        return $this->callOnDemand('beginTransaction', true);
     }
 
     /**
@@ -136,10 +153,7 @@ class Pdo extends Core\Assembly implements Data\IPdo
             throw new NoActiveTransactionException;
         }
         $this->inTransaction = false;
-        if (!$this->isConnected()) {
-            return true;
-        }
-        return $this->pdo->commit();
+        return $this->callOnDemand('commit', true);
     }
 
     /**
@@ -334,11 +348,7 @@ class Pdo extends Core\Assembly implements Data\IPdo
      */
     public function lastInsertId($name = null)
     {
-        if ($this->isConnected())
-        {
-            return $this->pdo->lastInsertId($name);
-        }
-        return '';
+        return $this->callOnDemand(__METHOD__, '', array($name));
     }
 
     /**
@@ -383,7 +393,7 @@ class Pdo extends Core\Assembly implements Data\IPdo
     /**
      * {@inheritdoc}
      *
-     * @param  IPdoStatement $stmt Statement.
+     * @param  Data\IPdoStatement $stmt Statement.
      * @return \PDOStatement
      *
      * @throws DismatchedStatementException If trying to realize a statement
@@ -430,10 +440,7 @@ class Pdo extends Core\Assembly implements Data\IPdo
             throw new NoActiveTransactionException;
         }
         $this->inTransaction = false;
-        if (!$this->isConnected()) {
-            return true;
-        }
-        return $this->pdo->rollBack();
+        return $this->callOnDemand('rollBack', true);
     }
 
     /**
@@ -442,6 +449,8 @@ class Pdo extends Core\Assembly implements Data\IPdo
      * @param  const $attribute Attribute name.
      * @param  mixed $value     New value.
      * @return bool
+     *
+     * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
     public function setAttribute($attribute, $value)
     {
@@ -463,11 +472,7 @@ class Pdo extends Core\Assembly implements Data\IPdo
                 return false;
         }
         $this->options[$attribute] = $value;
-        if ($this->isConnected())
-        {
-            $this->pdo->setAttribute($attribute, $value);
-        }
-        return true;
+        return $this->callOnDemand('setAttribute', true, array($attribute, $value));
     }
 
     /**
