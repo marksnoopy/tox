@@ -438,6 +438,7 @@ class PdoTest extends PHPUnit_Framework_TestCase
     public function testRealizingForPrepare()
     {
         $s_sql = microtime();
+        $a_opts = array(microtime());
         $o_stmt = $this->getMock(
             'Tox\\Data\\IPdoStatement',
             array(),
@@ -448,10 +449,12 @@ class PdoTest extends PHPUnit_Framework_TestCase
         $o_stmt->expects($this->once())->method('getPdo')
             ->will($this->returnValue($this->pdoMock));
         $this->pdo->expects($this->once())->method('prepare')
-            ->with($this->equalTo($o_stmt), $this->equalTo(array()));
+            ->with($this->equalTo($o_stmt), $this->equalTo($a_opts));
         $this->pdoMock->expects($this->once())->method('newPHPPdo')
             ->will($this->returnValue($this->pdo));
-        $this->pdoMock->realize($o_stmt);
+        $this->pdoMock->expects($this->once())->method('newStatement')
+            ->will($this->returnValue($o_stmt));
+        $this->pdoMock->realize($this->pdoMock->prepare($s_sql, $a_opts));
     }
 
     public function testRealizingForQuery()
