@@ -152,6 +152,7 @@ interface IPdoStatement extends Iterator, Countable
 
     /**
      * CONSTRUCT FUNCTION
+     *
      * @param IPdo   $pdo  Hosting data object.
      * @param const  $type Type
      * @param string $sql  Statement SQL.

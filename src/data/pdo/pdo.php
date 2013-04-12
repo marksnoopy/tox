@@ -107,6 +107,7 @@ class Pdo extends Core\Assembly implements Data\IPdo
 
     /**
      * Calls the real PHP data object if connected.
+     *
      * @param  string  $method   Method name.
      * @param  mixed   $defaults Defaults value which would be return if not
      *                           connected.
@@ -173,8 +174,7 @@ class Pdo extends Core\Assembly implements Data\IPdo
      */
     protected function connect()
     {
-        if (!$this->isConnected())
-        {
+        if (!$this->isConnected()) {
             $this->pdo = $this->newPHPPdo();
             if ($this->inTransaction) {
                 $this->pdo->beginTransaction();
@@ -233,8 +233,7 @@ class Pdo extends Core\Assembly implements Data\IPdo
      */
     public function getAttribute($attribute)
     {
-        if (array_key_exists($attribute, $this->options))
-        {
+        if (array_key_exists($attribute, $this->options)) {
             return $this->options[$attribute];
         }
         return $this->connect()->getAttribute($attribute);
@@ -311,14 +310,12 @@ class Pdo extends Core\Assembly implements Data\IPdo
      */
     public static function getInstance($dsn, $username = '', $password = '', $driverOptions = array())
     {
-        if (!is_array(static::$instances))
-        {
+        if (!is_array(static::$instances)) {
             static::$seed = microtime();
             static::$instances = array();
         }
         $s_id = sha1($dsn . static::$seed . $username);
-        if (!array_key_exists($s_id, static::$instances))
-        {
+        if (!array_key_exists($s_id, static::$instances)) {
             static::$instances[$s_id] = new static(
                 (string) $dsn,
                 (string) $username,
@@ -483,8 +480,7 @@ class Pdo extends Core\Assembly implements Data\IPdo
     public function __toString()
     {
         $s_lob = get_class($this) . ':';
-        if ($this->username)
-        {
+        if ($this->username) {
             $s_lob .= $this->username . '@';
         }
         return $s_lob . $this->dsn;

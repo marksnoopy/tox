@@ -70,6 +70,17 @@
 [Tox\Data\Pdo]
 0x80040101 = NestedTransactionUnsupportedException
 0x80040102 = NoActiveTransactionException
+0x80040103 = DismatchedStatementException
+0x80040104 = ClosedStatementException
+0x80040105 = ExecutingFailureException
+0x80040106 = ColumnBindingFailureException
+0x80040107 = ParamBindingFailureException
+0x80040108 = ValueBindingFailureException
+0x80040109 = CursorClosingFailureException
+0x8004010A = RowsetIteratingFailureException
+0x8004010B = AttributeSettingFailureException
+0x8004010C = FetchModeSettingFailureException
+0x8004010D = ExecutedStatementException
 
 [Tox\Data\Kv]
 0x80040201 = EmptyHostException

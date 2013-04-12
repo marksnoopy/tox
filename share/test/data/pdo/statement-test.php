@@ -145,8 +145,13 @@ class StatementTest extends PHPUnit_Framework_TestCase
         $f_val4 = 4 + microtime(true);
         $o_stmt1 = $this->getMock('Tox\\Data\\IPdoStatement');
         $o_stmt1->expects($this->once())->method('bindColumn')
-            ->with($this->equalTo($i_key), $this->equalTo($s_val1), $this->equalTo($i_val2), $this->equalTo($i_val3), $this->equalTo($f_val4))
-            ->will($this->returnValue(microtime()));
+            ->with(
+                $this->equalTo($i_key),
+                $this->equalTo($s_val1),
+                $this->equalTo($i_val2),
+                $this->equalTo($i_val3),
+                $this->equalTo($f_val4)
+            )->will($this->returnValue(microtime()));
         $this->pdo->expects($this->once())->method('realize')
             ->will($this->returnValue($o_stmt1));
         $o_stmt2 = $this->getMockForAbstractClass(
@@ -165,8 +170,13 @@ class StatementTest extends PHPUnit_Framework_TestCase
         $f_val4 = 4 + microtime(true);
         $o_stmt1 = $this->getMock('Tox\\Data\\IPdoStatement');
         $o_stmt1->expects($this->once())->method('bindParam')
-            ->with($this->equalTo($i_key), $this->equalTo($s_val1), $this->equalTo($i_val2), $this->equalTo($i_val3), $this->equalTo($f_val4))
-            ->will($this->returnValue(microtime()));
+            ->with(
+                $this->equalTo($i_key),
+                $this->equalTo($s_val1),
+                $this->equalTo($i_val2),
+                $this->equalTo($i_val3),
+                $this->equalTo($f_val4)
+            )->will($this->returnValue(microtime()));
         $this->pdo->expects($this->once())->method('realize')
             ->will($this->returnValue($o_stmt1));
         $o_stmt2 = $this->getMockForAbstractClass(
@@ -501,7 +511,7 @@ class StatementTest extends PHPUnit_Framework_TestCase
         $o_stmt1->expects($this->once())->method('setAttribute')
             ->with($this->equalTo($i_key2), $this->equalTo($f_val2));
         $o_stmt1->expects($this->once())->method('setFetchMode')
-            ->with($this->equalTo($f_val3));
+            ->with($this->equalTo(intval($f_val3)));
         $o_stmt1->expects($this->at(3))->method('execute');
         $o_stmt1->expects($this->at(4))->method('fetch');
         $this->pdo->expects($this->once())->method('realize')
