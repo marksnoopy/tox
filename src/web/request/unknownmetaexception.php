@@ -24,6 +24,7 @@
 namespace Tox\Web\Request;
 
 use Tox\Core;
+
 /**
  * the request key is not set.
  *

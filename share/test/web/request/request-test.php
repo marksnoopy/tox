@@ -129,7 +129,7 @@ class RequestTest extends PHPUnit_Framework_TestCase
                 break;
             case 'post':
                 $_POST[$key] = $value;
-                break;                        !cat
+                break;
             case 'server':
                 $_SERVER[$key] = $value;
                 break;
