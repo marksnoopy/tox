@@ -602,6 +602,13 @@ interface IPdo extends ISource
     const MYSQL_ATTR_USE_BUFFERED_QUERY = PHPPdo::MYSQL_ATTR_USE_BUFFERED_QUERY;
 
     /**
+     * Retrieves the unique identifier.
+     *
+     * @return string
+     */
+    public function getId();
+
+    /**
      * Initiates a transaction.
      *
      * @return bool

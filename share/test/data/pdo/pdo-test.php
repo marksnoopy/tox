@@ -168,6 +168,13 @@ class PdoTest extends PHPUnit_Framework_TestCase
         $this->assertNotSame($o_pdo3, $o_pdo4);
     }
 
+    public function testRetrievingId()
+    {
+        $this->assertNull($this->pdoMock->getId());
+        $o_pdo = PdoStub::getInstance($this->dsn);
+        $this->assertRegExp('@^[\\da-f]{40}$@i', $o_pdo->getId());
+    }
+
     public function testRetrievingDsn()
     {
         $this->assertEquals($this->dsn, $this->pdoMock->getDsn());
@@ -186,15 +193,18 @@ class PdoTest extends PHPUnit_Framework_TestCase
     {
         $o_pdoMock = $this->getMock(
             'Tox\\Data\\Pdo\\PdoStub',
-            array('newPHPPdo', 'newStatement', 'getDsn', 'getUsername'),
+            array('newPHPPdo', 'newStatement', 'getid', 'getDsn', 'getUsername'),
             array($this->dsn, $this->username, $this->password, $this->options),
             'c' . sha1(microtime())
         );
         $s_value = microtime();
+        $o_pdoMock->expects($this->once())->method('getId')
+            ->will($this->returnValue($s_value));
         $o_pdoMock->expects($this->once())->method('getDsn')
             ->will($this->returnValue($s_value));
         $o_pdoMock->expects($this->once())->method('getUsername')
             ->will($this->returnValue($s_value));
+        $this->assertEquals($s_value, $o_pdoMock->id);
         $this->assertEquals($s_value, $o_pdoMock->dsn);
         $this->assertEquals($s_value, $o_pdoMock->username);
     }

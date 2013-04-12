@@ -43,6 +43,13 @@ use Tox\Data;
 class Pdo extends Core\Assembly implements Data\IPdo
 {
     /**
+     * Stores the unique identifier of current instance.
+     *
+     * @var string
+     */
+    protected $id;
+
+    /**
      * Stores the data source name.
      *
      * @var string
@@ -254,6 +261,30 @@ class Pdo extends Core\Assembly implements Data\IPdo
      *
      * @return string
      */
+    public function getId()
+    {
+        return $this->id;
+    }
+
+    /**
+     * Be invoked on retrieving the unique identifier.
+     *
+     * **THIS METHOD CANNOT BE OVERRIDDEN.**
+     *
+     * @internal
+     *
+     * @return string
+     */
+    final protected function toxGetId()
+    {
+        return $this->getId();
+    }
+
+    /**
+     * {@inheritdoc}
+     *
+     * @return string
+     */
     public function getDsn()
     {
         return $this->dsn;
@@ -322,6 +353,7 @@ class Pdo extends Core\Assembly implements Data\IPdo
                 (string) $password,
                 (array) $driverOptions
             );
+            static::$instances[$s_id]->id = $s_id;
         }
         return static::$instances[$s_id];
     }
