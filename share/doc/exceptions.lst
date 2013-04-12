@@ -56,7 +56,7 @@
 ;0x800300??
 
 [Tox\Web\Request]
-;0x800301??
+0x80030101 = UnknownMetaException
 
 [Tox\Web\Response]
 0x80030201 = ResponseRequiredException

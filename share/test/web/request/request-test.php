@@ -21,21 +21,20 @@
  * @license   GNU General Public License, version 3
  */
 
-namespace Tox\Web;
+namespace Tox\Web\Request;
 
 use PHPUnit_Framework_TestCase;
 
-require_once __DIR__ . '/../../../src/core/assembly.php';
-require_once __DIR__ . '/../../../src/application/iinput.php';
-require_once __DIR__ . '/../../../src/web/irequest.php';
-require_once __DIR__ . '/../../../src/web/request.php';
-require_once __DIR__ . '/../../../src/application/itoken.php';
-require_once __DIR__ . '/../../../src/core/exception.php';
-require_once __DIR__ . '/../../../src/web/@exception/unknownrequestmeta.php';
+require_once __DIR__ . '/../../../../src/core/assembly.php';
+require_once __DIR__ . '/../../../../src/application/iinput.php';
+require_once __DIR__ . '/../../../../src/web/irequest.php';
+require_once __DIR__ . '/../../../../src/web/request/request.php';
+require_once __DIR__ . '/../../../../src/application/itoken.php';
+require_once __DIR__ . '/../../../../src/core/exception.php';
+require_once __DIR__ . '/../../../../src/web/request/unknownmetaexception.php';
 
 
 
-use Exception as PHPException;
 
 use Tox;
 
@@ -52,7 +51,8 @@ class RequestTest extends PHPUnit_Framework_TestCase
     /**
      * @dataProvider provideResetData
      */
-    public function testResetVariable($key, $value) {
+    public function testResetVariable($key, $value)
+    {
         $i_server = count($_SERVER);
         $_COOKIE[$key] = $_ENV[$key] = $_FILES[$key]
             = $_GET[$key] = $_POST[$key] = $_SERVER[$key] = $value;
@@ -62,7 +62,7 @@ class RequestTest extends PHPUnit_Framework_TestCase
         $this->assertEquals($_FILES, array($key=> $value));
         $this->assertEquals($_GET, array($key=> $value));
         $this->assertEquals($_POST, array($key=> $value));
-        $this->assertCount(($i_server +1) , $_SERVER);
+        $this->assertCount(($i_server +1), $_SERVER);
 
         $o_request = new Request;
 
@@ -78,7 +78,8 @@ class RequestTest extends PHPUnit_Framework_TestCase
      * @dataProvider provideSuccessVariableData
      * @depends testResetVariable
      */
-    public function testSuccessGetVariable($variable_type, $key, $value) {
+    public function testSuccessGetVariable($variable_type, $key, $value)
+    {
         switch ($variable_type) {
             case 'cookie':
                 $_COOKIE[$key] = $value;
@@ -103,19 +104,80 @@ class RequestTest extends PHPUnit_Framework_TestCase
 
     /**
      * @dataProvider provideErrorVariableData
+     * @expectedException Tox\Web\Request\UnknownMetaException
      */
-    public function testErrorGetVariable($key) {
+    public function testErrorGetVariable($key)
+    {
         $o_request = new Request;
-        try {
-            $o_request[$key];
-        } catch (Tox\Web\UnknownRequestMetaException $ex) {
-        }
+        $o_request[$key];
     }
 
     /**
      * @dataProvider provideSuccessVariableData
      */
-    public function testExistVariable($variable_type, $key, $value) {
+    public function testExistVariable($variable_type, $key, $value)
+    {
+        switch ($variable_type) {
+            case 'cookie':
+                $_COOKIE[$key] = $value;
+                break;
+            case 'env':
+                $_ENV[$key] = $value;
+                break;
+            case 'get':
+                $_GET[$key] = $value;
+                break;
+            case 'post':
+                $_POST[$key] = $value;
+                break;                        !cat
+            case 'server':
+                $_SERVER[$key] = $value;
+                break;
+        }
+        $o_request = new Request;
+        $this->assertTrue(isset($o_request[$variable_type. '.' .$key]));
+    }
+
+    /**
+     * @depends testResetVariable
+     */
+    public function testRoute()
+    {
+        $a_server = $_SERVER;
+        $o_token = $this->getMockForAbstractClass('Tox\\Application\\IToken');
+        $o_token->expects($this->once())->method('export');
+        $o_request = new Request;
+        $o_request->recruit($o_token);
+        foreach($a_server as $k=>$v) {
+            $this->assertEquals($a_server[$k], $o_request['server.' .strtolower($k)]);
+        }
+
+    }
+
+    /**
+     * @depends testResetVariable
+     */
+    public function testRawurldecode()
+    {
+        $_SERVER['request_uri'] = '你好';
+        $o_request = new Request;
+        $this->assertEquals(rawurldecode('你好'), $o_request->getCommandLine());
+    }
+
+    /**
+     * @dataProvider provideErrorVariableData
+     */
+    public function testNotExistVariable($key)
+    {
+        $o_request = new Request;
+        $this->assertFalse(isset($o_request[$key]));
+    }
+
+    /**
+     * @dataProvider provideSuccessVariableData
+     */
+    public function testUnsetVariable($variable_type, $key, $value)
+    {
         switch ($variable_type) {
             case 'cookie':
                 $_COOKIE[$key] = $value;
@@ -134,62 +196,40 @@ class RequestTest extends PHPUnit_Framework_TestCase
                 break;
         }
         $o_request = new Request;
-        $this->assertTrue(isset($o_request[$variable_type. '.' .$key]));
-    }
-
-    /**
-     * @depends testResetVariable
-     */
-    public function testRoute() {
-        $o_token = $this->getMockForAbstractClass('Tox\\Application\\IToken');
-        $o_token->expects($this->once())->method('export')->will($this->returnValue($o_token));
-        $o_request = new Request;
-        $o_request->recruit($o_token);
-    }
-
-    /**
-     * @depends testResetVariable
-     */
-    public function testRawurldecode() {
-        $_SERVER['request_uri'] = '你好';
-        $o_request = new Request;
-        $this->assertEquals(rawurldecode('你好'),$o_request->getCommandLine());
-    }
-
-    /**
-     * @dataProvider provideErrorVariableData
-     */
-    public function testNotExistVariable($key) {
-        $o_request = new Request;
-        $this->assertFalse(isset($o_request[$key]));
+        $o_request->offsetUnset($o_request[$variable_type. '.' .$key]);
+        $this->assertEquals($value, $o_request[$variable_type. '.' .$key]);
     }
 
     /**
      * @dataProvider provideResetData
+     * @expectedException Tox\Web\Request\UnknownMetaException
      */
-    public function testUnsetVariable($key, $value) {
+    public function testSetVariable($key, $value) {
         $o_request = new Request;
-        $o_request[$key] = $value;
-        unset($o_request[$key]);
+        $o_request->offsetSet($key, $value);
+        $o_request[$key];
     }
 
-    public function provideResetData() {
+    public function provideResetData()
+    {
         return array(
             array('testkey', 'testvalue'),
         );
     }
 
-    public function provideSuccessVariableData() {
+    public function provideSuccessVariableData()
+    {
         return array(
-            array('cookie', 'test1', 'test1'),
-            array('env', 'hostname', 'www.9apps.mobi'),
-            array('get', 'g1', 'g1'),
-            array('post', 'p1', 'p1'),
-            array('server', 's1', 's1'),
+            array('cookie', rand(1, 9), rand(1, 9)),
+            array('env',  rand(1, 9), rand(1, 9)),
+            array('get',  rand(1, 9), rand(1, 9)),
+            array('post',  rand(1, 9), rand(1, 9)),
+            array('server',  rand(1, 9), rand(1, 9)),
         );
     }
 
-    public function provideErrorVariableData() {
+    public function provideErrorVariableData()
+    {
         return array(
             array('cookies.errorkey'),
             array('env.error'),

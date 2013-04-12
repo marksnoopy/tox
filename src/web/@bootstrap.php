@@ -24,5 +24,6 @@
  */
 
 Tox::alias('Tox\\Web\\Response\\Response', 'Tox\\Web\\Response');
+Tox::alias('Tox\\Web\\Request\\Request', 'Tox\\Web\\Request');
 
 // vi:ft=php fenc=utf-8 ff=unix ts=4 sts=4 et sw=4 fen fdm=indent fdl=1 tw=120

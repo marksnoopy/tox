@@ -19,16 +19,17 @@
  *
  * @package   Tox\Web
  * @author    Snakevil Zen <zsnakevil@gmail.com>
- * @copyright © 2012 szen.in
+ * @copyright © 2012-2013 PHP-Tox.org
  * @license   http://www.gnu.org/licenses/gpl.html
  */
 
-namespace Tox\Web;
+namespace Tox\Web\Request;
 
 use Tox\Core;
 use Tox\Application;
+use Tox\Web;
 
-class Request extends Core\Assembly implements IRequest
+class Request extends Core\Assembly implements Web\IRequest
 {
     protected $data;
 
@@ -82,7 +83,7 @@ class Request extends Core\Assembly implements IRequest
         settype($offset, 'string');
         if (!$this->offsetExists($offset))
         {
-            throw new UnknownRequestMetaException(array('field' => $offset));
+            throw new UnknownMetaException(array('field' => $offset));
         }
         return $this->data[$offset];
     }
