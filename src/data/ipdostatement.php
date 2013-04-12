@@ -23,6 +23,9 @@
 
 namespace Tox\Data;
 
+use Iterator;
+use Countable;
+
 /**
  * Announces the extended behaviors of PHP data statement objects.
  *
@@ -30,7 +33,7 @@ namespace Tox\Data;
  * @author  Snakevil Zen <zsnakevil@gmail.com>
  * @since   0.1.0-beta1
  */
-interface IPdoStatement
+interface IPdoStatement extends Iterator, Countable
 {
     /**
      * Represents a statement by `Tox\Data\IPdo::prepare()`.
@@ -78,11 +81,11 @@ interface IPdoStatement
      *                           will be bound.
      * @param  const $type       OPTIONAL. Data type of the parameter, specified
      *                           by the PDO::PARAM_* constants.
-     * @param  int   $maxlen     OPTIONAL. A hint for pre-allocation.
-     * @param  mixed $driverdata OPTIONAL. Optional parameter(s) for the driver.
-     * @return bool
+     * @param  int   $maxLen     OPTIONAL. A hint for pre-allocation.
+     * @param  mixed $driverData OPTIONAL. Optional parameter(s) for the driver.
+     * @return self
      */
-    public function bindColumn($column, & $param, $type = null, $maxlen = null, $driverdata = null);
+    public function bindColumn($column, & $param, $type = null, $maxLen = null, $driverData = null);
 
     /**
      * Binds a parameter to the specified variable name.
@@ -108,7 +111,7 @@ interface IPdoStatement
      *                              explicitly set the length.
      * @param  array $driverOptions OPTIONAL. Attribute values for the
      *                              parameter.
-     * @return bool
+     * @return self
      */
     public function bindParam(
         $parameter,
@@ -129,14 +132,14 @@ interface IPdoStatement
      * @param  mixed $value     The value to bind to the parameter.
      * @param  const $dataType  OPTIONAL. Explicit data type for the parameter
      *                          using the `Tox\Data\IPdo::PARAM_*` constants.
-     * @return bool
+     * @return self
      */
     public function bindValue($parameter, $value, $dataType = IPdo::PARAM_STR);
 
     /**
      * Closes the cursor, enabling the statement to be executed again.
      *
-     * @return bool
+     * @return self
      */
     public function closeCursor();
 
@@ -169,7 +172,7 @@ interface IPdoStatement
      *                             elements as there are bound parameters in the
      *                             SQL statement being executed. All values are
      *                             treated as `Tox\Data\IPdo::PARAM_STR`.
-     * @return bool
+     * @return self
      */
     public function execute($inputParams = array());
 
@@ -257,7 +260,7 @@ interface IPdoStatement
     /**
      * Advances to the next rowset in a multi-rowset statement handle.
      *
-     * @return bool
+     * @return self
      */
     public function nextRowset();
 
@@ -273,7 +276,7 @@ interface IPdoStatement
      *
      * @param  const $attribute Attribute name.
      * @param  mixed $value     New value.
-     * @return bool
+     * @return self
      */
     public function setAttribute($attribute, $value);
 
@@ -282,7 +285,7 @@ interface IPdoStatement
      *
      * @param  const $mode The fetch mode must be one of the
      *                     `Tox\Data\IPdo::FETCH_*` constants.
-     * @return bool
+     * @return self
      */
     public function setFetchMode($mode);
 }
