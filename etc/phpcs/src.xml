@@ -4,7 +4,6 @@
   <description>PSR-2 standard excluding files.</description>
   <exclude-pattern>src/application/model/*</exclude-pattern>
   <exclude-pattern>src/web/*</exclude-pattern>
-  <exclude-pattern>src/data/pdo/cluster.php</exclude-pattern>
   <exclude-pattern>src/type/enumeration/*</exclude-pattern>
   <rule ref="PSR2"/>
 </ruleset>
