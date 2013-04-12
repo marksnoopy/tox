@@ -58,7 +58,7 @@ class ClusterTest extends PHPUnit_Framework_TestCase
         $this->master = $this->getMock('Tox\\Data\\IPdo');
         $this->slave = $this->getMock('Tox\\Data\\IPdo');
         $this->slave->expects($this->any())->method('getId')
-            ->will($this->returnValue(sha1(microtime())));
+            ->will($this->returnValue(sha1('slave' . microtime())));
         $this->cluster = new Cluster($this->master);
         $this->cluster->addSlave($this->slave);
     }
@@ -306,15 +306,15 @@ class ClusterTest extends PHPUnit_Framework_TestCase
             (rand(0, 10) > 5 ? 'E' : 'e') .
             (rand(0, 10) > 5 ? 'C' : 'c') .
             (rand(0, 10) > 5 ? 'T' : 't') .
-            str_repeat(' ', rand(0, 10)) . $sql;
+            str_repeat(' ', rand(1, 10)) . $sql;
         $o_slave2 = $this->getMock('Tox\\Data\\IPdo');
+        $o_slave2->expects($this->any())->method('getId')
+            ->will($this->returnValue(sha1('slave2' . microtime())));
         $this->cluster->addSlave($o_slave2, 1);
         $this->slave->expects($this->never())->method('exec');
         $o_slave2->expects($this->once())->method('exec')
             ->with($this->equalTo($s_sql))
             ->will($this->returnValue($ret));
-        $o_slave2->expects($this->any())->method('getId')
-            ->will($this->returnValue(sha1(microtime())));
         $this->cluster->exec($s_sql);
     }
 

@@ -81,6 +81,7 @@
 0x8004010B = AttributeSettingFailureException
 0x8004010C = FetchModeSettingFailureException
 0x8004010D = ExecutedStatementException
+0x8004010E = ClusterOopsException
 
 [Tox\Data\Kv]
 0x80040201 = EmptyHostException
