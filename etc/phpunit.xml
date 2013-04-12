@@ -24,6 +24,12 @@
     <testsuite name="tox.web">
       <directory suffix="-test.php">../share/test/web</directory>
     </testsuite>
+    <testsuite name="tox.data">
+      <directory suffix="-test.php">../share/test/data</directory>
+    </testsuite>
+    <testsuite name="tox.data.pdo">
+      <directory suffix="-test.php">../share/test/data/pdo</directory>
+    </testsuite>
     <testsuite name="tox.data.kv">
       <directory suffix="-test.php">../share/test/data/kv</directory>
     </testsuite>
@@ -34,6 +40,20 @@
   <filter>
     <whitelist addUncoveredFilesFromWhitelist="true">
       <directory suffix=".php">../src</directory>
+      <exclude>
+        <directory suffix="exception.php">../src</directory>
+        <directory>../src/application/@exception</directory>
+        <directory>../src/application/configuration/@exception</directory>
+        <directory>../src/application/dao/cache/@exception</directory>
+        <directory>../src/application/model/@exception</directory>
+        <directory>../src/application/output/@exception</directory>
+        <directory>../src/application/router/@exception</directory>
+        <directory>../src/core/@exception</directory>
+        <directory>../src/data/kv/@exception</directory>
+        <directory>../src/type/@exception</directory>
+        <directory>../src/web/@exception</directory>
+        <directory>../src/web/response/@exception</directory>
+      </exclude>
     </whitelist>
   </filter>
   <logging>
@@ -54,7 +74,7 @@
     />
   </logging>
   <php>
-    <ini name="display_errors" value="off"/>
+    <ini name="display_errors" value="on"/>
     <ini name="date.timezone" value="Asia/Shanghai"/>
     <ini name="xdebug.collect_includes" value="off"/>
     <ini name="xdebug.collect_params" value="0"/>

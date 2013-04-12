@@ -1,6 +1,6 @@
 <?php
 /**
- * Represents as a data source.
+ * Defines an exception for binding a executed statement.
  *
  * This file is part of Tox.
  *
@@ -17,21 +17,36 @@
  * You should have received a copy of the GNU General Public License
  * along with Tox.  If not, see <http://www.gnu.org/licenses/>.
  *
- * @package    Tox
- * @subpackage Tox\Data
- * @author     Snakevil Zen <zsnakevil@gmail.com>
- * @copyright  © 2012 szen.in
- * @license    http://www.gnu.org/licenses/gpl.html
+ * @copyright © 2012-2013 PHP-Tox.org
+ * @license   GNU General Public License, version 3
  */
 
 namespace Tox\Data\Pdo;
 
-interface IPartition
-{
-    public function partitionTable($table, $method);
+use Tox\Core;
 
-    public function identifyPartition($table, $id);
+/**
+ * Be raised on binding a executed statement.
+ *
+ * @package tox.data.pdo
+ * @author  Snakevil Zen <zsnakevil@gmail.com>
+ * @since   0.2.0
+ */
+final class ExecutedStatementException extends Core\Exception
+{
+    /**
+     * {@inheritdoc}
+     *
+     * > Defined as `0x8004010D`.
+     */
+    const CODE = 0x8004010D;
+
+    /**
+     * {@inheritdoc}
+     *
+     * > Defined as `statement already executed`.
+     */
+    const MESSAGE = 'statement already executed';
 }
 
-// vi:se ft=php fenc=utf-8 ff=unix ts=4 sts=4 et sw=4 fen fdm=indent fdl=1 tw=120:
-
+// vi:ft=php fenc=utf-8 ff=unix ts=4 sts=4 et sw=4 fen fdm=indent fdl=1 tw=120

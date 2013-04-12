@@ -19,7 +19,7 @@
  *
  * @package   tox.web
  * @author    Snakevil Zen <zsnakevil@gmail.com>
- * @copyright © 2012-2013 SZen.in
+ * @copyright © 2012-2013 PHP-Tox.org
  * @license   GNU General Public License, version 3
  */
 
