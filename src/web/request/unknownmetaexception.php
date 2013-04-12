@@ -25,7 +25,7 @@ namespace Tox\Web\Request;
 
 use Tox\Core;
 /**
- * Be raised on aliasing an existant class.
+ * the request key is not set.
  *
  * **THIS CLASS CANNOT BE INHERITED.**
  *
