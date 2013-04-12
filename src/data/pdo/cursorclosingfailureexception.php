@@ -30,7 +30,7 @@ use Tox\Core;
  *
  * @package tox.data.pdo
  * @author  Snakevil Zen <zsnakevil@gmail.com>
- * @since   0.1.0-beta1
+ * @since   0.2.0
  */
 final class CursorClosingFailureException extends Core\Exception
 {
