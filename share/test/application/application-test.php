@@ -17,7 +17,7 @@
  * You should have received a copy of the GNU General Public License
  * along with Tox.  If not, see <http://www.gnu.org/licenses/>.
  *
- * @copyright © 2012-2013 SZen.in
+ * @copyright © 2012-2013 PHP-Tox.org
  * @license   GNU General Public License, version 3
  */
 
@@ -248,27 +248,72 @@ class ApplicationTest extends PHPUnit_Framework_TestCase
 
     /**
      * @depends testRunningWithDefaults
+     */
+    public function testRunningWithDefaultsByNewObject()
+    {
+        $this->oin->expects($this->once())->method('recruit')
+            ->with($this->equalTo($this->otoken));
+        $this->orouter->expects($this->once())->method('analyse')
+            ->with($this->equalTo($this->oin))
+            ->will($this->returnValue($this->otoken));
+        $this->octrl->expects($this->once())->method('act');
+        $this->ocfg->expects($this->atLeastOnce())->method('offsetExists')
+            ->will($this->returnValue(false));
+        $o_app = $this->getMockBuilder('Tox\\Application\\Application')
+            ->setMethods(
+                array(
+                    'getInstance',
+                    'dispatch',
+                    'getDefaultConfiguration',
+                    'newRouter',
+                    'newViewFallback'
+                )
+            )
+            ->disableOriginalConstructor()
+            ->getMockForAbstractClass();
+        $o_app->staticExpects($this->once())->method('getInstance')
+            ->will($this->returnValue($o_app));
+        $o_app->expects($this->once())->method('getDefaultConfiguration')
+            ->will($this->returnValue($this->ocfg));
+        $o_app::staticExpects($this->once())->method('newRouter')
+            ->will($this->returnValue($this->orouter));
+        $o_app::staticExpects($this->once())->method('newViewFallback');
+        $o_app->expects($this->once())->method('getDefaultInput')
+            ->will($this->returnValue($this->oin));
+        $o_app->expects($this->once())->method('init');
+        $o_app->expects($this->once())->method('dispatch')
+            ->with($this->equalTo($this->otoken))
+            ->will($this->returnValue($this->octrl));
+        $o_app::run();
+    }
+
+    /**
+     * @depends testRunningWithDefaults
      * @depends testRunningWithParameters
      */
     public function testRunInvalidOutputTypeConfigured()
     {
         $this->ofb->expects($this->once())->method('cause')->will($this->returnValue($this->oview));
-        $this->oout->expects($this->once())->method('setView')->will($this->returnSelf());
         $this->oout->expects($this->once())->method('close');
+        $this->oout->expects($this->once())->method('setView')->will($this->returnValue($this->oout));
 
-        $o_app = $this->getMockBuilder('Tox\\Application\\Application')
-            ->setMethods(array('getDefaultFallback', 'getDefaultOutput', 'getInstance'))
+
+        $o_app = $this->getMockBuilder('Tox\\Application\\ApplicationStub')
+            ->setMockClassName('a' . md5(microtime()))
+            ->setMethods(array('getDefaultFallback', 'getDefaultOutput', 'newSelf'))
             ->disableOriginalConstructor()
             ->getMockForAbstractClass();
+
         $o_app->expects($this->once())->method('getDefaultFallback')->will($this->returnValue($this->ofb));
         $o_app->expects($this->once())->method('getDefaultOutput')->will($this->returnValue($this->oout));
-        $o_app->staticExpects($this->any())->method('getInstance')->will($this->returnValue($o_app));
+        $o_app::staticExpects($this->once())->method('newSelf')->will($this->returnValue($o_app));
 
         $this->ocfg->expects($this->once())
             ->method('offsetExists')
             ->with($this->equalTo('output.type'))
             ->will($this->returnValue(true));
 
+        $o_app->clearInstance();
         $o_app::run($this->ocfg);
     }
 
@@ -320,16 +365,18 @@ class ApplicationTest extends PHPUnit_Framework_TestCase
     public function testRunInvalidInputTypeConfigured()
     {
         $this->ofb->expects($this->once())->method('cause')->will($this->returnValue($this->oview));
-        $this->oout->expects($this->once())->method('setView')->will($this->returnSelf());
         $this->oout->expects($this->once())->method('close');
+        $this->oout->expects($this->once())->method('setView')->will($this->returnValue($this->oout));
 
-        $o_app = $this->getMockBuilder('Tox\\Application\\Application')
-            ->setMethods(array('getDefaultFallback', 'getDefaultOutput', 'getInstance'))
+        $o_app = $this->getMockBuilder('Tox\\Application\\ApplicationStub')
+            ->setMockClassName('a' . md5(microtime()))
+            ->setMethods(array('getDefaultFallback', 'getDefaultOutput', 'newSelf'))
             ->disableOriginalConstructor()
             ->getMockForAbstractClass();
+
         $o_app->expects($this->once())->method('getDefaultFallback')->will($this->returnValue($this->ofb));
         $o_app->expects($this->once())->method('getDefaultOutput')->will($this->returnValue($this->oout));
-        $o_app->staticExpects($this->any())->method('getInstance')->will($this->returnValue($o_app));
+        $o_app::staticExpects($this->once())->method('newSelf')->will($this->returnValue($o_app));
 
         $this->ocfg->expects($this->at(0))
             ->method('offsetExists')
@@ -340,6 +387,7 @@ class ApplicationTest extends PHPUnit_Framework_TestCase
             ->with($this->equalTo('input.type'))
             ->will($this->returnValue(true));
 
+        $o_app->clearInstance();
         $o_app::run($this->ocfg);
     }
 
@@ -391,22 +439,32 @@ class ApplicationTest extends PHPUnit_Framework_TestCase
     /**
      * @depends testRunningWithDefaults
      * @depends testRunningWithParameters
-     * @expectedException Tox\Application\InvalidConfiguredFallbackTypeException
      */
     public function testRunInvalidFallBackTypeConfigured()
     {
-        $o_app = $this->getMockBuilder('Tox\\Application\\Application')
-            ->setMethods(array('getInstance'))
+        $this->ofb->expects($this->once())->method('cause')->will($this->returnValue($this->oview));
+        $this->oout->expects($this->once())->method('setView')->will($this->returnSelf());
+        $this->oout->expects($this->once())->method('close');
+
+        $o_app = $this->getMockBuilder('Tox\\Application\\ApplicationStub')
+            ->setMethods(array('newSelf', 'getDefaultOutput', 'newViewFallback'))
             ->disableOriginalConstructor()
             ->getMockForAbstractClass();
 
-        $o_app->staticExpects($this->any())->method('getInstance')->will($this->returnValue($o_app));
+        $o_app::staticExpects($this->once())->method('newSelf')->will($this->returnValue($o_app));
+        $o_app::staticExpects($this->once())->method('newViewFallback')->will($this->returnValue($this->ofb));
+        $o_app->expects($this->once())->method('getDefaultOutput')->will($this->returnValue($this->oout));
 
-        $this->ocfg->expects($this->atLeastOnce())
+        $this->ocfg->expects($this->at(0))
+            ->method('offsetExists')
+            ->with($this->equalTo('fallback.type'))
+            ->will($this->returnValue(true));
+        $this->ocfg->expects($this->at(3))
             ->method('offsetExists')
             ->with($this->equalTo('fallback.type'))
             ->will($this->returnValue(true));
 
+        $o_app->clearInstance();
         $o_app::run($this->ocfg);
     }
 
@@ -455,23 +513,24 @@ class ApplicationTest extends PHPUnit_Framework_TestCase
     public function testRunInvalidRouterTypeConfigured()
     {
         $this->ofb->expects($this->once())->method('cause')->will($this->returnValue($this->oview));
-        $this->oout->expects($this->once())->method('setView')->will($this->returnSelf());
         $this->oout->expects($this->once())->method('close');
+        $this->oout->expects($this->once())->method('setView')->will($this->returnSelf());
 
-        $o_app = $this->getMockBuilder('Tox\\Application\\Application')
-            ->setMethods(array('getDefaultFallback', 'getDefaultOutput', 'getInstance', 'getDefaultInput'))
+        $o_app = $this->getMockBuilder('Tox\\Application\\ApplicationStub')
+            ->setMethods(array('getDefaultFallback', 'getDefaultOutput', 'newSelf', 'getDefaultInput'))
             ->disableOriginalConstructor()
             ->getMockForAbstractClass();
         $o_app->expects($this->once())->method('getDefaultFallback')->will($this->returnValue($this->ofb));
         $o_app->expects($this->once())->method('getDefaultOutput')->will($this->returnValue($this->oout));
         $o_app->expects($this->once())->method('getDefaultInput')->will($this->returnValue($this->oin));
-        $o_app->staticExpects($this->any())->method('getInstance')->will($this->returnValue($o_app));
+        $o_app::staticExpects($this->once())->method('newSelf')->will($this->returnValue($o_app));
 
         $this->ocfg->expects($this->at(2))
             ->method('offsetExists')
             ->with($this->equalTo('router.type'))
             ->will($this->returnValue(true));
 
+        $o_app->clearInstance();
         $o_app::run($this->ocfg);
     }
 
@@ -515,15 +574,51 @@ class ApplicationTest extends PHPUnit_Framework_TestCase
     }
 
     /**
-     * @expectedException Tox\Application\MultipleApplicationRuntimeException
+     * @depends testRunningWithDefaults
      */
     public function testMultipleApplicationRuntime()
     {
-        $o_app = $this->getMockBuilder('Tox\\Application\\Application')
-            ->disableOriginalConstructor()
+        $this->ofb->expects($this->once())->method('cause')->will($this->returnValue($this->oview));
+        $this->oout->expects($this->once())->method('close');
+        $this->oout->expects($this->once())->method('setView')->will($this->returnSelf());
+
+        $this->oin->expects($this->once())->method('recruit')
+            ->with($this->equalTo($this->otoken));
+        $this->orouter->expects($this->once())->method('analyse')
+            ->with($this->equalTo($this->oin))
+            ->will($this->returnValue($this->otoken));
+        $this->octrl->expects($this->once())->method('act');
+        $this->ocfg->expects($this->atLeastOnce())->method('offsetExists')
+            ->will($this->returnValue(false));
+        $o_app = $this->getMockBuilder('Tox\\Application\\ApplicationStub')
+            ->setMethods(
+                array(
+                    'newSelf',
+                    'dispatch',
+                    'getDefaultConfiguration',
+                    'getDefaultRouter',
+                    'getDefaultFallback',
+                    'getDefaultOutput',
+                )
+            )->disableOriginalConstructor()
             ->getMockForAbstractClass();
-        $o_app::getInstance();
-        $o_app::getInstance();
+        $o_app::staticExpects($this->once())->method('newSelf')->will($this->returnValue($o_app));
+        $o_app->expects($this->once())->method('getDefaultConfiguration')
+            ->will($this->returnValue($this->ocfg));
+        $o_app->expects($this->once())->method('getDefaultRouter')
+            ->will($this->returnValue($this->orouter));
+        $o_app->expects($this->any())->method('getDefaultFallback')->will($this->returnValue($this->ofb));
+        $o_app->expects($this->once())->method('getDefaultInput')
+            ->will($this->returnValue($this->oin));
+        $o_app->expects($this->once())->method('getDefaultOutput')->will($this->returnValue($this->oout));
+        $o_app->expects($this->once())->method('init');
+        $o_app->expects($this->once())->method('dispatch')
+            ->with($this->equalTo($this->otoken))
+            ->will($this->returnValue($this->octrl));
+
+        $o_app->clearInstance();
+        $o_app::run();
+        $o_app::run();
     }
 
     /**
@@ -554,6 +649,20 @@ class ApplicationTest extends PHPUnit_Framework_TestCase
             ->will($this->returnValue($this->oin));
 
         $o_app::run($this->ocfg, $this->orouter, $this->ofb);
+    }
+}
+
+/**
+ * use to test
+ */
+abstract class ApplicationStub extends Application
+{
+    /**
+     * clear instance
+     */
+    public function clearInstance()
+    {
+        static::$instance = null;
     }
 }
 
