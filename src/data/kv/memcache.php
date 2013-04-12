@@ -23,7 +23,6 @@
 
 namespace Tox\Data\KV;
 
-
 /**
  * Represents as the memcache data source.
  *
@@ -65,8 +64,14 @@ class Memcache extends KV
     protected $field;
 
     /**
-     * Constructor.
+     * Memcache COMPRESSION option
      *
+     * @var bool
+     */
+    protected $compression;
+
+    /**
+     * CONSTRUCT FUNCTION
      */
     public function __construct($field = null)
     {
@@ -91,6 +96,30 @@ class Memcache extends KV
     }
 
     /**
+     * Sets the memcache default expire time
+     *
+     * @param booler $option
+     */
+    public function setCompression($option)
+    {
+        if (!$option) {
+            $this->compression = $option;
+        } else {
+            $this->compression = true;
+        }
+    }
+
+    /**
+     * Gets the memcache default expire time
+     *
+     * @param booler $option
+     */
+    public function getCompression()
+    {
+        return $this->compression;
+    }
+
+    /**
      * Gets the memcache default expire time
      *
      * @param field $expire
@@ -109,31 +138,57 @@ class Memcache extends KV
     {
         $servers = $this->getServers();
         $cache = $this->getMemCache();
-        if (count($servers)) {
+
+
+        if (is_array($servers) && count($servers) > 0) {
             foreach ($servers as $server) {
-                if ($this->useMemcached) {
-                    if (null != $this->field) {
-                        if ($this->field === $server->field) {
-                            $cache->addServer($server->host, $server->port, $server->weight);
+                if (count($servers)) {
+                    foreach ($servers as $server) {
+                        if ($this->useMemcached) {
+                            $serverList = $cache->getServerList();
+                            if (null != $this->field) {
+                                if ($this->field === $server->field) {
+                                    if (count($serverList) > 0) {
+                                        $serverExit = false;
+                                        foreach ($serverList as $key => $value) {
+                                            if ($value['host'] == $server->host && $value['port'] == $server->port) {
+                                                $serverExit = true;
+                                            }
+                                        }
+                                        if (false === $serverExit) {
+                                            $cache->addServer($server->host, $server->port, $server->weight);
+                                        }
+                                    }
+                                }
+                            } else {
+                                if (count($serverList) > 0) {
+                                    $serverExit = false;
+                                    foreach ($serverList as $key => $value) {
+                                        if ($value['host'] == $server->host && $value['port'] == $server->port) {
+                                            $serverExit = true;
+                                        }
+                                    }
+                                    if (false === $serverExit) {
+                                        $cache->addServer($server->host, $server->port, $server->weight);
+                                    }
+                                }
+                            }
+                        } else {
+                            $cache->addServer(
+                                $server->host,
+                                $server->port,
+                                $server->persistent,
+                                $server->weight,
+                                $server->timeout,
+                                $server->retryInterval,
+                                $server->status
+                            );
                         }
-                    } else {
-                        $cache->addServer($server->host, $server->port, $server->weight);
                     }
-                } else {
-                    $cache->addServer(
-                        $server->host,
-                        $server->port,
-                        $server->persistent,
-                        $server->weight,
-                        $server->timeout,
-                        $server->retryInterval,
-                        $server->status
-                    );
                 }
             }
         } else {
             throw new MemcacheConfigNotArrayException(array('config' => ''));
-            //$cache->addServer('localhost', 11211);
         }
     }
 
@@ -167,6 +222,9 @@ class Memcache extends KV
                 $instance = new \Memcached($this->field);
                 $instance->setOption(\Memcached::OPT_PREFIX_KEY, $this->field);
                 $instance->setOption(\Memcached::OPT_LIBKETAMA_COMPATIBLE, true);
+                if (false === $this->compression) {
+                    $instance->setOption(\Memcached::OPT_COMPRESSION, false);
+                }
                 $memcached_instances[$this->field] = $instance;
             }
             return $instance;
@@ -206,6 +264,7 @@ class Memcache extends KV
         if ($config['useMemcached'] === true) {
             $memcacheConfig = $config['memcached'];
         } else {
+            $this->useMemcached = false;
             $memcacheConfig = $config['memcache'];
         }
         foreach ($memcacheConfig as $c) {
@@ -249,17 +308,14 @@ class Memcache extends KV
     {
 
         if ($expire > 0) {
-            if ($expire > 2592000) {
-                $expire = 2592000 - 1;
-            }
         } elseif (null !== $this->expireTime) {
             $expire = $this->expireTime;
         } else {
             $expire = 0;
         }
         return $this->useMemcached ?
-            $this->cache->set($key, $value, $expire) :
-            $this->cache->set($key, $value, 0, $expire);
+                $this->cache->set($key, $value, $expire) :
+                $this->cache->set($key, $value, 0, $expire);
     }
 
     /**
@@ -281,8 +337,8 @@ class Memcache extends KV
         }
 
         return $this->useMemcached ?
-            $this->cache->add($key, $value, $expire) :
-            $this->cache->add($key, $value, 0, $expire);
+                $this->cache->add($key, $value, $expire) :
+                $this->cache->add($key, $value, 0, $expire);
     }
 
     /**
@@ -328,8 +384,8 @@ class Memcache extends KV
             throw new MemcacheKeyTooLongException(array('key' => $key));
         }
         return $this->useMemcached ?
-            $this->cache->set($key, $value, $expire) :
-            $this->cache->set($key, $value, 0, $expire);
+                $this->cache->set($key, $value, $expire) :
+                $this->cache->set($key, $value, 0, $expire);
     }
 
     /**

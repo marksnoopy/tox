@@ -218,6 +218,8 @@ class ConfigurationTest extends PHPUnit_Framework_TestCase
 
         $o_configuration->set('domain', 'google.com');
         $o_configuration->set('package-name', 'com.google.android');
+
+        $this->assertTrue(isset($o_configuration['domain']));
         $this->assertEquals('google.com', $o_configuration['domain']);
         $this->assertEquals('com.google.android', $o_configuration['package-name']);
 
@@ -320,6 +322,15 @@ class ConfigurationTest extends PHPUnit_Framework_TestCase
         $this->assertTrue(array_key_exists('imported', $o_dump));
         $this->assertTrue(array_key_exists('loaded', $o_dump));
         $this->assertTrue(array_key_exists('seted', $o_dump));
+    }
+
+    public function testInvalidFileCanNotBeAssembled()
+    {
+        $o_configuration = $this->getMockBuilder('Tox\\Application\\Configuration\\Configuration')
+            ->setMethods(array('abc'))
+            ->disableOriginalConstructor()
+            ->getMock();
+        $this->assertFalse($o_configuration->getPath('/etc/conf.php'));
     }
 
     public function invalidConfigurationFile()
