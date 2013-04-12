@@ -49,7 +49,7 @@ class QueryTest extends PHPUnit_Framework_TestCase
     /**
      * Stores the mocking data object for testing.
      *
-     * @var Data\IPdo
+     * @var \Tox\Data\IPdo
      */
     protected $pdo;
 
