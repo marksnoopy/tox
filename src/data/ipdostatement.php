@@ -154,10 +154,19 @@ interface IPdoStatement extends Iterator, Countable
      * CONSTRUCT FUNCTION
      *
      * @param IPdo   $pdo  Hosting data object.
-     * @param const  $type Type
      * @param string $sql  Statement SQL.
      */
-    public function __construct(IPdo $pdo, $type, $sql);
+    public function __construct(IPdo $pdo, $sql);
+
+    /**
+     * Manufactures a new statement object.
+     *
+     * @param  IPdo   $pdo  Hosting data object.
+     * @param  const  $type Statement type.
+     * @param  string $sql  Raw statement SQL.
+     * @return self
+     */
+    public static function manufacture(IPdo $pdo, $type, $sql);
 
     /**
      * Dump an SQL prepared command.

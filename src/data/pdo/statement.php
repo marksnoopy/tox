@@ -381,18 +381,58 @@ abstract class Statement extends Core\Assembly implements Data\IPdoStatement
      * {@inheritdoc}
      *
      * @param Data\IPdo $pdo  Hosting data object.
-     * @param const     $type Type
      * @param string    $sql  Statement SQL.
      */
-    public function __construct(Data\IPdo $pdo, $type, $sql)
+    public function __construct(Data\IPdo $pdo, $sql)
     {
         $this->options =
         $this->values = array();
         $this->id = sha1(microtime());
         $this->pdo = $pdo;
-        $this->type = self::TYPE_QUERY == $type ? $type : self::TYPE_PREPARE;
         $this->sql = $sql;
         $this->status = self::STATE_PREPARED;
+    }
+
+    /**
+     * Creates a new prepared statement object.
+     *
+     * @param  Data\IPdo $pdo Hosting data object.
+     * @param  string    $sql Raw statement SQL.
+     * @return Prepare
+     */
+    protected static function newPrepare(Data\IPdo $pdo, $sql)
+    {
+        return new Prepare($pdo, $sql);
+    }
+
+    /**
+     * Creates a new query statement object.
+     *
+     * @param  Data\IPdo $pdo Hosting data object.
+     * @param  string    $sql Raw statement SQL.
+     * @return Query
+     */
+    protected static function newQuery(Data\IPdo $pdo, $sql)
+    {
+        return new Query($pdo, $sql);
+    }
+
+    /**
+     * {@inheritdoc}
+     *
+     * **THIS METHOD CANNOT BE OVERRIDDEN.**
+     *
+     * @param  Data\IPdo $pdo  Hosting data object.
+     * @param  const     $type Statement type.
+     * @param  string    $sql  Raw statement SQL.
+     * @return self
+     */
+    final public static function manufacture(Data\IPdo $pdo, $type, $sql)
+    {
+        if (self::TYPE_PREPARE == $type) {
+            return static::newPrepare($pdo, $sql);
+        }
+        return static::newQuery($pdo, $sql);
     }
 
     /**

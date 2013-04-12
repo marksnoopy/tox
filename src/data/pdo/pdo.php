@@ -373,7 +373,7 @@ class Pdo extends Core\Assembly implements Data\IPdo
      */
     protected function newStatement($sql, $type)
     {
-        return new Statement($this, $type, $sql);
+        return Statement::manufacture($this, $type, $sql);
     }
 
     /**

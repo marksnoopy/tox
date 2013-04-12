@@ -65,17 +65,9 @@ class StatementTest extends PHPUnit_Framework_TestCase
      */
     protected $pdo;
 
-    /**
-     * Stores the statement type.
-     *
-     * @var const
-     */
-    protected $type;
-
     protected function setUp()
     {
         $this->pdo = $this->getMock('Tox\\Data\\IPdo');
-        $this->type = (rand() % 2) ? Statement::TYPE_PREPARE : Statement::TYPE_QUERY;
     }
 
     public function testStringCasting()
@@ -83,7 +75,7 @@ class StatementTest extends PHPUnit_Framework_TestCase
         $s_sql = microtime();
         $o_stmt = $this->getMockForAbstractClass(
             'Tox\\Data\\Pdo\\Statement',
-            array($this->pdo, $this->type, $s_sql)
+            array($this->pdo, $s_sql)
         );
         $this->assertEquals($s_sql, (string) $o_stmt);
     }
@@ -92,7 +84,7 @@ class StatementTest extends PHPUnit_Framework_TestCase
     {
         $o_stmt = $this->getMockForAbstractClass(
             'Tox\\Data\\Pdo\\Statement',
-            array($this->pdo, $this->type, microtime())
+            array($this->pdo, microtime())
         );
         $this->assertRegExp('@^[\\da-z]{40}$@i', $o_stmt->getId());
     }
@@ -101,7 +93,7 @@ class StatementTest extends PHPUnit_Framework_TestCase
     {
         $o_stmt = $this->getMockForAbstractClass(
             'Tox\\Data\\Pdo\\Statement',
-            array($this->pdo, $this->type, microtime())
+            array($this->pdo, microtime())
         );
         $this->assertSame($this->pdo, $o_stmt->getPdo());
     }
@@ -110,9 +102,9 @@ class StatementTest extends PHPUnit_Framework_TestCase
     {
         $o_stmt = $this->getMockForAbstractClass(
             'Tox\\Data\\Pdo\\Statement',
-            array($this->pdo, $this->type, microtime())
+            array($this->pdo, microtime())
         );
-        $this->assertEquals($this->type, $o_stmt->getType());
+        $this->assertNull($o_stmt->getType());
     }
 
     public function testMagicMethods()
@@ -156,7 +148,7 @@ class StatementTest extends PHPUnit_Framework_TestCase
             ->will($this->returnValue($o_stmt1));
         $o_stmt2 = $this->getMockForAbstractClass(
             'Tox\\Data\\Pdo\\Statement',
-            array($this->pdo, $this->type, microtime())
+            array($this->pdo, microtime())
         );
         $this->assertSame($o_stmt2, $o_stmt2->bindColumn($i_key, $s_val1, $i_val2, $i_val3, $f_val4));
     }
@@ -181,7 +173,7 @@ class StatementTest extends PHPUnit_Framework_TestCase
             ->will($this->returnValue($o_stmt1));
         $o_stmt2 = $this->getMockForAbstractClass(
             'Tox\\Data\\Pdo\\Statement',
-            array($this->pdo, $this->type, microtime())
+            array($this->pdo, microtime())
         );
         $this->assertSame($o_stmt2, $o_stmt2->bindParam($i_key, $s_val1, $i_val2, $i_val3, $f_val4));
     }
@@ -191,9 +183,9 @@ class StatementTest extends PHPUnit_Framework_TestCase
         $this->pdo->expects($this->never())->method('realize');
         $o_stmt = $this->getMockForAbstractClass(
             'Tox\\Data\\Pdo\\Statement',
-            array($this->pdo, $this->type, microtime())
+            array($this->pdo, microtime())
         );
-        $this->assertSame($o_stmt, $o_stmt->bindValue(microtime(), $this->type));
+        $this->assertSame($o_stmt, $o_stmt->bindValue(microtime(), microtime()));
     }
 
     public function testLazyLoadingForCloseCursor()
@@ -201,7 +193,7 @@ class StatementTest extends PHPUnit_Framework_TestCase
         $this->pdo->expects($this->never())->method('realize');
         $o_stmt = $this->getMockForAbstractClass(
             'Tox\\Data\\Pdo\\Statement',
-            array($this->pdo, $this->type, microtime())
+            array($this->pdo, microtime())
         );
         $o_stmt->closeCursor();
     }
@@ -216,7 +208,7 @@ class StatementTest extends PHPUnit_Framework_TestCase
             ->will($this->returnValue($o_stmt1));
         $o_stmt2 = $this->getMockForAbstractClass(
             'Tox\\Data\\Pdo\\Statement',
-            array($this->pdo, $this->type, microtime())
+            array($this->pdo, microtime())
         );
         $this->assertEquals($m_ret, $o_stmt2->columnCount());
     }
@@ -231,7 +223,7 @@ class StatementTest extends PHPUnit_Framework_TestCase
             ->will($this->returnValue($o_stmt1));
         $o_stmt2 = $this->getMockForAbstractClass(
             'Tox\\Data\\Pdo\\Statement',
-            array($this->pdo, $this->type, microtime())
+            array($this->pdo, microtime())
         );
         $this->assertEquals($m_ret, $o_stmt2->debugDumpParams());
     }
@@ -248,7 +240,7 @@ class StatementTest extends PHPUnit_Framework_TestCase
             ->will($this->returnValue($o_stmt1));
         $o_stmt2 = $this->getMockForAbstractClass(
             'Tox\\Data\\Pdo\\Statement',
-            array($this->pdo, $this->type, microtime())
+            array($this->pdo, microtime())
         );
         $this->assertSame($o_stmt2, $o_stmt2->execute($a_pars));
     }
@@ -267,7 +259,7 @@ class StatementTest extends PHPUnit_Framework_TestCase
             ->will($this->returnValue($o_stmt1));
         $o_stmt2 = $this->getMockForAbstractClass(
             'Tox\\Data\\Pdo\\Statement',
-            array($this->pdo, $this->type, microtime())
+            array($this->pdo, microtime())
         );
         $this->assertEquals($m_ret, $o_stmt2->fetch($m_val1, $m_val2, $m_val3));
     }
@@ -286,7 +278,7 @@ class StatementTest extends PHPUnit_Framework_TestCase
             ->will($this->returnValue($o_stmt1));
         $o_stmt2 = $this->getMockForAbstractClass(
             'Tox\\Data\\Pdo\\Statement',
-            array($this->pdo, $this->type, microtime())
+            array($this->pdo, microtime())
         );
         $this->assertEquals($m_ret, $o_stmt2->fetchAll($m_val1, $m_val2, $m_val3));
     }
@@ -303,7 +295,7 @@ class StatementTest extends PHPUnit_Framework_TestCase
             ->will($this->returnValue($o_stmt1));
         $o_stmt2 = $this->getMockForAbstractClass(
             'Tox\\Data\\Pdo\\Statement',
-            array($this->pdo, $this->type, microtime())
+            array($this->pdo, microtime())
         );
         $this->assertEquals($m_ret, $o_stmt2->fetchColumn($m_val1));
     }
@@ -321,7 +313,7 @@ class StatementTest extends PHPUnit_Framework_TestCase
             ->will($this->returnValue($o_stmt1));
         $o_stmt2 = $this->getMockForAbstractClass(
             'Tox\\Data\\Pdo\\Statement',
-            array($this->pdo, $this->type, microtime())
+            array($this->pdo, microtime())
         );
         $this->assertEquals($m_ret, $o_stmt2->fetchObject($m_val1, $m_val2));
     }
@@ -338,7 +330,7 @@ class StatementTest extends PHPUnit_Framework_TestCase
             ->will($this->returnValue($o_stmt1));
         $o_stmt2 = $this->getMockForAbstractClass(
             'Tox\\Data\\Pdo\\Statement',
-            array($this->pdo, $this->type, microtime())
+            array($this->pdo, microtime())
         );
         $this->assertEquals($m_ret, $o_stmt2->getAttribute($m_val1));
     }
@@ -355,7 +347,7 @@ class StatementTest extends PHPUnit_Framework_TestCase
             ->will($this->returnValue($o_stmt1));
         $o_stmt2 = $this->getMockForAbstractClass(
             'Tox\\Data\\Pdo\\Statement',
-            array($this->pdo, $this->type, microtime())
+            array($this->pdo, microtime())
         );
         $this->assertEquals($m_ret, $o_stmt2->getColumnMeta($m_val1));
     }
@@ -370,7 +362,7 @@ class StatementTest extends PHPUnit_Framework_TestCase
             ->will($this->returnValue($o_stmt1));
         $o_stmt2 = $this->getMockForAbstractClass(
             'Tox\\Data\\Pdo\\Statement',
-            array($this->pdo, $this->type, microtime())
+            array($this->pdo, microtime())
         );
         $this->assertSame($o_stmt2, $o_stmt2->nextRowset());
     }
@@ -385,7 +377,7 @@ class StatementTest extends PHPUnit_Framework_TestCase
             ->will($this->returnValue($o_stmt1));
         $o_stmt2 = $this->getMockForAbstractClass(
             'Tox\\Data\\Pdo\\Statement',
-            array($this->pdo, $this->type, microtime())
+            array($this->pdo, microtime())
         );
         $this->assertEquals($m_ret, $o_stmt2->rowCount());
     }
@@ -395,7 +387,7 @@ class StatementTest extends PHPUnit_Framework_TestCase
         $this->pdo->expects($this->never())->method('realize');
         $o_stmt = $this->getMockForAbstractClass(
             'Tox\\Data\\Pdo\\Statement',
-            array($this->pdo, $this->type, microtime())
+            array($this->pdo, microtime())
         );
         $this->assertSame($o_stmt, $o_stmt->setAttribute(microtime(), microtime()));
     }
@@ -405,7 +397,7 @@ class StatementTest extends PHPUnit_Framework_TestCase
         $this->pdo->expects($this->never())->method('realize');
         $o_stmt = $this->getMockForAbstractClass(
             'Tox\\Data\\Pdo\\Statement',
-            array($this->pdo, $this->type, microtime())
+            array($this->pdo, microtime())
         );
         $this->assertSame($o_stmt, $o_stmt->setFetchMode(microtime()));
     }
@@ -421,7 +413,7 @@ class StatementTest extends PHPUnit_Framework_TestCase
         $o_stmt = $this->getMock(
             'Tox\\Data\\Pdo\\Statement',
             array('realize'),
-            array($this->pdo, $this->type, microtime())
+            array($this->pdo, microtime())
         );
         $o_stmt->expects($this->never())->method('realize');
         $this->assertEquals($s_value, $o_stmt->setAttribute($i_attr, $s_value)->getAttribute($i_attr));
@@ -437,7 +429,7 @@ class StatementTest extends PHPUnit_Framework_TestCase
         $this->pdo->expects($this->never())->method('realize');
         $o_stmt = $this->getMockForAbstractClass(
             'Tox\\Data\\Pdo\\Statement',
-            array($this->pdo, $this->type, microtime())
+            array($this->pdo, microtime())
         );
         $o_stmt->closeCursor()->fetch();
     }
@@ -455,7 +447,7 @@ class StatementTest extends PHPUnit_Framework_TestCase
             ->will($this->returnValue($o_stmt1));
         $o_stmt2 = $this->getMockForAbstractClass(
             'Tox\\Data\\Pdo\\Statement',
-            array($this->pdo, $this->type, microtime())
+            array($this->pdo, microtime())
         );
         $o_stmt2->execute()->bindParam($s_key, $s_val);
     }
@@ -473,7 +465,7 @@ class StatementTest extends PHPUnit_Framework_TestCase
             ->will($this->returnValue($o_stmt1));
         $o_stmt2 = $this->getMockForAbstractClass(
             'Tox\\Data\\Pdo\\Statement',
-            array($this->pdo, $this->type, microtime())
+            array($this->pdo, microtime())
         );
         $o_stmt2->execute()->bindValue($s_key, $s_val);
     }
@@ -487,7 +479,7 @@ class StatementTest extends PHPUnit_Framework_TestCase
             ->will($this->returnValue($o_stmt1));
         $o_stmt2 = $this->getMockForAbstractClass(
             'Tox\\Data\\Pdo\\Statement',
-            array($this->pdo, $this->type, microtime())
+            array($this->pdo, microtime())
         );
         $o_stmt2->fetch();
     }
@@ -518,7 +510,7 @@ class StatementTest extends PHPUnit_Framework_TestCase
             ->will($this->returnValue($o_stmt1));
         $o_stmt2 = $this->getMockForAbstractClass(
             'Tox\\Data\\Pdo\\Statement',
-            array($this->pdo, $this->type, microtime())
+            array($this->pdo, microtime())
         );
         $o_stmt2->bindValue($s_key1, $f_val1)
             ->setAttribute($i_key2, $f_val2)->setFetchMode($f_val3)
@@ -547,7 +539,7 @@ class StatementTest extends PHPUnit_Framework_TestCase
             ->will($this->returnValue($o_stmt1));
         $o_stmt2 = $this->getMockForAbstractClass(
             'Tox\\Data\\Pdo\\Statement',
-            array($this->pdo, $this->type, microtime())
+            array($this->pdo, microtime())
         );
         $o_stmt2->bindValue($s_key1, $f_val1)->bindParam($s_key1, $f_val2)
             ->bindParam($s_key2, $f_val3)->bindValue($s_key2, $f_val4);
@@ -567,7 +559,7 @@ class StatementTest extends PHPUnit_Framework_TestCase
             ->will($this->returnValue($o_stmt1));
         $o_stmt2 = $this->getMockForAbstractClass(
             'Tox\\Data\\Pdo\\Statement',
-            array($this->pdo, $this->type, microtime())
+            array($this->pdo, microtime())
         );
         $this->assertSame($o_stmt2, $o_stmt2->execute($a_pars)->execute(array()));
     }
@@ -587,7 +579,7 @@ class StatementTest extends PHPUnit_Framework_TestCase
             ->will($this->returnValue($o_stmt1));
         $o_stmt2 = $this->getMockForAbstractClass(
             'Tox\\Data\\Pdo\\Statement',
-            array($this->pdo, $this->type, microtime())
+            array($this->pdo, microtime())
         );
         $o_stmt2->bindColumn($i_key, $s_val);
     }
@@ -607,7 +599,7 @@ class StatementTest extends PHPUnit_Framework_TestCase
             ->will($this->returnValue($o_stmt1));
         $o_stmt2 = $this->getMockForAbstractClass(
             'Tox\\Data\\Pdo\\Statement',
-            array($this->pdo, $this->type, microtime())
+            array($this->pdo, microtime())
         );
         $o_stmt2->bindParam($s_key, $s_val);
     }
@@ -626,7 +618,7 @@ class StatementTest extends PHPUnit_Framework_TestCase
             ->will($this->returnValue($o_stmt1));
         $o_stmt2 = $this->getMockForAbstractClass(
             'Tox\\Data\\Pdo\\Statement',
-            array($this->pdo, $this->type, microtime())
+            array($this->pdo, microtime())
         );
         $o_stmt2->bindParam($s_key, $s_key)->bindValue($s_key, microtime());
     }
@@ -644,7 +636,7 @@ class StatementTest extends PHPUnit_Framework_TestCase
             ->will($this->returnValue($o_stmt1));
         $o_stmt2 = $this->getMockForAbstractClass(
             'Tox\\Data\\Pdo\\Statement',
-            array($this->pdo, $this->type, microtime())
+            array($this->pdo, microtime())
         );
         $o_stmt2->fetch();
         $o_stmt2->closeCursor();
@@ -663,7 +655,7 @@ class StatementTest extends PHPUnit_Framework_TestCase
             ->will($this->returnValue($o_stmt1));
         $o_stmt2 = $this->getMockForAbstractClass(
             'Tox\\Data\\Pdo\\Statement',
-            array($this->pdo, $this->type, microtime())
+            array($this->pdo, microtime())
         );
         $o_stmt2->execute();
     }
@@ -681,7 +673,7 @@ class StatementTest extends PHPUnit_Framework_TestCase
             ->will($this->returnValue($o_stmt1));
         $o_stmt2 = $this->getMockForAbstractClass(
             'Tox\\Data\\Pdo\\Statement',
-            array($this->pdo, $this->type, microtime())
+            array($this->pdo, microtime())
         );
         $o_stmt2->nextRowset();
     }
@@ -699,7 +691,7 @@ class StatementTest extends PHPUnit_Framework_TestCase
             ->will($this->returnValue($o_stmt1));
         $o_stmt2 = $this->getMockForAbstractClass(
             'Tox\\Data\\Pdo\\Statement',
-            array($this->pdo, $this->type, microtime())
+            array($this->pdo, microtime())
         );
         $o_stmt2->execute()->setAttribute(rand(), microtime());
     }
@@ -717,7 +709,7 @@ class StatementTest extends PHPUnit_Framework_TestCase
             ->will($this->returnValue($o_stmt1));
         $o_stmt2 = $this->getMockForAbstractClass(
             'Tox\\Data\\Pdo\\Statement',
-            array($this->pdo, $this->type, microtime())
+            array($this->pdo, microtime())
         );
         $o_stmt2->execute()->setFetchMode(rand(), microtime());
     }
@@ -729,7 +721,7 @@ class StatementTest extends PHPUnit_Framework_TestCase
         $o_stmt = $this->getMock(
             'Tox\\Data\\Pdo\\Statement',
             array('fetchAll'),
-            array($this->pdo, $this->type, microtime())
+            array($this->pdo, microtime())
         );
         $o_stmt->expects($this->once())->method('fetchAll')
             ->will($this->returnValue($a_rows));
@@ -752,13 +744,39 @@ class StatementTest extends PHPUnit_Framework_TestCase
         $o_stmt = $this->getMock(
             'Tox\\Data\\Pdo\\Statement',
             array('fetchAll'),
-            array($this->pdo, $this->type, microtime())
+            array($this->pdo, microtime())
         );
         $o_stmt->expects($this->once())->method('fetchAll')
             ->will($this->returnValue($a_rows));
         foreach ($o_stmt as $ii => $jj) {
             $this->assertEquals($a_rows[$ii], $jj);
         }
+    }
+
+    public function testManufacturingPreparedStatement()
+    {
+        $s_val = microtime();
+        $o_stmt = $this->getMock(
+            'Tox\\Data\\Pdo\\Statement',
+            array('newPrepare', 'newQuery'),
+            array($this->pdo, microtime())
+        );
+        $o_stmt->staticExpects($this->once())->method('newPrepare')
+            ->will($this->returnValue($s_val));
+        $this->assertEquals($s_val, $o_stmt::manufacture($this->pdo, Statement::TYPE_PREPARE, microtime()));
+    }
+
+    public function testManufacturingQueryStatement()
+    {
+        $s_val = microtime();
+        $o_stmt = $this->getMock(
+            'Tox\\Data\\Pdo\\Statement',
+            array('newPrepare', 'newQuery'),
+            array($this->pdo, microtime())
+        );
+        $o_stmt->staticExpects($this->once())->method('newQuery')
+            ->will($this->returnValue($s_val));
+        $this->assertEquals($s_val, $o_stmt::manufacture($this->pdo, Statement::TYPE_QUERY, microtime()));
     }
 }
 
