@@ -48,7 +48,7 @@ class AssemblyTest extends PHPUnit_Framework_TestCase
         try {
             $s_prop = md5(microtime());
             $o_mock = $this->getMock(
-                'Tox\\Core\\AssemblyMockA',
+                'Tox\\Core\\AssemblyStubA',
                 array('toxIsMagicPropReadable', 'toxGet' . $s_prop)
             );
             $o_mock->expects($this->once())->method('toxIsMagicPropReadable')
@@ -67,7 +67,7 @@ class AssemblyTest extends PHPUnit_Framework_TestCase
     public function testRegularPairOfPropAndGetterWouldWorkFine()
     {
         try {
-            $o_obj = new AssemblyMockA;
+            $o_obj = new AssemblyStubA;
             $this->assertNull($o_obj->ok);
         } catch (Exception $ex) {
             $this->fail();
@@ -80,7 +80,7 @@ class AssemblyTest extends PHPUnit_Framework_TestCase
      */
     public function testPropertyMustBeDeclaredForGetterMechanism()
     {
-        $o_obj = new AssemblyMockA;
+        $o_obj = new AssemblyStubA;
         $o_obj->noProp;
     }
 
@@ -90,7 +90,7 @@ class AssemblyTest extends PHPUnit_Framework_TestCase
      */
     public function testGetterMustBeDeclaredForGetterMechanism()
     {
-        $o_obj = new AssemblyMockA;
+        $o_obj = new AssemblyStubA;
         $o_obj->noGetter;
     }
 
@@ -100,7 +100,7 @@ class AssemblyTest extends PHPUnit_Framework_TestCase
      */
     public function testPrivatePropAgainstGetterMechanism()
     {
-        $o_obj = new AssemblyMockA;
+        $o_obj = new AssemblyStubA;
         $o_obj->privProp;
     }
 
@@ -110,7 +110,7 @@ class AssemblyTest extends PHPUnit_Framework_TestCase
      */
     public function testPublicGetterAgainstGetterMechanism()
     {
-        $o_obj = new AssemblyMockA;
+        $o_obj = new AssemblyStubA;
         $o_obj->pubGetter;
     }
 
@@ -119,7 +119,7 @@ class AssemblyTest extends PHPUnit_Framework_TestCase
         try {
             $s_prop = md5(microtime());
             $f_value = microtime(true);
-            $o_mock = $this->getMock('Tox\\Core\\AssemblyMockA', array('toxIsMagicPropWritable', 'toxSet' . $s_prop));
+            $o_mock = $this->getMock('Tox\\Core\\AssemblyStubA', array('toxIsMagicPropWritable', 'toxSet' . $s_prop));
             $o_mock->expects($this->once())->method('toxIsMagicPropWritable')
                 ->with($this->equalTo($s_prop))
                 ->will($this->returnValue(true));
@@ -139,7 +139,7 @@ class AssemblyTest extends PHPUnit_Framework_TestCase
     {
         try {
             $f_value = microtime(true);
-            $o_obj = new AssemblyMockA;
+            $o_obj = new AssemblyStubA;
             $o_obj->ok = $f_value;
             $this->assertEquals($f_value, $o_obj->ok);
         } catch (Exception $ex) {
@@ -153,7 +153,7 @@ class AssemblyTest extends PHPUnit_Framework_TestCase
      */
     public function testPropertyMustBeDeclaredForSetterMechanism()
     {
-        $o_obj = new AssemblyMockA;
+        $o_obj = new AssemblyStubA;
         $o_obj->noProp = 1;
     }
 
@@ -163,7 +163,7 @@ class AssemblyTest extends PHPUnit_Framework_TestCase
      */
     public function testSetterMustBeDeclaredForSetterMechanism()
     {
-        $o_obj = new AssemblyMockA;
+        $o_obj = new AssemblyStubA;
         $o_obj->noSetter = 1;
     }
 
@@ -173,7 +173,7 @@ class AssemblyTest extends PHPUnit_Framework_TestCase
      */
     public function testPrivatePropAgainstSetterMechanism()
     {
-        $o_obj = new AssemblyMockA;
+        $o_obj = new AssemblyStubA;
         $o_obj->privProp = 1;
     }
 
@@ -183,7 +183,7 @@ class AssemblyTest extends PHPUnit_Framework_TestCase
      */
     public function testPublicSetterAgainstSetterMechanism()
     {
-        $o_obj = new AssemblyMockA;
+        $o_obj = new AssemblyStubA;
         $o_obj->pubSetter = 1;
     }
 
@@ -194,8 +194,8 @@ class AssemblyTest extends PHPUnit_Framework_TestCase
     {
         try {
             $f_value = microtime(true);
-            $o_obj1 = new AssemblyMockA;
-            $o_obj2 = new AssemblyMockB;
+            $o_obj1 = new AssemblyStubA;
+            $o_obj2 = new AssemblyStubB;
             $o_obj1->ok = $f_value;
             $o_obj2->foo = $f_value;
             $this->assertEquals($f_value, $o_obj1->ok);
@@ -203,6 +203,26 @@ class AssemblyTest extends PHPUnit_Framework_TestCase
         } catch (PHPException $ex) {
             $this->fail();
         }
+    }
+
+    /**
+     * @depends testGetterMechanismSupported
+     */
+    public function testPreGet()
+    {
+        $o_obj = $this->getMock('Tox\\Core\\AssemblyStubA', array('toxPreGet'));
+        $o_obj->expects($this->once())->method('toxPreGet')->with($this->equalTo('ok'));
+        $o_obj->ok;
+    }
+
+    /**
+     * @depends testSetterMechanismSupported
+     */
+    public function testPostSet()
+    {
+        $o_obj = $this->getMock('Tox\\Core\\AssemblyStubA', array('toxPostSet'));
+        $o_obj->expects($this->once())->method('toxPostSet')->with($this->equalTo('ok'));
+        $o_obj->ok = microtime();
     }
 }
 
@@ -216,7 +236,7 @@ class AssemblyTest extends PHPUnit_Framework_TestCase
  *
  * @property mixed $ok
  */
-class AssemblyMockA extends Assembly
+class AssemblyStubA extends Assembly
 {
     /**
      * Retrieves and sets some value.
@@ -349,7 +369,7 @@ class AssemblyMockA extends Assembly
  *
  * @property NULL $foo
  */
-class AssemblyMockB extends Assembly
+class AssemblyStubB extends Assembly
 {
     /**
      * Retrieves and sets some value.

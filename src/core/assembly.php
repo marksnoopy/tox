@@ -107,6 +107,7 @@ abstract class Assembly
         if (!$this->toxIsMagicPropReadable($prop)) {
             throw new PropertyReadDeniedException(array('object' => $this, 'property' => $prop));
         }
+        $this->toxPreGet($prop);
         return call_user_func(array($this, 'toxGet' . $prop));
     }
 
@@ -215,6 +216,7 @@ abstract class Assembly
         if (!$this->toxIsMagicPropWritable($prop)) {
             throw new PropertyWriteDeniedException(array('object' => $this, 'property' => $prop));
         }
+        $this->toxPostSet($prop);
         call_user_func(array($this, 'toxSet' . $prop), $value);
     }
 
@@ -242,6 +244,26 @@ abstract class Assembly
     public function __toString()
     {
         return get_class($this);
+    }
+
+    /**
+     * Be invoked before retrieving a magic property.
+     *
+     * @param  string $prop Property name.
+     * @return void
+     */
+    protected function toxPreGet($prop)
+    {
+    }
+
+    /**
+     * Be invoked after setting a magic property.
+     *
+     * @param  string $prop Property name.
+     * @return void
+     */
+    protected function toxPostSet($prop)
+    {
     }
 }
 
