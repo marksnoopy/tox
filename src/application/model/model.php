@@ -204,6 +204,8 @@ abstract class Model extends Core\Assembly implements Application\IModel
      * Creates a new model object.
      *
      * @return self
+     *
+     * @codeCoverageIgnore
      */
     protected static function newModel()
     {

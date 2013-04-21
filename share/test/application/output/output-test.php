@@ -30,9 +30,9 @@ require_once __DIR__ . '/../../../../src/application/ioutput.php';
 require_once __DIR__ . '/../../../../src/application/output/output.php';
 
 require_once __DIR__ . '/../../../../src/core/exception.php';
-require_once __DIR__ . '/../../../../src/application/output/@exception/closedoutput.php';
-require_once __DIR__ . '/../../../../src/application/output/@exception/bufferreadonly.php';
-require_once __DIR__ . '/../../../../src/application/output/@exception/streamingviewexpected.php';
+require_once __DIR__ . '/../../../../src/application/output/closedoutputexception.php';
+require_once __DIR__ . '/../../../../src/application/output/bufferreadonlyexception.php';
+require_once __DIR__ . '/../../../../src/application/output/streamingviewexpectedexception.php';
 
 require_once __DIR__ . '/../../../../src/application/iview.php';
 require_once __DIR__ . '/../../../../src/application/istreamingview.php';

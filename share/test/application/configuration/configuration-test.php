@@ -43,8 +43,8 @@ require_once __DIR__ . '/../../../../src/core/assembly.php';
 require_once __DIR__ . '/../../../../src/core/exception.php';
 require_once __DIR__ . '/../../../../src/application/iconfiguration.php';
 require_once __DIR__ . '/../../../../src/application/configuration/configuration.php';
-require_once __DIR__ . '/../../../../src/application/configuration/@exception/invalidconfigurationfile.php';
-require_once __DIR__ . '/../../../../src/application/configuration/@exception/invalidconfigurationitems.php';
+require_once __DIR__ . '/../../../../src/application/configuration/invalidconfigurationfileexception.php';
+require_once __DIR__ . '/../../../../src/application/configuration/invalidconfigurationitemsexception.php';
 
 require_once __DIR__ . '/../../../../src/application/application.php';
 

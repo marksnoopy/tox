@@ -44,9 +44,9 @@ require_once __DIR__ . '/../../../src/core/assembly.php';
 require_once __DIR__ . '/../../../src/core/packagemanager.php';
 
 require_once __DIR__ . '/../../../src/core/exception.php';
-require_once __DIR__ . '/../../../src/core/@exception/packageduplicateregistration.php';
-require_once __DIR__ . '/../../../src/core/@exception/packageaccessdenied.php';
-require_once __DIR__ . '/../../../src/core/@exception/illegal3rdpartypackage.php';
+require_once __DIR__ . '/../../../src/core/packageduplicateregistrationexception.php';
+require_once __DIR__ . '/../../../src/core/packageaccessdeniedexception.php';
+require_once __DIR__ . '/../../../src/core/illegal3rdpartypackageexception.php';
 
 /**
  * Tests Tox\Core\PackageManager.

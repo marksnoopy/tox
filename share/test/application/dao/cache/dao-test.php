@@ -36,8 +36,8 @@ require_once __DIR__ . '/../../../../../src/data/kv/kv.php';
 require_once __DIR__ . '/../../../../../src/data/kv/memcache.php';
 
 require_once __DIR__ . '/../../../../../src/core/exception.php';
-require_once __DIR__ . '/../../../../../src/application/dao/cache/@exception/datasourceexpected.php';
-require_once __DIR__ . '/../../../../../src/application/dao/cache/@exception/invalidcachingdatadomain.php';
+require_once __DIR__ . '/../../../../../src/application/dao/cache/datasourceexpectedexception.php';
+require_once __DIR__ . '/../../../../../src/application/dao/cache/invalidcachingdatadomainexception.php';
 
 use Tox;
 use stdClass;

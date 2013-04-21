@@ -30,8 +30,8 @@ use PHPUnit_Framework_TestCase;
 require_once __DIR__ . '/../../../src/core/assembly.php';
 
 require_once __DIR__ . '/../../../src/core/exception.php';
-require_once __DIR__ . '/../../../src/core/@exception/propertyreaddenied.php';
-require_once __DIR__ . '/../../../src/core/@exception/propertywritedenied.php';
+require_once __DIR__ . '/../../../src/core/propertyreaddeniedexception.php';
+require_once __DIR__ . '/../../../src/core/propertywritedeniedexception.php';
 
 /**
  * Tests Tox\Core\Assembly.

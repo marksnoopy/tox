@@ -29,7 +29,7 @@ require_once __DIR__ . '/../../../src/core/assembly.php';
 require_once __DIR__ . '/../../../src/core/classmanager.php';
 
 require_once __DIR__ . '/../../../src/core/exception.php';
-require_once __DIR__ . '/../../../src/core/@exception/existantclasstoalias.php';
+require_once __DIR__ . '/../../../src/core/existantclasstoaliasexception.php';
 
 /**
  * Tests Tox\Core\ClassManager.

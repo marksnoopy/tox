@@ -32,9 +32,9 @@ require_once __DIR__ . '/../../../../src/web/iresponse.php';
 require_once __DIR__ . '/../../../../src/web/response/response.php';
 
 require_once __DIR__ . '/../../../../src/core/exception.php';
-require_once __DIR__ . '/../../../../src/application/output/@exception/closedoutput.php';
-require_once __DIR__ . '/../../../../src/web/response/@exception/headersreadonly.php';
-require_once __DIR__ . '/../../../../src/web/response/@exception/illegalhttpstatuscode.php';
+require_once __DIR__ . '/../../../../src/application/output/closedoutputexception.php';
+require_once __DIR__ . '/../../../../src/web/response/headersreadonlyexception.php';
+require_once __DIR__ . '/../../../../src/web/response/illegalhttpstatuscodeexception.php';
 
 require_once __DIR__ . '/../../../../src/application/ioutputtask.php';
 require_once __DIR__ . '/../../../../src/web/ihttpheadersprocessor.php';
