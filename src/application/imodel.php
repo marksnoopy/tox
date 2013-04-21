@@ -84,11 +84,22 @@ interface IModel extends ICommittable
      * Returns the unique indentifier on string casting.
      *
      * @return string
-     *
-     * @throws NonExistantEntityException If the model entity is prepared or
-     *                                    terminated.
      */
     public function __toString();
+
+    /**
+     * Checks whether the model entity alive.
+     *
+     * @return bool
+     */
+    public function isAlive();
+
+    /**
+     * Duplicates a prepared model entity.
+     *
+     * @return void
+     */
+    public function __clone();
 }
 
 // vi:ft=php fenc=utf-8 ff=unix ts=4 sts=4 et sw=4 fen fdm=indent fdl=1 tw=120

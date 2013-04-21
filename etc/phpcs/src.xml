@@ -2,7 +2,6 @@
 <!-- vi:se fenc=utf-8 ff=unix tw=80 ai si sw=2 et ts=2 sts=2: -->
 <ruleset name="Tox">
   <description>PSR-2 standard excluding files.</description>
-  <exclude-pattern>src/application/model/*</exclude-pattern>
   <exclude-pattern>src/web/*</exclude-pattern>
   <exclude-pattern>src/type/enumeration/*</exclude-pattern>
   <rule ref="PSR2"/>
