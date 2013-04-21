@@ -216,8 +216,8 @@ abstract class Assembly
         if (!$this->toxIsMagicPropWritable($prop)) {
             throw new PropertyWriteDeniedException(array('object' => $this, 'property' => $prop));
         }
+        call_user_func(array($this, 'toxSet' . $prop), $this->toxPreSet($prop, $value));
         $this->toxPostSet($prop);
-        call_user_func(array($this, 'toxSet' . $prop), $value);
     }
 
     /**
@@ -254,6 +254,20 @@ abstract class Assembly
      */
     protected function toxPreGet($prop)
     {
+    }
+
+    /**
+     * Be invoked before setting a magic property.
+     *
+     * NOTICE: The returning value WOULD be passed to setter methods.
+     *
+     * @param  string $prop  Property name.
+     * @param  mixed  $value New value.
+     * @return mixed
+     */
+    protected function toxPreSet($prop, $value)
+    {
+        return $value;
     }
 
     /**
