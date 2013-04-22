@@ -44,6 +44,9 @@
 0x80020702 = NonExistantEntityException
 0x80020703 = PreparationCanNotResetException
 0x80020704 = DuplicateIdentifierException
+0x80020705 = IllegalFilterException
+0x80020706 = AttributeFilteredException
+0x80020707 = AttributeSortedException
 
 [Tox\Application\Dao]
 0x80020801 = DataSourceExpectedException

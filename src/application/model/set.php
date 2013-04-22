@@ -1,5 +1,7 @@
 <?php
 /**
+ * Defines the models sets.
+ *
  * This file is part of Tox.
  *
  * Tox is free software: you can redistribute it and/or modify
@@ -16,535 +18,599 @@
  * along with Tox.  If not, see <http://www.gnu.org/licenses/>.
  *
  * @copyright © 2012-2013 PHP-Tox.org
- * @license    http://www.gnu.org/licenses/gpl.html
+ * @license   GNU General Public License, version 3
  */
 
 namespace Tox\Application\Model;
 
 use Tox\Core;
 use Tox\Application;
-use Tox\Application\Type;
 
 /**
- * Represents as a collection of entities.
+ * Represents as a models set.
  *
- * @package Tox\Application\Model
+ * **THIS CLASS CANNOT BE INSTANTIATED.**
+ *
+ * @package tox.application.model
  * @author  Snakevil Zen <zsnakevil@gmail.com>
  * @since   0.1.0-beta1
  */
-abstract class Set extends Core\Assembly implements ICollection
+abstract class Set extends Core\Assembly implements Application\IModelSet
 {
-    protected $_committing;
-
-    protected $_cursor;
-
-    protected $_dao;
-
-    protected $_elements;
-
-    protected $_filters;
-
-    protected $_index;
-
-    protected $_length;
-
-    protected $_totalLength;
-
-    protected $_maxLength;
-
-    protected $_orders;
-
-    protected $_offset;
+    /**
+     * Represents the prototype of corresponding model.
+     */
+    const MODEL = 'Tox\\Application\\IModel';
 
     /**
-     * Stores the changements.
+     * Stores the data access object in use.
      *
-     * @internal
-     *
-     * @var Application\Model[][]
+     * @var Application\IDao
      */
-    protected $_stack;
-
-    public function append(IEntity $entity)
-    {
-        if (strlen($entity->id))
-        {
-            $this->valid();
-            if (isset($this->_stack['drop'][$entity->id]))
-            {
-                unset($this->_stack['drop'][$entity->id]);
-            }
-            if (isset($this->_elements[$entity->id]))
-            {
-                return $this;
-            }
-            if (!isset($this->_stack['append'][$entity->id]))
-            {
-                $this->_stack['append'][$entity->id] = $entity;
-            }
-            return $this;
-        }
-        foreach ($this->_stack['drop'] as $s_id => $o_entity)
-        {
-            if ($o_entity === $entity)
-            {
-                unset($this->_stack['drop'][$s_id]);
-            }
-        }
-        foreach ($this->_stack['append'] as $s_id => $o_entity)
-        {
-            if ($o_entity === $entity)
-            {
-                return $this;
-            }
-        }
-        $s_id = md5(get_class($this) . microtime());
-        $this->_stack['append'][$s_id] = $entity;
-        return $this;
-    }
-
-    public function __clone()
-    {
-        $this->_committing = FALSE;
-        $this->_cursor =
-        $this->_length =
-        $this->_totalLength = -1;
-        $this->_elements =
-        $this->_index = array();
-        $this->_stack = array('append' => array(),
-            'change' => array(),
-            'drop' => array()
-        );
-    }
-
-    public function clear()
-    {
-        $this->valid();
-        $this->_stack['drop'] = $this->_elements;
-        return $this;
-    }
-
-    public function __construct(Application\IDao $dao = NULL)
-    {
-        if (NULL === $dao)
-        {
-            $dao = $this->getDefaultDao();
-        }
-        $this->_committing = FALSE;
-        $this->_cursor =
-        $this->_totalLength = -1;
-        $this->_dao = $dao;
-        $this->_elements =
-        $this->_filters =
-        $this->_index =
-        $this->_orders = array();
-        $this->_maxLength =
-        $this->_offset = 0;
-        $this->_stack = array('append' => array(),
-            'change' => array(),
-            'drop' => array()
-        );
-    }
-
-    public function commit()
-    {
-        if (!$this->isChanged() || $this->_committing)
-        {
-            return $this;
-        }
-        $this->_committing = TRUE;
-        foreach ($this->_stack['append'] as $o_entity)
-        {
-            $o_entity->commit();
-        }
-        foreach ($this->_stack['change'] as $o_entity)
-        {
-            $o_entity->commit();
-        }
-        foreach ($this->_stack['drop'] as $o_entity)
-        {
-            $o_entity->commit();
-        }
-        $this->_committing = FALSE;
-        $this->_stack = array();
-        return $this;
-    }
+    protected $dao;
 
     /**
-     * Sets up an element entity through attributes.
+     * Stores the applied filters.
      *
-     * <code>
-     * return Model::import($this);
-     * </code>
-     *
-     * @return Application\Model
+     * @var array[]
      */
-    abstract protected function convertElement();
+    protected $filters;
 
-    public function count()
-    {
-        $this->valid();
-        return $this->_totalLength;
-    }
+    /**
+     * Stores the applied sorting orders.
+     *
+     * @var const[]
+     */
+    protected $orders;
 
-    public function crop($offset, $length = 0)
-    {
-        $offset = (int) $offset;
-        $length = (int) $length;
-        if (0 > $offset)
-        {
-            $offset = 0;
-        }
-        if (0 > $length)
-        {
-            $length = 0;
-        }
-        $o_collection = clone $this;
-        $o_collection->_offset = $offset;
-        $o_collection->_maxLength = $length;
-        return $o_collection;
-    }
+    /**
+     * Stores the applied cropping offset.
+     *
+     * @var int
+     */
+    protected $offset;
 
-    public function current()
-    {
-        if (!$this->valid())
-        {
-            return;
-        }
-        if (!$this->_cursor)
-        {
-            $this->load();
-        }
-        if (!$this->_elements[$this->_index[$this->_cursor]] instanceof Application\Model)
-        {
-            $this->_elements[$this->_index[$this->_cursor]] = $this->convertElement();
-        }
-        if (!$this->_elements[$this->_index[$this->_cursor]] instanceof Application\Model)
-        {
-            throw new ElementEntityConversionFailedException;
-        }
-        return $this->_elements[$this->_index[$this->_cursor]];
-    }
+    /**
+     * Stores the applied cropping limit.
+     *
+     * @var int
+     */
+    protected $limit;
 
-    final protected function doFilter($attribute, $value)
-    {
-        if (is_array($value) || $value instanceof self)
-        {
-            return $this->doFilterIn($attribute, $value);
-        }
-        return $this->doFilterEqual($attribute, $value);
-    }
+    /**
+     * Stores the amount of included model entities.
+     *
+     * @var int
+     */
+    protected $length;
 
-    final protected function doFilterBetween($attribute, $minValue, $maxValue)
-    {
-        $o_set = clone $this;
-        $o_set->_filters[(string) $attribute] = array(array((int) $minValue, (int) $maxValue), new Type\SetFilterType('><'));
-        return $o_set;
-    }
+    /**
+     * Stores the included model entities.
+     *
+     * @var Model[]
+     */
+    protected $items;
 
-    final protected function doFilterEqual($attribute, $value)
-    {
-        $o_set = clone $this;
-        $o_set->_filters[(string) $attribute] = array((string) $value, new Type\SetFilterType('='));
-        return $o_set;
-    }
+    /**
+     * Stores the cursor of iteration.
+     *
+     * @var int
+     */
+    protected $cursor;
 
-    final protected function doFilterGreaterOrEqual($attribute, $value)
-    {
-        return $this->doFilterNotLessThan($attribute, $value);
-    }
+    /**
+     * Stores the parent model entity.
+     *
+     * @var Application\IModel
+     */
+    protected $parent;
 
-    final protected function doFilterGreaterThan($attribute, $value)
-    {
-        $o_set = clone $this;
-        $o_set->_filters[(string) $attribute] = array((int) $value, new Type\SetFilterType('>'));
-        return $o_set;
-    }
-
-    final protected function doFilterIn($attribute, $value)
-    {
-        if ($value instanceof self)
-        {
-            $value = $value->dumpIds();
-        }
-        else
-        {
-            $value = (array) $value;
-        }
-        $o_set = clone $this;
-        $o_set->_filters[(string) $attribute] = array($value, new Type\SetFilterType('in'));
-        return $o_set;
-    }
-
-    final protected function doFilterLessOrEqual($attribute, $value)
-    {
-        return $this->doFilterNotGreaterThan($attribute, $value);
-    }
-
-    final protected function doFilterLessThan($attribute, $value)
-    {
-        $o_set = clone $this;
-        $o_set->_filters[(string) $attribute] = array((int) $value, new Type\SetFilterType('<'));
-        return $o_set;
-    }
-
-    final protected function doFilterLike($attribute, $value)
-    {
-        $o_set = clone $this;
-        $o_set->_filters[(string) $attribute] = array((string) $value, new Type\SetFilterType('%'));
-        return $o_set;
-    }
-
-    final protected function doFilterNotBetween($attribute, $minValue, $maxValue)
-    {
-        $o_set = clone $this;
-        $o_set->_filters[(string) $attribute] = array(array((int) $minValue, (int) $maxValue), new Type\SetFilterType('< >'));
-        return $o_set;
-    }
-
-    final protected function doFilterNotEqual($attribute, $value)
-    {
-        $o_set = clone $this;
-        $o_set->_filters[(string) $attribute] = array((string) $value, new Type\SetFilterType('!='));
-        return $o_set;
-    }
-
-    final protected function doFilterNotGreaterThan($attribute, $value)
-    {
-        $o_set = clone $this;
-        $o_set->_filters[(string) $attribute] = array((string) $value, new Type\SetFilterType('<='));
-        return $o_set;
-    }
-
-    final protected function doFilterNotIn($attribute, $value)
-    {
-        if ($value instanceof self)
-        {
-            $value = $value->dumpIds();
-        }
-        else
-        {
-            $value = (array) $value;
-        }
-        $o_set = clone $this;
-        $o_set->_filters[(string) $attribute] = array($value, new Type\SetFilterType('!in'));
-        return $o_set;
-    }
-
-    final protected function doFilterNotLessThan($attribute, $value)
-    {
-        $o_set = clone $this;
-        $o_set->_filters[(string) $attribute] = array((int) $value, new Type\SetFilterType('>='));
-        return $o_set;
-    }
-
-    final protected function doFilterNotLike($attribute, $value)
-    {
-        $o_set = clone $this;
-        $o_set->_filters[(string) $attribute] = array((string) $value, new Type\SetFilterType('!%'));
-        return $o_set;
-    }
-
-    final protected function doFilterOut($attribute, $value)
-    {
-        if (is_array($value) || $value instanceof self)
-        {
-            return $this->doFilterNotIn($attribute, $value);
-        }
-        return $this->doFilterNotEqual($attribute, $value);
-    }
-
-    final protected function doSort($attribute, Type\SetSortOrder $order = NULL)
-    {
-        if (NULL === $order)
-        {
-            $order = new Type\SetSortOrder(NULL);
-        }
-        $o_set = clone $this;
-        $o_set->_orders[(string) $attribute] = $order;
-        return $o_set;
-    }
-
-    public function drop(IEntity $entity)
-    {
-        if (strlen($entity->id))
-        {
-            $this->valid();
-            if (isset($this->_stack['append'][$entity->id]))
-            {
-                unset($this->_stack['append'][$entity->id]);
-            }
-            if (isset($this->_elements[$entity->id]))
-            {
-                return $this;
-            }
-            if (!isset($this->_stack['drop'][$entity->id]))
-            {
-                $this->_stack['drop'][$entity->id] = $entity;
-            }
-            return $this;
-        }
-        foreach ($this->_stack['append'] as $s_id => $o_entity)
-        {
-            if ($o_entity === $entity)
-            {
-                unset($this->_stack['append'][$s_id]);
-            }
-        }
-        foreach ($this->_stack['drop'] as $s_id => $o_entity)
-        {
-            if ($o_entity === $entity)
-            {
-                return $this;
-            }
-        }
-        $s_id = md5(get_class($this) . microtime());
-        $this->_stack['drop'][$s_id] = $entity;
-        return $this;
-    }
-
-    public function dumpIds()
-    {
-        $this->valid();
-        return array_values($this->_index);
-    }
-
-    public function export()
-    {
-        if (!$this->valid())
-        {
-            return;
-        }
-        return $this->_elements[$this->_index[$this->_cursor]];
-    }
-
+    /**
+     * Retrieves the default data access object.
+     *
+     * @return Application\IDao
+     */
     abstract protected function getDefaultDao();
 
     /**
-     * Checks whether changed.
+     * CONSTRUCT FUNCTION
      *
-     * @return bool
+     * @param Application\IModel $parent OPTIONAL. Parent model entity.
+     * @param Application\IDao   $dao    OPTIONAL. Data access object to use.
      */
-    public function isChanged()
+    public function __construct(Application\IModel $parent = null, Application\IDao $dao = null)
     {
-        return !empty($this->_stack['append']) || !empty($this->_stack['drop']) || !empty($this->_stack['change']);
+        $this->parent = $parent;
+        $this->dao = $dao;
+        $this->filters =
+        $this->orders = array();
+        $this->offset =
+        $this->limit = 0;
+        $this->length =
+        $this->cursor = -1;
     }
 
-    public function key()
+    /**
+     * Retrieves the data access object in use.
+     *
+     * **THIS METHOD CANNOT BE OVERRIDDEN.**
+     *
+     * @return Application\IDao
+     */
+    final protected function getDao()
     {
-        if (!$this->valid())
-        {
-            return;
+        if (!$this->dao instanceof Application\IDao) {
+            $this->dao = $this->getDefaultDao();
         }
-        return $this->_index[$this->_cursor];
+        return $this->dao;
     }
 
-    protected function load()
+    /**
+     * Be invoked on filterings or excludings.
+     *
+     * @param  string $method    Invoking method name.
+     * @param  array  $arguments Arguments.
+     * @return self
+     *
+     * @throws IllegalFilterException If calling unexpected method.
+     */
+    public function __call($method, Array $arguments)
     {
-        if (!$this->valid())
-        {
-            return self;
-        }
-		ksort($this->_filters);
-		$s_func = implode('And', array_keys($this->_filters));
-        if (!$this->_length && 0 < $this->_totalLength)
-        {
-            $a_elements = call_user_func(array($this->_dao, 'listBy' . $s_func), $this->_filters, $this->_orders,
-                $this->_offset, $this->_totalLength
-            );
-            for ($ii = 0, $jj = count($a_elements); $ii < $jj; $ii++)
-            {
-                $this->_elements[$a_elements[$ii]['id']] = $a_elements[$ii];
-                $this->_index[] = $a_elements[$ii]['id'];
+        $regex = '@^(filter|exclude)(\w+)' .
+            '(Equals|GreaterThan|GreaterOrEquals|LessThan|LessOrEquals|Between|In|Like)$@U';
+        $a_parts = array();
+        if (preg_match($regex, $method, $a_parts)) {
+            if ('Between' == $a_parts[3] && 1 == count($arguments)) {
+                $a_parts[3] = 'equals';
             }
+            array_unshift($arguments, $a_parts[2]);
+            return call_user_func_array(array($this, $a_parts[1] . $a_parts[3]), $arguments);
         }
-        return $this;
+        $regex = '@^(sort)(\w+)$@';
+        if (preg_match($regex, $method, $a_parts)) {
+            array_unshift($arguments, $a_parts[2]);
+            return call_user_func_array(array($this, 'doSort'), $arguments);
+        }
+        throw new IllegalFilterException(array('name' => $method));
     }
 
-    public function next()
+    /**
+     * Filters that the attribute equals to the value.
+     *
+     * @param  string $attribute Attribute name.
+     * @param  mixed  $value     Expected value.
+     * @return self
+     */
+    protected function filterEquals($attribute, $value)
     {
-        if ($this->valid())
-        {
-            $this->_cursor++;
-        }
+        return $this->doFilter(__METHOD__, $attribute, $value);
     }
 
-    public function receiveChanging(Application\Model $entity)
+    /**
+     * Filters that the attribute is greater than the value.
+     *
+     * @param  string    $attribute Attribute name.
+     * @param  int|float $value     Expected value.
+     * @return self
+     */
+    protected function filterGreaterThan($attribute, $value)
     {
-        if (!strlen($entity->id))
-        {
-            return $this;
-        }
-        $this->valid();
-        if (!isset($this->_elements[$entity->id]))
-        {
-            return $this;
-        }
-        if (!isset($this->_stack['change'][$entity->id]))
-        {
-            $this->_stack['change'][$entity->id] = $entity;
-        }
-        return $this;
+        return $this->doFilter(__METHOD__, $attribute, $value);
     }
 
-    public function receiveResuming(Application\Model $entity)
+    /**
+     * Filters that the attribute is greater than or equals to the value.
+     *
+     * @param  string    $attribute Attribute name.
+     * @param  int|float $value     Expected value.
+     * @return self
+     */
+    protected function filterGreaterOrEquals($attribute, $value)
     {
-        if (!strlen($entity->id))
-        {
-            return $this;
-        }
-        $this->valid();
-        if (!isset($this->_elements[$entity->id]))
-        {
-            return $this;
-        }
-        unset($this->_stack['change'][$entity->id]);
-        return $this;
+        return $this->doFilter(__METHOD__, $attribute, $value);
     }
 
-    public function replace(self $collection)
+    /**
+     * Filters that the attribute is less than the value.
+     *
+     * @param  string    $attribute Attribute name.
+     * @param  int|float $value     Expected value.
+     * @return self
+     */
+    protected function filterLessThan($attribute, $value)
+    {
+        return $this->doFilter(__METHOD__, $attribute, $value);
+    }
+
+    /**
+     * Filters that the attribute is less than or equals to the value.
+     *
+     * @param  string    $attribute Attribute name.
+     * @param  int|float $value     Expected value.
+     * @return self
+     */
+    protected function filterLessOrEquals($attribute, $value)
+    {
+        return $this->doFilter(__METHOD__, $attribute, $value);
+    }
+
+    /**
+     * Filters that the attribute is in the range.
+     *
+     * @param  string    $attribute Attribute name.
+     * @param  int|float $min       Expected minimize value.
+     * @param  int|float $max       Expected maximize value.
+     * @return self
+     */
+    protected function filterBetween($attribute, $min, $max)
+    {
+        if ($min == $max) {
+            return $this->filterEquals($attribute, $min);
+        }
+        return $this->doFilter(__METHOD__, $attribute, array($min, $max));
+    }
+
+    /**
+     * Filters that the attribute is one of the values.
+     *
+     * @param  string $attribute Attribute name.
+     * @param  array  $value     Expected values.
+     * @return self
+     */
+    protected function filterIn($attribute, array $values)
+    {
+        return $this->doFilter(__METHOD__, $attribute, $values);
+    }
+
+    /**
+     * Filters that the attribute is alike the value.
+     *
+     * @param  string $attribute Attribute name.
+     * @param  string $value     Expected value.
+     * @return self
+     */
+    protected function filterLike($attribute, $value)
+    {
+        return $this->doFilter(__METHOD__, $attribute, $value);
+    }
+
+    /**
+     * Excludes that the attribute equals to the value.
+     *
+     * @param  string $attribute Attribute name.
+     * @param  mixed  $value     Expected value.
+     * @return self
+     */
+    protected function excludeEquals($attribute, $value)
+    {
+        return $this->doFilter(__METHOD__, $attribute, $value);
+    }
+
+    /**
+     * Excludes that the attribute is greater than the value.
+     *
+     * @param  string    $attribute Attribute name.
+     * @param  int|float $value     Expected value.
+     * @return self
+     */
+    protected function excludeGreaterThan($attribute, $value)
+    {
+        return $this->filterLessOrEquals($attribute, $value);
+    }
+
+    /**
+     * Excludes that the attribute is greater than or equals to the value.
+     *
+     * @param  string    $attribute Attribute name.
+     * @param  int|float $value     Expected value.
+     * @return self
+     */
+    protected function excludeGreaterOrEquals($attribute, $value)
+    {
+        return $this->filterLessThan($attribute, $value);
+    }
+
+    /**
+     * Excludes that the attribute is less than the value.
+     *
+     * @param  string    $attribute Attribute name.
+     * @param  int|float $value     Expected value.
+     * @return self
+     */
+    protected function excludeLessThan($attribute, $value)
+    {
+        return $this->filterGreaterOrEquals($attribute, $value);
+    }
+
+    /**
+     * Excludes that the attribute is less than or equals to the value.
+     *
+     * @param  string    $attribute Attribute name.
+     * @param  int|float $value     Expected value.
+     * @return self
+     */
+    protected function excludeLessOrEquals($attribute, $value)
+    {
+        return $this->filterGreaterThan($attribute, $value);
+    }
+
+    /**
+     * Excludes that the attribute is in the range.
+     *
+     * @param  string    $attribute Attribute name.
+     * @param  int|float $min       Expected minimize value.
+     * @param  int|float $max       Expected maximize value.
+     * @return self
+     */
+    protected function excludeBetween($attribute, $min, $max)
+    {
+        if ($min == $max) {
+            return $this->excludeEquals($attribute, $min);
+        }
+        return $this->doFilter(__METHOD__, $attribute, array($min, $max));
+    }
+
+    /**
+     * Excludes that the attribute is one of the values.
+     *
+     * @param  string $attribute Attribute name.
+     * @param  array  $value     Expected values.
+     * @return self
+     */
+    protected function excludeIn($attribute, array $values)
+    {
+        return $this->doFilter(__METHOD__, $attribute, $values);
+    }
+
+    /**
+     * Excludes that the attribute is alike the value.
+     *
+     * @param  string $attribute Attribute name.
+     * @param  string $value     Expected value.
+     * @return self
+     */
+    protected function excludeLike($attribute, $value)
+    {
+        return $this->doFilter(__METHOD__, $attribute, $value);
+    }
+
+    /**
+     * Filters the set by a condition.
+     *
+     * @param  string $type      Filter type.
+     * @param  string $attribute Attribute name.
+     * @param  mixed  $value     Expected value.
+     * @return self
+     *
+     * @throws AttributeFilteredException If filtering an attribute multiple
+     *                                    times.
+     */
+    protected function doFilter($type, $attribute, $value)
+    {
+        $a_parts = explode('::', $type);
+        $type = $a_parts[1];
+        if (isset($this->filters[$attribute])) {
+            if (array($type, $value) != $this->filters[$attribute]) {
+                throw new AttributeFilteredException(
+                    array('name' => $attribute, 'type' => $this->filters[$attribute][0])
+                );
+            }
+            return $this;
+        }
+        $o_this = clone $this;
+        $o_this->filters[$attribute] = array($type, $value);
+        return $o_this;
+    }
+
+    /**
+     * {@inheritdoc}
+     *
+     * @return void
+     */
+    public function __clone()
     {
     }
 
     /**
-     * Ignores all the changements.
+     * Sorts by the attribute.
      *
+     * @param  string $attribute Attribute name.
+     * @param  const  $order     Sorting order.
+     * @return self
+     *
+     * @throws AttributeSortedException If Sorting an attribute multiple times.
+     */
+    protected function doSort($attribute, $order = self::SORT_DESC)
+    {
+        if (self::SORT_DESC != $order) {
+            $order = self::SORT_ASC;
+        }
+        if (isset($this->orders[$attribute])) {
+            if ($order != $this->orders[$attribute]) {
+                throw new AttributeSortedException(array('name' => $attribute));
+            }
+            return $this;
+        }
+        $o_this = clone $this;
+        $o_this->orders[$attribute] = $order;
+        return $o_this;
+    }
+
+    /**
+     * {@inheritdoc}
+     *
+     * @param  int  $offset The beginning offset to be kept.
+     * @param  int  $length OPTIONAL. The length to be kept. In defaults, every
+     *                      model sould be kept until the end.
      * @return self
      */
-    public function reset()
+    public function crop($offset, $length = 0)
     {
-        $this->_stack = array('append' => array(),
-            'change' => array(),
-            'drop' => array()
-        );
-        return $this;
+        $offset = (int) $offset;
+        if (0 > $offset) {
+            $offset = 0;
+        }
+        $length = (int) $length;
+        if (0 > $length) {
+            $length = 0;
+        }
+        if (!$offset && !$length) {
+            return $this;
+        }
+        $o_this = clone $this;
+        $o_this->offset += $offset;
+        $o_this->limit = $o_this->limit ? min($length, $o_this->limit) : $length;
+        return $o_this;
     }
 
+    /**
+     * Counts the amount of included model entities.
+     *
+     * @return int
+     */
+    public function count()
+    {
+        if (-1 == $this->length) {
+            $this->length = $this->getDao()->countBy($this->filters, $this->offset, $this->limit);
+        }
+        return $this->length;
+    }
+
+    /**
+     * Returns a generated model entity.
+     *
+     * @param  mixed[]            $attributes Attributes values.
+     * @return Application\IModel
+     */
+    protected function newModel($attributes)
+    {
+        return call_user_func(array(static::MODEL, 'import'), $attributes);
+    }
+
+    /**
+     * Rewind the Iterator to the first element.
+     *
+     * @return void
+     */
     public function rewind()
     {
-        if (-1 == $this->_totalLength)
-        {
-            ksort($this->_filters);
-            $s_func = implode('And', array_keys($this->_filters));
-            $i_totalLength = call_user_func(array($this->_dao, 'countBy' . $s_func), $this->_filters) - $this->_offset;
-            if ($this->_maxLength)
-            {
-                $i_totalLength = min($i_totalLength, $this->_maxLength);
+        if (!is_array($this->items)) {
+            $this->items = array();
+            foreach ($this->getDao()->listBy($this->filters, $this->orders, $this->offset, $this->limit) as $ii) {
+                $this->items[] = $this->newModel($ii);
             }
-            $this->_length = 0;
-            $this->_totalLength = $i_totalLength;
+            $this->length = count($this->items);
         }
-        $this->_cursor = 0;
+        $this->cursor = 0;
     }
 
+    /**
+     * Checks if current position is valid.
+     *
+     * @return bool
+     */
     public function valid()
     {
-        if (-1 == $this->_totalLength)
-        {
+        if (-1 == $this->cursor) {
             $this->rewind();
         }
-        return -1 < $this->_cursor && $this->_cursor < $this->_totalLength;
+        return -1 < $this->cursor && $this->cursor < $this->length;
+    }
+
+    /**
+     * Move forward to next element.
+     *
+     * @return void
+     */
+    public function next()
+    {
+        if (-1 == $this->cursor) {
+            $this->rewind();
+        }
+        $this->cursor++;
+    }
+
+    /**
+     * Return the key of the current element.
+     *
+     * @return int
+     */
+    public function key()
+    {
+        if (-1 == $this->cursor) {
+            $this->rewind();
+        }
+        return $this->cursor;
+    }
+
+    /**
+     * Return the current element.
+     *
+     * @return Application\IModel
+     */
+    public function current()
+    {
+        if (-1 == $this->cursor) {
+            $this->rewind();
+        }
+        return $this->items[$this->cursor];
+    }
+
+    /**
+     * {@inheritdoc}
+     *
+     * @return IModel
+     */
+    public function getParent()
+    {
+        return $this->parent;
+    }
+
+    /**
+     * Be invoked on retrieving the parent model entity.
+     *
+     * @return Application\IModel
+     */
+    final protected function toxGetParent()
+    {
+        return $this->getParent();
+    }
+
+    /**
+     * {@inheritdoc}
+     *
+     * **THIS METHOD CANNOT BE OVERRIDDEN.**
+     *
+     * @return int
+     */
+    public function getLength()
+    {
+        return $this->count();
+    }
+
+    /**
+     * Be invoked on retrieving the amount of included models entities.
+     *
+     * **THIS METHOD CANNOT BE OVERRIDDEN.**
+     *
+     * @return int
+     */
+    final protected function toxGetLength()
+    {
+        return $this->getLength();
+    }
+
+    /**
+     * {@inheritdoc}
+     *
+     * **THIS METHOD CANNOT BE OVERRIDDEN.**
+     *
+     * @return bool
+     */
+    final public function hasParent()
+    {
+        return $this->parent instanceof Application\IModel;
     }
 }
 
-// vi:se ft=php fenc=utf-8 ff=unix ts=4 sts=4 et sw=4 fen fdm=indent fdl=1 tw=120:
+// vi:ft=php fenc=utf-8 ff=unix ts=4 sts=4 et sw=4 fen fdm=indent fdl=1 tw=120

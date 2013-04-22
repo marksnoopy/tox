@@ -36,6 +36,20 @@ use Iterator;
 interface IModelSet extends ICommittable, Countable, Iterator
 {
     /**
+     * Represents sorting entities in ascending order.
+     *
+     * @var bool
+     */
+    const SORT_ASC = false;
+
+    /**
+     * Represents sorting entities in descending order.
+     *
+     * @var bool
+     */
+    const SORT_DESC = true;
+
+    /**
      * Appends a model.
      *
      * @param  IModel $entity The model to be appended.
@@ -67,6 +81,42 @@ interface IModelSet extends ICommittable, Countable, Iterator
      * @return self
      */
     public function crop($offset, $length = 0);
+
+    /**
+     * Duplicates another models set.
+     *
+     * @return void
+     */
+    public function __clone();
+
+    /**
+     * CONSTRUCT FUNCTION
+     *
+     * @param IModel $parent OPTIONAL. Parent model entity.
+     * @param IDao   $dao    OPTIONAL. Data access object to use.
+     */
+    public function __construct(IModel $parent = null, IDao $dao = null);
+
+    /**
+     * Retrieves the parent model entity.
+     *
+     * @return IModel
+     */
+    public function getParent();
+
+    /**
+     * Retrieves the amount of included models entities.
+     *
+     * @return int
+     */
+    public function getLength();
+
+    /**
+     * Checks whether there is a parent.
+     *
+     * @return bool
+     */
+    public function hasParent();
 }
 
 // vi:ft=php fenc=utf-8 ff=unix ts=4 sts=4 et sw=4 fen fdm=indent fdl=1 tw=120
