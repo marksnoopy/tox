@@ -43,6 +43,7 @@
 0x80020701 = IdentifierReadOnlyException
 0x80020702 = NonExistantEntityException
 0x80020703 = PreparationCanNotResetException
+0x80020704 = DuplicateIdentifierException
 
 [Tox\Application\Dao]
 0x80020801 = DataSourceExpectedException

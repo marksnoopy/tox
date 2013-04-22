@@ -319,6 +319,8 @@ abstract class Model extends Core\Assembly implements Application\IModel
      * **THIS METHOD CANNOT BE OVERRIDDEN.**
      *
      * @return self
+     *
+     * @throws DuplicateIdentifierException If the identifier already in use.
      */
     final public function commit()
     {
@@ -333,6 +335,11 @@ abstract class Model extends Core\Assembly implements Application\IModel
             return $this->reset();
         }
         $this->id = $this->toxOriginal['id'] = $this->getDao()->create($this->toxStash);
+        $s_type = get_class($this);
+        if (isset(self::$instances[$s_type][$this->id])) {
+            throw new DuplicateIdentifierException(array('prototype' => $s_type, 'id' => $this->id));
+        }
+        self::$instances[$s_type][$this->id] = $this;
         unset($this->toxStash['id']);
         return $this->assign($this->toxStash)->reset();
     }

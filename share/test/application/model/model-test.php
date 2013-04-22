@@ -34,6 +34,7 @@ require_once __DIR__ . '/../../../../src/core/exception.php';
 require_once __DIR__ . '/../../../../src/application/model/identifierreadonlyexception.php';
 require_once __DIR__ . '/../../../../src/application/model/nonexistantentityexception.php';
 require_once __DIR__ . '/../../../../src/application/model/preparationcannotresetexception.php';
+require_once __DIR__ . '/../../../../src/application/model/duplicateidentifierexception.php';
 
 require_once __DIR__ . '/../../../../src/application/imodelset.php';
 require_once __DIR__ . '/../../../../src/core/isingleton.php';
@@ -57,9 +58,22 @@ class ModelTest extends PHPUnit_Framework_TestCase
      */
     protected $dao;
 
+    /**
+     * Stores the dummy of model entity for test.
+     *
+     * @var Model
+     */
+    protected $model;
+
     protected function setUp()
     {
         $this->dao = $this->getMock('Tox\\Application\\IDao');
+        $this->model = $this->getMockForAbstractClass(
+            'Tox\\Application\\Model\\Model',
+            array(),
+            'c_' . sha1(microtime()),
+            false
+        );
     }
 
     public function testMagicMethods()
@@ -85,14 +99,12 @@ class ModelTest extends PHPUnit_Framework_TestCase
 
     public function testLoadBySpecificDao()
     {
-        $s_class = 'c_' . sha1(microtime());
-        $o_mod1 = $this->getMockForAbstractClass('Tox\\Application\\Model\\Model', array(), $s_class, false);
         $s_id = microtime();
         $this->dao->expects($this->once())->method('read')
             ->with($this->equalTo($s_id))
             ->will($this->returnValue(array('id' => $s_id)));
-        $o_mod2 = $o_mod1::load($s_id, $this->dao);
-        $this->assertInstanceOf($s_class, $o_mod2);
+        $o_mod2 = $this->model->load($s_id, $this->dao);
+        $this->assertInstanceOf(get_class($this->model), $o_mod2);
         $this->assertEquals($s_id, $o_mod2->getId());
         $this->assertTrue($o_mod2->isAlive());
         $this->assertFalse($o_mod2->isChanged());
@@ -177,14 +189,12 @@ class ModelTest extends PHPUnit_Framework_TestCase
      */
     public function testTerminateWouldNotDeleteBeforeCommit()
     {
-        $s_class = 'c_' . sha1(microtime());
-        $o_mod1 = $this->getMockForAbstractClass('Tox\\Application\\Model\\Model', array(), $s_class, false);
         $s_id = microtime();
         $this->dao->expects($this->once())->method('read')
             ->with($this->equalTo($s_id))
             ->will($this->returnValue(array('id' => $s_id)));
         $this->dao->expects($this->never())->method('delete');
-        $o_mod2 = $o_mod1::load($s_id, $this->dao);
+        $o_mod2 = $this->model->load($s_id, $this->dao);
         $this->assertSame($o_mod2, $o_mod2->terminate());
         $this->assertEquals($s_id, $o_mod2->getId());
         $this->assertTrue($o_mod2->isAlive());
@@ -217,14 +227,12 @@ class ModelTest extends PHPUnit_Framework_TestCase
      */
     public function testCreationOnCommit()
     {
-        $s_class = 'c_' . sha1(microtime());
-        $o_mod1 = $this->getMockForAbstractClass('Tox\\Application\\Model\\Model', array(), $s_class, false);
         $s_id1 = microtime();
         $s_id2 = microtime();
         $this->dao->expects($this->once())->method('create')
             ->with($this->equalTo(array('id' => $s_id1)))
             ->will($this->returnValue($s_id2));
-        $o_mod2 = $o_mod1::prepare(array('id' => $s_id1), $this->dao);
+        $o_mod2 = $this->model->prepare(array('id' => $s_id1), $this->dao);
         $o_mod2->commit();
         $this->assertEquals($s_id2, $o_mod2->getId());
     }
@@ -278,10 +286,8 @@ class ModelTest extends PHPUnit_Framework_TestCase
      */
     public function testPreparationCanNotReset()
     {
-        $s_class = 'c_' . sha1(microtime());
-        $o_mod1 = $this->getMockForAbstractClass('Tox\\Application\\Model\\Model', array(), $s_class, false);
         $this->dao->expects($this->never())->method('create');
-        $o_mod2 = $o_mod1::prepare(array('id' => microtime()), $this->dao);
+        $o_mod2 = $this->model->prepare(array('id' => microtime()), $this->dao);
         $o_mod2->reset();
     }
 
@@ -290,13 +296,11 @@ class ModelTest extends PHPUnit_Framework_TestCase
      */
     public function testResetTermination()
     {
-        $s_class = 'c_' . sha1(microtime());
-        $o_mod1 = $this->getMockForAbstractClass('Tox\\Application\\Model\\Model', array(), $s_class, false);
         $s_id = microtime();
         $this->dao->expects($this->once())->method('read')
             ->with($this->equalTo($s_id))
             ->will($this->returnValue(array('id' => $s_id)));
-        $o_mod2 = $o_mod1::load($s_id, $this->dao);
+        $o_mod2 = $this->model->load($s_id, $this->dao);
         $o_mod2->terminate()->reset();
         $this->assertFalse($o_mod2->isChanged());
         $o_mod2->commit();
@@ -308,13 +312,11 @@ class ModelTest extends PHPUnit_Framework_TestCase
      */
     public function testStringCasting()
     {
-        $s_class = 'c_' . sha1(microtime());
-        $o_mod1 = $this->getMockForAbstractClass('Tox\\Application\\Model\\Model', array(), $s_class, false);
         $s_id = microtime();
         $this->dao->expects($this->once())->method('read')
             ->with($this->equalTo($s_id))
             ->will($this->returnValue(array('id' => $s_id)));
-        $o_mod2 = $o_mod1::load($s_id, $this->dao);
+        $o_mod2 = $this->model->load($s_id, $this->dao);
         $this->assertEquals($s_id, (string) $o_mod2);
     }
 
@@ -324,9 +326,7 @@ class ModelTest extends PHPUnit_Framework_TestCase
      */
     public function testStringCastingFailureForPrepared()
     {
-        $s_class = 'c_' . sha1(microtime());
-        $o_mod1 = $this->getMockForAbstractClass('Tox\\Application\\Model\\Model', array(), $s_class, false);
-        $o_mod2 = $o_mod1::prepare(array('id' => microtime()), $this->dao);
+        $o_mod2 = $this->model->prepare(array('id' => microtime()), $this->dao);
         $this->assertEquals('', (string) $o_mod2);
     }
 
@@ -336,14 +336,12 @@ class ModelTest extends PHPUnit_Framework_TestCase
      */
     public function testStringCastingFailureForTerminated()
     {
-        $s_class = 'c_' . sha1(microtime());
-        $o_mod1 = $this->getMockForAbstractClass('Tox\\Application\\Model\\Model', array(), $s_class, false);
         $s_id = microtime();
         $s_foo = microtime();
         $this->dao->expects($this->once())->method('read')
             ->will($this->returnValue(array('id' => microtime())));
         $this->dao->expects($this->once())->method('delete');
-        $o_mod2 = $o_mod1::load($s_id, $this->dao);
+        $o_mod2 = $this->model->load($s_id, $this->dao);
         $o_mod2->terminate()->commit();
         $this->assertEquals('', (string) $o_mod2);
     }
@@ -353,16 +351,14 @@ class ModelTest extends PHPUnit_Framework_TestCase
      */
     public function testLoadOnlyOnce()
     {
-        $s_class = 'c_' . sha1(microtime());
-        $o_mod1 = $this->getMockForAbstractClass('Tox\\Application\\Model\\Model', array(), $s_class, false);
         $s_id = microtime();
         $this->dao->expects($this->once())->method('read')
             ->with($this->equalTo($s_id))
             ->will($this->returnValue(array('id' => $s_id)));
-        $o_mod2 = $o_mod1::load($s_id, $this->dao);
+        $o_mod2 = $this->model->load($s_id, $this->dao);
         $o_dao = $this->getMock('Tox\\Application\\IDao');
         $o_dao->expects($this->never())->method('read');
-        $o_mod3 = $o_mod1::load($s_id, $o_dao);
+        $o_mod3 = $this->model->load($s_id, $o_dao);
         $this->assertSame($o_mod2, $o_mod3);
     }
 
@@ -396,13 +392,11 @@ class ModelTest extends PHPUnit_Framework_TestCase
      */
     public function testIdFrozenForExistant()
     {
-        $s_class = 'c_' . sha1(microtime());
-        $o_mod1 = $this->getMockForAbstractClass('Tox\\Application\\Model\\Model', array(), $s_class, false);
         $s_id = microtime();
         $this->dao->expects($this->once())->method('read')
             ->with($this->equalTo($s_id))
             ->will($this->returnValue(array('id' => $s_id)));
-        $o_mod2 = $o_mod1::load($s_id, $this->dao);
+        $o_mod2 = $this->model->load($s_id, $this->dao);
         $o_mod2->setId(microtime());
     }
 
@@ -411,13 +405,11 @@ class ModelTest extends PHPUnit_Framework_TestCase
      */
     public function testIdChangableForPrepared()
     {
-        $s_class = 'c_' . sha1(microtime());
-        $o_mod1 = $this->getMockForAbstractClass('Tox\\Application\\Model\\Model', array(), $s_class, false);
         $s_id = microtime();
         $this->dao->expects($this->once())->method('create')
             ->with($this->equalTo(array('id' => $s_id)))
             ->will($this->returnValue($s_id));
-        $o_mod2 = $o_mod1::prepare(array('id' => microtime()), $this->dao);
+        $o_mod2 = $this->model->prepare(array('id' => microtime()), $this->dao);
         $o_mod2->setId($s_id);
         $o_mod2->commit();
         $this->assertEquals($s_id, $o_mod2->getId());
@@ -429,14 +421,65 @@ class ModelTest extends PHPUnit_Framework_TestCase
      */
     public function testIdFrozenForDead()
     {
-        $s_class = 'c_' . sha1(microtime());
-        $o_mod1 = $this->getMockForAbstractClass('Tox\\Application\\Model\\Model', array(), $s_class, false);
         $s_id = microtime();
         $this->dao->expects($this->once())->method('read')
             ->with($this->equalTo($s_id))
             ->will($this->returnValue(array('id' => $s_id)));
-        $o_mod2 = $o_mod1::load($s_id, $this->dao);
+        $o_mod2 = $this->model->load($s_id, $this->dao);
         $o_mod2->terminate()->commit()->setId(microtime());
+    }
+
+    /**
+     * @depends testDeletionOnCommit
+     * @depends testLoadOnlyOnce
+     */
+    public function testTerminatedStillLoadOnlyOnce()
+    {
+        $s_id = microtime();
+        $this->dao->expects($this->once())->method('read')
+            ->with($this->equalTo($s_id))
+            ->will($this->returnValue(array('id' => $s_id)));
+        $o_mod2 = $this->model->load($s_id, $this->dao);
+        $o_mod2->terminate()->commit();
+        $o_mod3 = $this->model->load($s_id, $this->dao);
+        $this->assertSame($o_mod2, $o_mod3);
+    }
+
+    /**
+     * @depends testCreationOnCommit
+     * @depends testLoadOnlyOnce
+     */
+    public function testPreparedStillLoadOnlyOnce()
+    {
+        $s_id1 = microtime();
+        $s_id2 = microtime();
+        $this->dao->expects($this->once())->method('create')
+            ->with($this->equalTo(array('id' => $s_id1)))
+            ->will($this->returnValue($s_id2));
+        $this->dao->expects($this->never())->method('read');
+        $o_mod2 = $this->model->prepare(array('id' => $s_id1), $this->dao);
+        $o_mod2->commit();
+        $o_mod3 = $this->model->load($s_id2, $this->dao);
+        $this->assertSame($o_mod2, $o_mod3);
+    }
+
+    /**
+     * @depends testPreparedStillLoadOnlyOnce
+     * @expectedException Tox\Application\Model\DuplicateIdentifierException
+     */
+    public function testDuplicateIdentifierOnCreation()
+    {
+        $s_id1 = microtime();
+        $s_id2 = microtime();
+        $this->dao->expects($this->once())->method('create')
+            ->with($this->equalTo(array('id' => $s_id1)))
+            ->will($this->returnValue($s_id2));
+        $this->dao->expects($this->once())->method('read')
+            ->with($this->equalTo($s_id2))
+            ->will($this->returnValue(array('id' => $s_id2)));
+        $o_mod2 = $this->model->load($s_id2, $this->dao);
+        $o_mod3 = $this->model->prepare(array('id' => $s_id1), $this->dao);
+        $o_mod3->commit();
     }
 }
 
