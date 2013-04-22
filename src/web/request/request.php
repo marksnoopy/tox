@@ -78,9 +78,17 @@ class Request extends Core\Assembly implements Web\IRequest
     {
         settype($offset, 'string');
         if (!$this->offsetExists($offset)) {
-            throw new UnknownMetaException(array('field' => $offset));
+            if(!isset($this->_default[$offset])){
+                throw new UnknownMetaException(array('field' => $offset));
+            }
+            else {
+                return $this->_default[$offset];
+            }
         }
-        return $this->data[$offset];
+        else {
+            return $this->data[$offset];
+        }
+
     }
 
     public function offsetSet($offset, $value)
