@@ -17,8 +17,15 @@
  * You should have received a copy of the GNU General Public License
  * along with Tox.  If not, see <http://www.gnu.org/licenses/>.
  *
+<<<<<<< HEAD
  * @copyright © 2012-2013 SZen.in
  * @license   GNU General Public License, version 3
+=======
+ * @package   Tox\Web
+ * @author    Snakevil Zen <zsnakevil@gmail.com>
+ * @copyright © 2012-2013 PHP-Tox.org
+ * @license   http://www.gnu.org/licenses/gpl.html
+>>>>>>> 8215764e12c89be4544f43818a9af88ec20022d9
  */
 
 namespace Tox\Web;
