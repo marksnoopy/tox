@@ -1,8 +1,6 @@
 <?php
 /**
- *
- *
- * This class cannot be instantiated.
+ * Defines the essential behaviors of applications.
  *
  * This file is part of Tox.
  *
@@ -19,31 +17,121 @@
  * You should have received a copy of the GNU General Public License
  * along with Tox.  If not, see <http://www.gnu.org/licenses/>.
  *
+<<<<<<< HEAD
+ * @copyright © 2012-2013 SZen.in
+ * @license   GNU General Public License, version 3
+=======
  * @package   Tox\Web
  * @author    Snakevil Zen <zsnakevil@gmail.com>
  * @copyright © 2012-2013 PHP-Tox.org
  * @license   http://www.gnu.org/licenses/gpl.html
+>>>>>>> 8215764e12c89be4544f43818a9af88ec20022d9
  */
 
 namespace Tox\Web;
 
 use Tox\Application as TApp;
 
+/**
+ * Represents as the abstract application to provide essential behaviors.
+ *
+ * **THIS CLASS CANNOT BE INSTANTIATED.**
+ *
+ * __*ALIAS*__ as `Tox\Web`.
+ *
+ * @property-read IConfiguration $config Retrieves the configuration.
+ * @property-read IInput         $input  Retrieves the input.
+ * @property-read IOutput        $output Retrieves the output.
+ *
+ * @package tox.web
+ * @author  Snakevil Zen <zsnakevil@gmail.com>
+ * @since   0.1.0-beta1
+ */
 abstract class Application extends TApp\Application
 {
-    protected function __construct(IRequest $input = NULL, IResponse $output = NULL)
+    /**
+     * Stores the session.
+     *
+     * @var ISession
+     * @author Yi Qiao <qyia0245@gmail.com>
+     */
+    protected $session;
+
+    /**
+     * Initializes the appliance runtime.
+     *
+     * @return Application
+     * @throws InvalidConfiguredSessionTypeException
+     * @author Yi Qiao <qyia0245@gmail.com>
+     */
+    protected function init()
     {
-        parent::__construct($input, $output);
+        if (isset($this->config['session.type'])) {
+            if (!is_subclass_of($this->config['session.type'], 'Tox\\Web\\ISession')) {
+                throw new InvalidConfiguredSessionTypeException(array('type' => $this->config['session.type']));
+            }
+            $this->session = new $this->config['session.type'];
+        } else {
+            $this->session = $this->getDefaultSession();
+        }
+
+        return $this;
     }
 
+    /**
+     * Retrieves the default input on demand.
+     *
+     * @return Request
+     */
     protected function getDefaultInput()
     {
         return new Request;
     }
 
+    /**
+     * Retrieves the default output on demand.
+     *
+     * @return Response\Response
+     */
     protected function getDefaultOutput()
     {
-        return new Response;
+        return new Response\Response;
+    }
+
+    /**
+     * Retrieves the session.
+     *
+     * @return ISession
+     * @author Yi Qiao <qyia0245@gmail.com>
+     */
+    public function getSession()
+    {
+        return $this->session;
+    }
+
+    /**
+     * Be invoked on retrieving the session.
+     *
+     * **THIS METHOD CANNOT BE OVERRIDDEN.**
+     *
+     * @internal
+     *
+     * @return ISession
+     * @author Yi Qiao <qyia0245@gmail.com>
+     */
+    final protected function toxGetSession()
+    {
+        return $this->getSession();
+    }
+
+    /**
+     * Retrieves the default session on demand.
+     *
+     * @author Yi Qiao <qyia0245@gmail.com>
+     */
+    protected function getDefaultSession()
+    {
+        //TODO
     }
 }
 

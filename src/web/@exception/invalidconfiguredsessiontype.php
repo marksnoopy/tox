@@ -1,6 +1,7 @@
 <?php
 /**
- * Defines the behaviors of HTTP headers processor tasks for web applications.
+ * Defines an exception for setting up an invalid configured session of
+ * applications.
  *
  * This file is part of Tox.
  *
@@ -17,23 +18,38 @@
  * You should have received a copy of the GNU General Public License
  * along with Tox.  If not, see <http://www.gnu.org/licenses/>.
  *
- * @copyright © 2012-2013 PHP-Tox.org
+ * @copyright © 2012-2013 SZen.in
  * @license   GNU General Public License, version 3
  */
 
 namespace Tox\Web;
 
-use Tox\Application as TApp;
+use Tox\Core;
 
 /**
- * Announces the behaviors of HTTP headers processor tasks for web applications.
+ * Be raised on setting up an invalid configured session of applications.
  *
- * @package tox.web
+ * **THIS CLASS CANNOT BE INHERITED.**
+ *
+ * @package tox.application
  * @author  Snakevil Zen <zsnakevil@gmail.com>
  * @since   0.1.0-beta1
  */
-interface IHTTPHeadersProcessor extends TApp\IOutputTask
+final class InvalidConfiguredSessionTypeException extends Core\Exception
 {
+    /**
+     * {@inheritdoc}
+     *
+     * > Defined as `0x80020004`.
+     */
+    const CODE = 0x80000004;
+
+    /**
+     * {@inheritdoc}
+     *
+     * > Defined as `invalid input type '%type$s' configured`.
+     */
+    const MESSAGE = 'invalid session type \'%type$s\' configured';
 }
 
 // vi:ft=php fenc=utf-8 ff=unix ts=4 sts=4 et sw=4 fen fdm=indent fdl=1 tw=120

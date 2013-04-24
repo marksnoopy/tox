@@ -23,7 +23,7 @@
 
 namespace Tox\Web;
 
-use Tox\Application;
+use Tox\Application as TApp;
 
 /**
  * Announces the essential behaviors of web applications response.
@@ -32,7 +32,7 @@ use Tox\Application;
  * @author  Snakevil Zen <zsnakevil@gmail.com>
  * @since   0.1.0-beta1
  */
-interface IResponse extends Application\IOutput
+interface IResponse extends TApp\IOutput
 {
     /**
      * Adds an extra HTTP to be sent.
