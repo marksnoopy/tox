@@ -49,12 +49,12 @@ require_once __DIR__ . '/../../../src/application/itoken.php';
 require_once __DIR__ . '/../../../src/application/icontroller.php';
 
 /**
- * Tests Tox\Application\Application.
+ * Tests Tox\Web\Application.
  *
  * @internal
  *
- * @package tox.application
- * @author  Snakevil Zen <zsnakevil@gmail.com>
+ * @package tox.web
+ * @author  Yi Qiao <qyia0245@gmail.com>
  */
 class WebApplicationTest extends PHPUnit_Framework_TestCase
 {
