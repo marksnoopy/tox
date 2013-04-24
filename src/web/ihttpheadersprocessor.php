@@ -23,7 +23,7 @@
 
 namespace Tox\Web;
 
-use Tox\Application;
+use Tox\Application as TApp;
 
 /**
  * Announces the behaviors of HTTP headers processor tasks for web applications.
@@ -32,7 +32,7 @@ use Tox\Application;
  * @author  Snakevil Zen <zsnakevil@gmail.com>
  * @since   0.1.0-beta1
  */
-interface IHTTPHeadersProcessor extends Application\IOutputTask
+interface IHTTPHeadersProcessor extends TApp\IOutputTask
 {
 }
 

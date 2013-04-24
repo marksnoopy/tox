@@ -284,7 +284,7 @@ class WebApplicationTest extends PHPUnit_Framework_TestCase
         $this->oout->expects($this->once())->method('setView')->will($this->returnValue($this->oout));
 
 
-        $o_app = $this->getMockBuilder('Tox\\Web\\ApplicationStub')
+        $o_app = $this->getMockBuilder('Tox\\Web\\WebApplicationStub')
             ->setMockClassName('a' . md5(microtime()))
             ->setMethods(array('getDefaultFallback', 'getDefaultOutput', 'newSelf', 'getDefaultInput'))
             ->disableOriginalConstructor()
@@ -328,16 +328,17 @@ class WebApplicationTest extends PHPUnit_Framework_TestCase
 
         $o_app = $this->getMockBuilder('Tox\\Web\\Application')
             ->setMethods(
-            array(
-                'getDefaultFallback',
-                'getInstance',
-                'getDefaultRouter',
-                'getDefaultInput',
-                'route',
-                'dispatch',
-                'getDefaultOutput'
+                array(
+                    'getDefaultFallback',
+                    'getInstance',
+                    'getDefaultRouter',
+                    'getDefaultInput',
+                    'route',
+                    'dispatch',
+                    'getDefaultOutput'
+                )
             )
-        )->disableOriginalConstructor()
+            ->disableOriginalConstructor()
             ->getMockForAbstractClass();
         $o_app->expects($this->once())->method('getDefaultFallback')->will($this->returnValue($this->ofb));
         $o_app->expects($this->once())->method('getDefaultInput')->will($this->returnValue($this->oin));
@@ -360,7 +361,7 @@ class WebApplicationTest extends PHPUnit_Framework_TestCase
 /**
  * use to test
  */
-abstract class ApplicationStub extends Application
+abstract class WebApplicationStub extends Tox\Web\Application
 {
     /**
      * clear instance

@@ -31,19 +31,83 @@ use Tox\Application as TApp;
 
 abstract class Application extends TApp\Application
 {
-    protected function __construct(IRequest $input = NULL, IResponse $output = NULL)
+    /**
+     * Stores the session.
+     *
+     * @var ISession
+     */
+    protected $session;
+
+    /**
+     * Initializes the appliance runtime.
+     *
+     * @return Application
+     * @throws InvalidConfiguredSessionTypeException
+     */
+    protected function init()
     {
-        parent::__construct($input, $output);
+        if (isset($this->config['session.type'])) {
+            if (!is_subclass_of($this->config['session.type'], 'Tox\\Web\\ISession')) {
+                throw new InvalidConfiguredSessionTypeException(array('type' => $this->config['session.type']));
+            }
+            $this->session = new $this->config['session.type'];
+        } else {
+            $this->session = $this->getDefaultSession();
+        }
+
+        return $this;
     }
 
+    /**
+     * Retrieves the default input on demand.
+     *
+     * @return Request
+     */
     protected function getDefaultInput()
     {
         return new Request;
     }
 
+    /**
+     * Retrieves the default output on demand.
+     *
+     * @return Response\Response
+     */
     protected function getDefaultOutput()
     {
-        return new Response;
+        return new Response\Response;
+    }
+
+    /**
+     * Retrieves the session.
+     *
+     * @return ISession
+     */
+    public function getSession()
+    {
+        return $this->session;
+    }
+
+    /**
+     * Be invoked on retrieving the session.
+     *
+     * **THIS METHOD CANNOT BE OVERRIDDEN.**
+     *
+     * @internal
+     *
+     * @return ISession
+     */
+    final protected function toxGetSession()
+    {
+        return $this->getSession();
+    }
+
+    /**
+     * Retrieves the default session on demand.
+     */
+    protected function getDefaultSession()
+    {
+        //TODO
     }
 }
 
