@@ -100,6 +100,15 @@ interface IModel extends ICommittable
      * @return void
      */
     public function __clone();
+
+    /**
+     * Imports a model entity from a models set.
+     *
+     * @param  IModelSet $set The container models set.
+     * @param  IDao      $dao Data access object to use.
+     * @return self
+     */
+    public static function import(IModelSet $set, IDao $dao);
 }
 
 // vi:ft=php fenc=utf-8 ff=unix ts=4 sts=4 et sw=4 fen fdm=indent fdl=1 tw=120

@@ -47,6 +47,7 @@
 0x80020705 = IllegalFilterException
 0x80020706 = AttributeFilteredException
 0x80020707 = AttributeSortedException
+0x80020708 = IllegalSetElementException
 
 [Tox\Application\Dao]
 0x80020801 = DataSourceExpectedException

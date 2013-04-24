@@ -454,6 +454,38 @@ abstract class Model extends Core\Assembly implements Application\IModel
         $this->toxAsync = false;
         return $this;
     }
+
+    /**
+     * {@inheritdoc}
+     *
+     * **THIS METHOD CANNOT BE OVERRIDDEN.**
+     *
+     * @param  Application\IModelSet $set The container models set.
+     * @param  Application\IDao      $dao Data access object to use.
+     * @return self
+     */
+    final public static function import(Application\IModelSet $set, Application\IDao $dao)
+    {
+        $m_cur = $set->current();
+        if ($m_cur instanceof Application\IModel) {
+            return $m_cur;
+        } elseif (!isset($m_cur['id'])) {
+            throw new IllegalSetElementException;
+        }
+        $s_type = get_called_class();
+        if (!isset(self::$instances[$s_type])) {
+            self::$instances[$s_type] = array();
+        }
+        if (isset(self::$instances[$s_type][$m_cur['id']])) {
+            $o_mod = self::$instances[$s_type][$m_cur['id']];
+        } else {
+            $o_mod = static::newModel();
+            $o_mod->id = $m_cur['id'];
+            $o_mod->dao = $dao;
+            self::$instances[$s_type][$m_cur['id']] = $o_mod;
+        }
+        return $o_mod->assign($m_cur);
+    }
 }
 
 // vi:ft=php fenc=utf-8 ff=unix ts=4 sts=4 et sw=4 fen fdm=indent fdl=1 tw=120

@@ -35,6 +35,7 @@ require_once __DIR__ . '/../../../../src/application/model/identifierreadonlyexc
 require_once __DIR__ . '/../../../../src/application/model/nonexistantentityexception.php';
 require_once __DIR__ . '/../../../../src/application/model/preparationcannotresetexception.php';
 require_once __DIR__ . '/../../../../src/application/model/duplicateidentifierexception.php';
+require_once __DIR__ . '/../../../../src/application/model/illegalsetelementexception.php';
 
 require_once __DIR__ . '/../../../../src/application/imodelset.php';
 require_once __DIR__ . '/../../../../src/core/isingleton.php';
@@ -71,18 +72,17 @@ class ModelTest extends PHPUnit_Framework_TestCase
         $this->model = $this->getMockForAbstractClass(
             'Tox\\Application\\Model\\Model',
             array(),
-            'c_' . sha1(microtime()),
+            '',
             false
         );
     }
 
     public function testMagicMethods()
     {
-        $s_class = 'c_' . sha1(microtime());
         $o_mod = $this->getMockForAbstractClass(
             'Tox\\Application\\Model\\Model',
             array(),
-            $s_class,
+            '',
             false,
             true,
             true,
@@ -115,11 +115,10 @@ class ModelTest extends PHPUnit_Framework_TestCase
      */
     public function testLoadByDefaultDao()
     {
-        $s_class = 'c_' . sha1(microtime());
         $o_mod1 = $this->getMockForAbstractClass(
             'Tox\\Application\\Model\\Model',
             array(),
-            $s_class,
+            '',
             false,
             true,
             true,
@@ -143,8 +142,7 @@ class ModelTest extends PHPUnit_Framework_TestCase
      */
     public function testAttributesAssignedOnLoad()
     {
-        $s_class = 'c_' . sha1(microtime());
-        $o_mod1 = $this->getMockForAbstractClass('Tox\\Application\\Model\\ModelDummy', array(), $s_class, false);
+        $o_mod1 = $this->getMockForAbstractClass('Tox\\Application\\Model\\ModelDummy', array(), '', false);
         $s_id = microtime();
         $s_foo = microtime();
         $this->dao->expects($this->once())->method('read')
@@ -159,8 +157,7 @@ class ModelTest extends PHPUnit_Framework_TestCase
      */
     public function testAttributesUnchangedBeforeCommit()
     {
-        $s_class = 'c_' . sha1(microtime());
-        $o_mod1 = $this->getMockForAbstractClass('Tox\\Application\\Model\\ModelDummy', array(), $s_class, false);
+        $o_mod1 = $this->getMockForAbstractClass('Tox\\Application\\Model\\ModelDummy', array(), '', false);
         $s_id = microtime();
         $s_foo1 = microtime();
         $this->dao->expects($this->once())->method('read')
@@ -175,11 +172,10 @@ class ModelTest extends PHPUnit_Framework_TestCase
 
     public function testPrepareWouldNotCreateBeforeCommit()
     {
-        $s_class = 'c_' . sha1(microtime());
-        $o_mod1 = $this->getMockForAbstractClass('Tox\\Application\\Model\\ModelDummy', array(), $s_class, false);
+        $o_mod1 = $this->getMockForAbstractClass('Tox\\Application\\Model\\ModelDummy', array(), '', false);
         $this->dao->expects($this->never())->method('create');
         $o_mod2 = $o_mod1::prepare(array('id' => microtime(), 'foo' => microtime()), $this->dao);
-        $this->assertInstanceOf($s_class, $o_mod2);
+        $this->assertInstanceOf(get_class($o_mod1), $o_mod2);
         $this->assertNull($o_mod2->getId());
         $this->assertNull($o_mod2->foo);
         $this->assertFalse($o_mod2->isAlive());
@@ -208,8 +204,7 @@ class ModelTest extends PHPUnit_Framework_TestCase
      */
     public function testChangementsAffecteOnCommit()
     {
-        $s_class = 'c_' . sha1(microtime());
-        $o_mod1 = $this->getMockForAbstractClass('Tox\\Application\\Model\\ModelDummy', array(), $s_class, false);
+        $o_mod1 = $this->getMockForAbstractClass('Tox\\Application\\Model\\ModelDummy', array(), '', false);
         $s_id = microtime();
         $s_foo1 = microtime();
         $s_foo2 = microtime();
@@ -244,8 +239,7 @@ class ModelTest extends PHPUnit_Framework_TestCase
      */
     public function testDeletionOnCommit()
     {
-        $s_class = 'c_' . sha1(microtime());
-        $o_mod1 = $this->getMockForAbstractClass('Tox\\Application\\Model\\ModelDummy', array(), $s_class, false);
+        $o_mod1 = $this->getMockForAbstractClass('Tox\\Application\\Model\\ModelDummy', array(), '', false);
         $s_id = microtime();
         $s_foo = microtime();
         $this->dao->expects($this->once())->method('read')
@@ -266,8 +260,7 @@ class ModelTest extends PHPUnit_Framework_TestCase
      */
     public function testResetChangements()
     {
-        $s_class = 'c_' . sha1(microtime());
-        $o_mod1 = $this->getMockForAbstractClass('Tox\\Application\\Model\\ModelDummy', array(), $s_class, false);
+        $o_mod1 = $this->getMockForAbstractClass('Tox\\Application\\Model\\ModelDummy', array(), '', false);
         $s_id = microtime();
         $s_foo1 = microtime();
         $this->dao->expects($this->once())->method('read')
@@ -369,8 +362,7 @@ class ModelTest extends PHPUnit_Framework_TestCase
      */
     public function testPrepareThroughClone()
     {
-        $s_class = 'c_' . sha1(microtime());
-        $o_mod1 = $this->getMockForAbstractClass('Tox\\Application\\Model\\ModelDummy', array(), $s_class, false);
+        $o_mod1 = $this->getMockForAbstractClass('Tox\\Application\\Model\\ModelDummy', array(), '', false);
         $s_id1 = microtime();
         $s_foo = microtime();
         $this->dao->expects($this->once())->method('read')
@@ -540,8 +532,7 @@ class ModelTest extends PHPUnit_Framework_TestCase
      */
     public function testModifyImmediatelyInSyncMode()
     {
-        $s_class = 'c_' . sha1(microtime());
-        $o_mod1 = $this->getMockForAbstractClass('Tox\\Application\\Model\\ModelDummy', array(), $s_class, false);
+        $o_mod1 = $this->getMockForAbstractClass('Tox\\Application\\Model\\ModelDummy', array(), '', false);
         $s_id = microtime();
         $s_foo1 = microtime();
         $s_foo2 = microtime();
@@ -553,6 +544,77 @@ class ModelTest extends PHPUnit_Framework_TestCase
         $o_mod2 = $o_mod1::load($s_id, $this->dao)->disableAsync();
         $o_mod2->foo = $s_foo2;
         $this->assertEquals($s_foo2, $o_mod2->foo);
+    }
+
+    public function testImportFromModelSet()
+    {
+        $a_rows = array(
+            array('id' => microtime(), 'foo' => microtime())
+        );
+        $o_mod1 = $this->getMockForAbstractClass('Tox\\Application\\Model\\ModelDummy', array(), '', false);
+        $o_set = $this->getMock('Tox\\Application\\IModelSet');
+        $o_set->expects($this->once())->method('current')
+            ->will($this->returnValue($a_rows[0]));
+        $o_mod2 = $o_mod1::import($o_set, $this->dao);
+        $this->assertInstanceOf(get_class($o_mod1), $o_mod2);
+        $this->assertEquals($a_rows[0]['id'], $o_mod2->getId());
+        $this->assertEquals($a_rows[0]['foo'], $o_mod2->foo);
+        $this->assertTrue($o_mod2->isAlive());
+        $this->assertFalse($o_mod2->isChanged());
+    }
+
+    /**
+     * @depends testImportFromModelSet
+     * @expectedException Tox\Application\Model\IllegalSetElementException
+     */
+    public function testImportFromMadModelSet()
+    {
+        $o_set = $this->getMock('Tox\\Application\\IModelSet');
+        $o_set->expects($this->once())->method('current')
+            ->will($this->returnValue(array()));
+        $this->model->import($o_set, $this->dao);
+    }
+
+    /**
+     * @depends testLoadOnlyOnce
+     * @depends testImportFromModelSet
+     */
+    public function testImportAsSameAsLoad()
+    {
+        $a_rows = array(
+            array('id' => microtime(), 'foo' => microtime())
+        );
+        $o_mod1 = $this->getMockForAbstractClass('Tox\\Application\\Model\\ModelDummy', array(), '', false);
+        $o_set = $this->getMock('Tox\\Application\\IModelSet');
+        $o_set->expects($this->once())->method('current')
+            ->will($this->returnValue($a_rows[0]));
+        $o_mod2 = $o_mod1::import($o_set, $this->dao);
+        $this->dao->expects($this->never())->method('read');
+        $o_mod3 = $o_mod1::load($a_rows[0]['id'], $this->dao);
+        $this->assertSame($o_mod2, $o_mod3);
+    }
+
+    /**
+     * @depends testLoadBySpecificDao
+     * @depends testImportFromModelSet
+     */
+    public function testImportUpdateAttributes()
+    {
+        $a_rows = array(
+            array('id' => microtime(), 'foo' => microtime()),
+            array('id' => microtime(), 'foo' => microtime())
+        );
+        $a_rows[1]['id'] = $a_rows[0]['id'];
+        $o_mod1 = $this->getMockForAbstractClass('Tox\\Application\\Model\\ModelDummy', array(), '', false);
+        $this->dao->expects($this->once())->method('read')
+            ->will($this->returnValue($a_rows[0]));
+        $o_mod2 = $o_mod1::load($a_rows[0]['id'], $this->dao);
+        $o_set = $this->getMock('Tox\\Application\\IModelSet');
+        $o_set->expects($this->once())->method('current')
+            ->will($this->returnValue($a_rows[1]));
+        $o_mod3 = $o_mod1::import($o_set, $this->dao);
+        $this->assertSame($o_mod2, $o_mod3);
+        $this->assertEquals($a_rows[1]['foo'], $o_mod3->foo);
     }
 }
 
