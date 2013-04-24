@@ -116,13 +116,15 @@ class ModelTest extends PHPUnit_Framework_TestCase
     public function testLoadByDefaultDao()
     {
         $s_class = 'c_' . sha1(microtime());
-        $o_mod1 = $this->getMockForAbstractClass('Tox\\Application\\Model\\Model',
+        $o_mod1 = $this->getMockForAbstractClass(
+            'Tox\\Application\\Model\\Model',
             array(),
             $s_class,
             false,
             true,
             true,
-            array('newModel'));
+            array('newModel')
+        );
         $o_mod1->expects($this->once())->method('getDefaultDao')
             ->will($this->returnValue($this->dao));
         $o_mod1->staticExpects($this->once())->method('newModel')
@@ -480,6 +482,77 @@ class ModelTest extends PHPUnit_Framework_TestCase
         $o_mod2 = $this->model->load($s_id2, $this->dao);
         $o_mod3 = $this->model->prepare(array('id' => $s_id1), $this->dao);
         $o_mod3->commit();
+    }
+
+    /**
+     * @depends testLoadBySpecificDao
+     */
+    public function testLoadBySpecificDaoThroughSetUp()
+    {
+        $s_id = microtime();
+        $this->dao->expects($this->once())->method('read')
+            ->with($this->equalTo($s_id))
+            ->will($this->returnValue(array('id' => $s_id)));
+        $o_mod2 = $this->model->setUp($s_id, $this->dao);
+        $this->assertInstanceOf(get_class($this->model), $o_mod2);
+        $this->assertEquals($s_id, $o_mod2->getId());
+        $this->assertTrue($o_mod2->isAlive());
+        $this->assertFalse($o_mod2->isChanged());
+    }
+
+    /**
+     * @depends testLoadBySpecificDao
+     */
+    public function testEnableAndDisableAsyncMode()
+    {
+        $s_id = microtime();
+        $this->dao->expects($this->once())->method('read')
+            ->with($this->equalTo($s_id))
+            ->will($this->returnValue(array('id' => $s_id)));
+        $o_mod2 = $this->model->load($s_id, $this->dao);
+        $this->assertTrue($o_mod2->isAsync());
+        $this->assertSame($o_mod2, $o_mod2->disableAsync());
+        $this->assertFalse($o_mod2->isAsync());
+        $this->assertSame($o_mod2, $o_mod2->enableAsync());
+        $this->assertTrue($o_mod2->isAsync());
+    }
+
+    /**
+     * @depends testTerminateWouldNotDeleteBeforeCommit
+     * @depends testEnableAndDisableAsyncMode
+     */
+    public function testTerminateImmediatelyInSyncMode()
+    {
+        $s_id1 = microtime();
+        $s_id2 = microtime();
+        $this->dao->expects($this->once())->method('read')
+            ->with($this->equalTo($s_id1))
+            ->will($this->returnValue(array('id' => $s_id2)));
+        $this->dao->expects($this->once())->method('delete')
+            ->with($this->equalTo($s_id2));
+        $o_mod2 = $this->model->load($s_id1, $this->dao)->disableAsync();
+        $this->assertSame($o_mod2, $o_mod2->terminate());
+    }
+
+    /**
+     * @depends testChangementsAffecteOnCommit
+     * @depends testEnableAndDisableAsyncMode
+     */
+    public function testModifyImmediatelyInSyncMode()
+    {
+        $s_class = 'c_' . sha1(microtime());
+        $o_mod1 = $this->getMockForAbstractClass('Tox\\Application\\Model\\ModelDummy', array(), $s_class, false);
+        $s_id = microtime();
+        $s_foo1 = microtime();
+        $s_foo2 = microtime();
+        $this->dao->expects($this->once())->method('read')
+            ->with($this->equalTo($s_id))
+            ->will($this->returnValue(array('id' => $s_id, 'foo' => $s_foo1)));
+        $this->dao->expects($this->once())->method('update')
+            ->with($this->equalTo($s_id), $this->equalTo(array('foo' => $s_foo2)));
+        $o_mod2 = $o_mod1::load($s_id, $this->dao)->disableAsync();
+        $o_mod2->foo = $s_foo2;
+        $this->assertEquals($s_foo2, $o_mod2->foo);
     }
 }
 

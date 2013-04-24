@@ -77,6 +77,13 @@ abstract class Model extends Core\Assembly implements Application\IModel
     protected $toxOriginal;
 
     /**
+     * Stores whether in async mode.
+     *
+     * @var bool
+     */
+    protected $toxAsync;
+
+    /**
      * Retrieves the default data access object.
      *
      * @return Application\IDao
@@ -90,6 +97,7 @@ abstract class Model extends Core\Assembly implements Application\IModel
     {
         $this->toxStash =
         $this->toxOriginal = array();
+        $this->toxAsync = true;
     }
 
     /**
@@ -201,6 +209,21 @@ abstract class Model extends Core\Assembly implements Application\IModel
     }
 
     /**
+     * {@inheritdoc}
+     *
+     * @deprecated Remained for forward compatibility. Would be removed in some
+     *             future version.
+     *
+     * @param  string $id  The unique identifier of the model entity.
+     * @param  IDao   $dao OPTIONAL. Data access object in use.
+     * @return self
+     */
+    final public static function setUp($id, Application\IDao $dao = null)
+    {
+        return static::load($id, $dao);
+    }
+
+    /**
      * Creates a new model object.
      *
      * @return self
@@ -282,6 +305,9 @@ abstract class Model extends Core\Assembly implements Application\IModel
         }
         $this->toxStash[$prop] = $this->$prop;
         $this->$prop = $this->toxOriginal[$prop];
+        if (!$this->toxAsync) {
+            $this->commit();
+        }
     }
 
     /**
@@ -310,7 +336,7 @@ abstract class Model extends Core\Assembly implements Application\IModel
     final public function terminate()
     {
         $this->toxStash = array('id' => null);
-        return $this;
+        return $this->toxAsync ? $this : $this->commit();
     }
 
     /**
@@ -393,6 +419,40 @@ abstract class Model extends Core\Assembly implements Application\IModel
             }
         }
         $this->toxStash['id'] = null;
+    }
+
+    /**
+     * {@inheritdoc}
+     *
+     * **THIS METHOD CANNOT BE OVERRIDDEN.**
+     *
+     * @return bool
+     */
+    final public function isAsync()
+    {
+        return $this->toxAsync;
+    }
+
+    /**
+     * {@inhertdoc}
+     *
+     * @return self
+     */
+    public function enableAsync()
+    {
+        $this->toxAsync = true;
+        return $this;
+    }
+
+    /**
+     * {@inhertdoc}
+     *
+     * @return self
+     */
+    public function disableAsync()
+    {
+        $this->toxAsync = false;
+        return $this;
     }
 }
 
