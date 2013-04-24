@@ -1,6 +1,6 @@
 <?php
 /**
- * Defines the test case for Tox\Application\Application.
+ * Defines the test case for Tox\Web\Application.
  *
  * This file is part of Tox.
  *

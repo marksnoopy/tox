@@ -1,8 +1,6 @@
 <?php
 /**
- *
- *
- * This class cannot be instantiated.
+ * Defines the essential behaviors of applications.
  *
  * This file is part of Tox.
  *
@@ -19,22 +17,36 @@
  * You should have received a copy of the GNU General Public License
  * along with Tox.  If not, see <http://www.gnu.org/licenses/>.
  *
- * @package   Tox\Web
- * @author    Snakevil Zen <zsnakevil@gmail.com>
- * @copyright © 2012 szen.in
- * @license   http://www.gnu.org/licenses/gpl.html
+ * @copyright © 2012-2013 SZen.in
+ * @license   GNU General Public License, version 3
  */
 
 namespace Tox\Web;
 
 use Tox\Application as TApp;
 
+/**
+ * Represents as the abstract application to provide essential behaviors.
+ *
+ * **THIS CLASS CANNOT BE INSTANTIATED.**
+ *
+ * __*ALIAS*__ as `Tox\Web`.
+ *
+ * @property-read IConfiguration $config Retrieves the configuration.
+ * @property-read IInput         $input  Retrieves the input.
+ * @property-read IOutput        $output Retrieves the output.
+ *
+ * @package tox.web
+ * @author  Snakevil Zen <zsnakevil@gmail.com>
+ * @since   0.1.0-beta1
+ */
 abstract class Application extends TApp\Application
 {
     /**
      * Stores the session.
      *
      * @var ISession
+     * @author Yi Qiao <qyia0245@gmail.com>
      */
     protected $session;
 
@@ -43,6 +55,7 @@ abstract class Application extends TApp\Application
      *
      * @return Application
      * @throws InvalidConfiguredSessionTypeException
+     * @author Yi Qiao <qyia0245@gmail.com>
      */
     protected function init()
     {
@@ -82,6 +95,7 @@ abstract class Application extends TApp\Application
      * Retrieves the session.
      *
      * @return ISession
+     * @author Yi Qiao <qyia0245@gmail.com>
      */
     public function getSession()
     {
@@ -96,6 +110,7 @@ abstract class Application extends TApp\Application
      * @internal
      *
      * @return ISession
+     * @author Yi Qiao <qyia0245@gmail.com>
      */
     final protected function toxGetSession()
     {
@@ -104,6 +119,8 @@ abstract class Application extends TApp\Application
 
     /**
      * Retrieves the default session on demand.
+     *
+     * @author Yi Qiao <qyia0245@gmail.com>
      */
     protected function getDefaultSession()
     {
