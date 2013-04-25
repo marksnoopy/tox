@@ -27,6 +27,7 @@ use PHPUnit_Framework_TestCase;
 
 require_once __DIR__ . '/../../../../src/core/assembly.php';
 require_once __DIR__ . '/../../../../src/application/iinput.php';
+require_once __DIR__ . '/../../../../src/application/input/input.php';
 require_once __DIR__ . '/../../../../src/web/irequest.php';
 require_once __DIR__ . '/../../../../src/web/request/request.php';
 require_once __DIR__ . '/../../../../src/application/itoken.php';
