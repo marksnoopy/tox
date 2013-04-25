@@ -25,6 +25,7 @@ namespace Tox\Application\Input;
 
 use Tox\Core;
 use Tox\Application;
+use Tox\Type;
 
 /**
  * Represents as the abstract input of applications.
@@ -36,15 +37,49 @@ use Tox\Application;
  */
 abstract class Input extends Core\Assembly implements Application\IInput
 {
-
-    protected $_default;
+    /**
+     * Stores the default value.
+     *
+     * @var mixed
+     */
+    protected $default;
 
     public function __construct()
     {
-
     }
 
-    public function defaults($key, $value) {
-        $this->_default[$key] = $value;
+    /**
+     * set the default value for the specil input.
+     *
+     * @param  string $key
+     * @param  mixed $value
+     * @return Input
+     */
+    public function defaults($key, $value)
+    {
+        $this->default[$key] = $value;
+        return $this;
+    }
+
+    /**
+     * valid the type of the input' value is equal to the expected type or not.
+     *
+     * @param string $key
+     * @param string $type
+     * @return Input
+     */
+    public function expected($key, $type) {
+        $a_type = $this->typeList();
+        if(!((is_array($a_type)) && (isset($a_type[$type])) && class_exists($a_type[$type]))) {
+            throw new UnknownTypeException;
+        }
+        new $a_type[$type]($this->offsetGet($key));
+        return $this;
+    }
+
+    protected function typeList(){
+        return array(
+            'email' => 'Tox\Type\Simple\Email',
+        );
     }
 }
