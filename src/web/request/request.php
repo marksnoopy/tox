@@ -29,7 +29,7 @@ use Tox\Core;
 use Tox\Application;
 use Tox\Web;
 
-class Request extends Core\Assembly implements Web\IRequest
+class Request extends Application\Input\Input implements Web\IRequest
 {
     protected $data;
 
@@ -78,14 +78,12 @@ class Request extends Core\Assembly implements Web\IRequest
     {
         settype($offset, 'string');
         if (!$this->offsetExists($offset)) {
-            if(!isset($this->_default[$offset])){
+            if (!isset($this->default[$offset])) {
                 throw new UnknownMetaException(array('field' => $offset));
+            } else {
+                return $this->default[$offset];
             }
-            else {
-                return $this->_default[$offset];
-            }
-        }
-        else {
+        } else {
             return $this->data[$offset];
         }
 
