@@ -112,6 +112,16 @@ class RequestTest extends PHPUnit_Framework_TestCase
         $o_request = new Request;
         $o_request[$key];
     }
+    /**
+     * @dataProvider provideErrorVariableData
+     *
+     */
+    public function testDefaultBeforeGetVariable($key) {
+        $o_request = new Request;
+        $s_value = md5(microtime());
+        $o_request->defaults($key, $s_value);
+        $this->assertEquals($s_value, $o_request[$key]);
+    }
 
     /**
      * @dataProvider provideSuccessVariableData
