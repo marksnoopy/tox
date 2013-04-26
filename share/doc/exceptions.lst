@@ -20,6 +20,7 @@
 
 [Tox\Application\Input]
 ;0x800201??
+0x80020101 = UnknownTypeException
 
 [Tox\Application\Output]
 0x80020201 = ClosedOutputException
@@ -51,6 +52,7 @@
 
 [Tox\Application\Type]
 ;0x800209??
+0x80020901 = UnexpectedTypeException
 
 [Tox\Web]
 ;0x800300??
