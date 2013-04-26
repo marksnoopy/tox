@@ -29,20 +29,6 @@ use Tox;
 
 interface IRequest extends Tox\Application\IInput
 {
-    /**
-     * Retrieves the formatted command-line for routing.
-     *
-     * @return string
-     */
-    public function getCommandLine();
-
-    /**
-     * Recruits the analysed options and values.
-     *
-     * @param  IToken $token Routing token containing the options and values.
-     * @return self
-     */
-    public function recruit(Tox\Application\IToken $token);
 }
 
 // vi:se ft=php fenc=utf-8 ff=unix ts=4 sts=4 et sw=4 fen fdm=indent fdl=1 tw=120:
