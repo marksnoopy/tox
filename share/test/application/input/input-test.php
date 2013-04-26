@@ -26,6 +26,7 @@ namespace Tox\Application\Input;
 use PHPUnit_Framework_TestCase;
 
 require_once __DIR__ . '/../../../../src/core/assembly.php';
+require_once __DIR__ . '/../../../../src/application/itoken.php';
 require_once __DIR__ . '/../../../../src/application/iinput.php';
 require_once __DIR__ . '/../../../../src/application/input/input.php';
 
@@ -48,16 +49,21 @@ use Tox;
  *
  * @internal
  *
- * @package tox.application.output
+ * @package tox.application.input
  * @author  Mark Snoopy <marksnoopy@gmail.com>
  */
-class OutputTest extends PHPUnit_Framework_TestCase
+class InputTest extends PHPUnit_Framework_TestCase
 {
-    public function testDefault()
+    /**
+     * test to set the default value.
+     * @dataProvider provideDefalutData
+     */
+    public function testSetDefaultValue($key, $value)
     {
         $o_input = $this->getMockBuilder('Tox\\Application\\Input\\Input')
+            ->setMethods(array('getCommandLine', 'recruit'))
             ->getMockForAbstractClass();
-        $this->assertEquals($o_input->defaults('post.a', 'aaaa'), $o_input);
+        $this->assertEquals($o_input->defaults($key, $value), $o_input);
     }
 
     /**
@@ -70,18 +76,42 @@ class OutputTest extends PHPUnit_Framework_TestCase
         $o_input->expected('post.email', $type);
     }
 
+    /**
+     * @dataProvider provideTypeData
+     * @expectedException Tox\Type\Simple\UnexpectedTypeException
+     */
+    public function testExpecetedType($key, $value) {
+        $o_input = $this->getMockBuilder('Tox\\Application\\Input\\Input')
+            ->getMockForAbstractClass();
+        $o_input->expected($key, $value);
+    }
+
     public function provideErrorTypeData()
     {
         return array(
-            array('aaaaaa'),
-            array('$##@'),
+            array(rand(1, 9)),
+            array(md5(microtime())),
         );
     }
 
     public function provideTypeData()
     {
         return array(
-            array('email'),
+            array('cookie'.rand(1, 9), 'email'),
+            array('env'.rand(1, 9), 'email'),
+            array('get'.rand(1, 9), 'email'),
+            array('post'.rand(1, 9), 'email'),
+            array('server'.rand(1, 9), 'email'),
+        );
+    }
+
+    public function provideDefalutData(){
+        return array(
+            array('cookie'.rand(1, 9), rand(1, 9)),
+            array('env'.rand(1, 9), rand(1, 9)),
+            array('get'.rand(1, 9), rand(1, 9)),
+            array('post'.rand(1, 9), rand(1, 9)),
+            array('server'.rand(1, 9), rand(1, 9)),
         );
     }
 
