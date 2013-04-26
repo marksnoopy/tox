@@ -42,9 +42,16 @@ use Tox\Type;
 
 class Email extends Type\Type
 {
-    protected function validate($value) {
-        if(preg_match('/([a-z0-9]*[-_\.]?[a-z0-9]+)*@([a-z0-9]*[-_]?[a-z0-9]+)+[\.][a-z]{2,3}([\.][a-z]{2})?/i'
-            , $value)) {
+    /**
+     * check the value is email type or not.
+     * @param mixed $value
+     * @return mixed
+     * @throws UnexpectedTypeException
+     */
+    protected function validate($value)
+    {
+        $s_match = '/([a-z0-9]*[-_\.]?[a-z0-9]+)*@([a-z0-9]*[-_]?[a-z0-9]+)+[\.][a-z]{2,3}([\.][a-z]{2})?/i';
+        if (preg_match($s_match, $value)) {
             return $value;
         } else {
             throw new UnexpectedTypeException;
