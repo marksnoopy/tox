@@ -1,6 +1,6 @@
 <?php
 /**
- * Defines the abstract output of applications.
+ * Defines the abstract input of applications.
  *
  * This file is part of Tox.
  *
@@ -68,16 +68,22 @@ abstract class Input extends Core\Assembly implements Application\IInput
      * @param string $type
      * @return Input
      */
-    public function expected($key, $type) {
+    public function expected($key, $type)
+    {
         $a_type = $this->typeList();
-        if(!((is_array($a_type)) && (isset($a_type[$type])) && class_exists($a_type[$type]))) {
+        if (!((is_array($a_type)) && (isset($a_type[$type])) && class_exists($a_type[$type]))) {
             throw new UnknownTypeException;
         }
         new $a_type[$type]($this->offsetGet($key));
         return $this;
     }
 
-    protected function typeList(){
+    /**
+     * the type list.
+     * @return array
+     */
+    protected function typeList()
+    {
         return array(
             'email' => 'Tox\Type\Simple\Email',
         );
