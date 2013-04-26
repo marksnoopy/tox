@@ -32,7 +32,7 @@ use Tox\Core;
  *
  * @package tox.type.simple
  * @author  Mark Snoopy <marksnoopy@gmail.com>
- * @since   0.1.0-beta1
+ * @since   0.2
  */
 final class UnknownTypeException extends Core\Exception
 {
