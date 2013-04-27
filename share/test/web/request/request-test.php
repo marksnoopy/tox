@@ -116,7 +116,8 @@ class RequestTest extends PHPUnit_Framework_TestCase
      * @dataProvider provideErrorVariableData
      *
      */
-    public function testDefaultBeforeGetVariable($key) {
+    public function testDefaultBeforeGetVariable($key)
+    {
         $o_request = new Request;
         $s_value = md5(microtime());
         $o_request->defaults($key, $s_value);
@@ -159,7 +160,7 @@ class RequestTest extends PHPUnit_Framework_TestCase
         $o_token->expects($this->once())->method('export');
         $o_request = new Request;
         $o_request->recruit($o_token);
-        foreach($a_server as $k=>$v) {
+        foreach ($a_server as $k => $v) {
             $this->assertEquals($a_server[$k], $o_request['server.' .strtolower($k)]);
         }
 
@@ -215,7 +216,8 @@ class RequestTest extends PHPUnit_Framework_TestCase
      * @dataProvider provideResetData
      * @expectedException Tox\Web\Request\UnknownMetaException
      */
-    public function testSetVariable($key, $value) {
+    public function testSetVariable($key, $value)
+    {
         $o_request = new Request;
         $o_request->offsetSet($key, $value);
         $o_request[$key];
