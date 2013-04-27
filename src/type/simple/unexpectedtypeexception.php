@@ -1,6 +1,6 @@
 <?php
 /**
- * Defines the essential behaviors of applications input.
+ * Defines an exception for aliasing an existant class.
  *
  * This file is part of Tox.
  *
@@ -21,34 +21,34 @@
  * @license   GNU General Public License, version 3
  */
 
-namespace Tox\Application;
+namespace Tox\Type\Simple;
 
-use ArrayAccess;
-use Tox;
+use Tox\Core;
 
 /**
- * Announces the essential behaviors of applications input.
+ * the request key is not set.
  *
- * @package tox.application
- * @author  Snakevil Zen <zsnakevil@gmail.com>
+ * **THIS CLASS CANNOT BE INHERITED.**
+ *
+ * @package tox.type.simple
+ * @author  Mark Snoopy <marksnoopy@gmail.com>
  * @since   0.1.0-beta1
  */
-interface IInput extends ArrayAccess
+final class UnexpectedTypeException extends Core\Exception
 {
     /**
-     * Retrieves the formatted command-line for routing.
+     * {@inheritdoc}
      *
-     * @return string
+     * > Defined as `00x80030101`.
      */
-    public function getCommandLine();
+    const CODE = 0x80020901;
 
     /**
-     * Recruits the analysed options and values.
+     * {@inheritdoc}
      *
-     * @param  IToken $token Routing token containing the options and values.
-     * @return self
+     * > Defined as `class '%class$s' already exists`.
      */
-    public function recruit(Tox\Application\IToken $token);
+    const MESSAGE = 'class \'%class$s\' already exists';
 }
 
 // vi:ft=php fenc=utf-8 ff=unix ts=4 sts=4 et sw=4 fen fdm=indent fdl=1 tw=120

@@ -23,12 +23,13 @@
  * @license   http://www.gnu.org/licenses/gpl.html
  */
 
-namespace Tox\Web;
+namespace Tox\Web\Request;
 
 use Tox\Core;
 use Tox\Application;
+use Tox\Web;
 
-class Request extends Core\Assembly implements IRequest
+class Request extends Application\Input\Input implements Web\IRequest
 {
     protected $data;
 
@@ -53,19 +54,15 @@ class Request extends Core\Assembly implements IRequest
     {
         settype($prefix, 'string');
         settype($depth, 'int');
-        if (0 < $depth)
-        {
+        if (0 < $depth) {
             $depth--;
             settype($data, 'array');
             reset($data);
-            for ($ii = 0, $jj = count($data); $ii < $jj; $ii++)
-            {
+            for ($ii = 0, $jj = count($data); $ii < $jj; $ii++) {
                 list($m_key, $m_data) = each($data);
                 $this->import($prefix . '.' . strtolower($m_key), $m_data, $depth);
             }
-        }
-        else if (!$depth)
-        {
+        } elseif (!$depth) {
             $this->data[$prefix] = $data;
         }
         return $this;
@@ -80,11 +77,16 @@ class Request extends Core\Assembly implements IRequest
     public function offsetGet($offset)
     {
         settype($offset, 'string');
-        if (!$this->offsetExists($offset))
-        {
-            throw new UnknownRequestMetaException(array('field' => $offset));
+        if (!$this->offsetExists($offset)) {
+            if (!isset($this->default[$offset])) {
+                throw new UnknownMetaException(array('field' => $offset));
+            } else {
+                return $this->default[$offset];
+            }
+        } else {
+            return $this->data[$offset];
         }
-        return $this->data[$offset];
+
     }
 
     public function offsetSet($offset, $value)
