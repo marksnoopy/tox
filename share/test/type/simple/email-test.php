@@ -25,7 +25,7 @@ namespace Tox\Type\Simple;
 
 use PHPUnit_Framework_TestCase;
 
-require_once __DIR__ . '/../../../../src/core/assembly.php';;
+require_once __DIR__ . '/../../../../src/core/assembly.php';
 require_once __DIR__ . '/../../../../src/core/exception.php';
 require_once __DIR__ . '/../../../../src/type/simple/unexpectedtypeexception.php';
 require_once __DIR__ . '/../../../../src/type/iboxable.php';
@@ -48,14 +48,16 @@ class EmailTest extends PHPUnit_Framework_TestCase
      * @dataProvider provideErrorData
      * @expectedException Tox\Type\Simple\UnexpectedTypeException
      */
-    public function testErrorEmail($value) {
+    public function testErrorEmail($value)
+    {
         new Tox\Type\Simple\Email($value);
     }
 
     /**
      * @dataProvider provideReturnData
      */
-    public function testReturnValue($value) {
+    public function testReturnValue($value)
+    {
         $o_email = new Tox\Type\Simple\Email($value);
         $this->assertEquals($o_email->getValue(), $value);
     }
