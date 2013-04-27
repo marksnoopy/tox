@@ -17,7 +17,7 @@
  * You should have received a copy of the GNU General Public License
  * along with Tox.  If not, see <http://www.gnu.org/licenses/>.
  *
- * @copyright © 2012-2013 SZen.in
+ * @copyright © 2012-2013 PHP-Tox.org
  * @license   GNU General Public License, version 3
  */
 
@@ -134,10 +134,20 @@ abstract class Application extends Core\Assembly
             }
             $o_router = new $this->config['router.type'];
         } else {
-            $o_router = new Router\Router;
+            $o_router = static::newRouter();
         }
         // TODO support routes table files.
         return $o_router;
+    }
+
+    /**
+     * create router
+     *
+     * @return Router\Router
+     */
+    protected static function newRouter()
+    {
+        return new Router\Router;
     }
 
     /**
@@ -156,9 +166,19 @@ abstract class Application extends Core\Assembly
             }
             $o_fb = new $this->config['fallback.type'];
         } else {
-            $o_fb = new View\Fallback;
+            $o_fb = static::newViewFallback();
         }
         return $o_fb;
+    }
+
+    /**
+     * create fallback
+     *
+     * @return View\Fallback
+     */
+    protected static function newViewFallback()
+    {
+        return new View\Fallback;
     }
 
     /**
@@ -284,7 +304,11 @@ abstract class Application extends Core\Assembly
                 throw $ex;
             }
             if (null === $fallback) {
-                $fallback = self::$instance->getDefaultFallback();
+                try {
+                    $fallback = self::$instance->getDefaultFallback();
+                } catch (Exception $e) {
+                    $fallback = static::newViewFallback();
+                }
             }
             $o_out = (self::$instance->output instanceof IOutput) ?
                 self::$instance->output :
@@ -306,8 +330,19 @@ abstract class Application extends Core\Assembly
         if (self::$instance instanceof self) {
             throw new MultipleApplicationRuntimeException(array('existant' => self::$instance));
         }
-        self::$instance = new static;
+        self::$instance = static::newSelf();
+
         return self::$instance;
+    }
+
+    /**
+     * Create self
+     *
+     * @return Application
+     */
+    protected static function newSelf()
+    {
+        return new static;
     }
 
     /**

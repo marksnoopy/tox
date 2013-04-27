@@ -17,13 +17,13 @@
  * You should have received a copy of the GNU General Public License
  * along with Tox.  If not, see <http://www.gnu.org/licenses/>.
  *
- * @copyright © 2012-2013 SZen.in
+ * @copyright © 2012-2013 PHP-Tox.org
  * @license   GNU General Public License, version 3
  */
 
 namespace Tox\Web;
 
-use Tox\Application;
+use Tox\Application as TApp;
 
 /**
  * Announces the behaviors of pages caching agent tasks for web applications.
@@ -32,7 +32,7 @@ use Tox\Application;
  * @author  Snakevil Zen <zsnakevil@gmail.com>
  * @since   0.1.0-beta1
  */
-interface IPageCacheAgent extends Application\IOutputTask
+interface IPageCacheAgent extends TApp\IOutputTask
 {
     /**
      * Attaches to a page cache object.

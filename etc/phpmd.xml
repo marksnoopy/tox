@@ -14,7 +14,14 @@
   <rule ref="rulesets/codesize.xml/ExcessiveParameterList"/>
   <rule ref="rulesets/codesize.xml/ExcessivePublicCount"/>
   <rule ref="rulesets/codesize.xml/TooManyFields"/>
-  <rule ref="rulesets/codesize.xml/TooManyMethods"/>
+  <rule ref="rulesets/codesize.xml/TooManyMethods">
+    <properties>
+      <property name="ignorepattern"
+                value="@^((tox[GS]|[gs])et|new|__).+$@"
+                description="Ignores Tox-specific getters/setters, composite factors and PHP internal magic methods."
+      />
+    </properties>
+  </rule>
   <rule ref="rulesets/codesize.xml/ExcessiveClassComplexity"/>
 
   <rule ref="rulesets/controversial.xml/Superglobals"/>
