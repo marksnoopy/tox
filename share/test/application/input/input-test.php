@@ -70,7 +70,8 @@ class InputTest extends PHPUnit_Framework_TestCase
      * @dataProvider provideErrorTypeData
      * @expectedException Tox\Application\Input\UnknownTypeException
      */
-    public function testNotExpecetedType($type) {
+    public function testNotExpecetedType($type)
+    {
         $o_input = $this->getMockBuilder('Tox\\Application\\Input\\Input')
             ->getMockForAbstractClass();
         $o_input->expected('post.email', $type);
@@ -80,7 +81,8 @@ class InputTest extends PHPUnit_Framework_TestCase
      * @dataProvider provideTypeData
      * @expectedException Tox\Type\Simple\UnexpectedTypeException
      */
-    public function testExpecetedType($key, $value) {
+    public function testExpecetedType($key, $value)
+    {
         $o_input = $this->getMockBuilder('Tox\\Application\\Input\\Input')
             ->getMockForAbstractClass();
         $o_input->expected($key, $value);
@@ -105,7 +107,8 @@ class InputTest extends PHPUnit_Framework_TestCase
         );
     }
 
-    public function provideDefalutData(){
+    public function provideDefalutData()
+    {
         return array(
             array('cookie'.rand(1, 9), rand(1, 9)),
             array('env'.rand(1, 9), rand(1, 9)),
@@ -114,9 +117,6 @@ class InputTest extends PHPUnit_Framework_TestCase
             array('server'.rand(1, 9), rand(1, 9)),
         );
     }
-
-
-
 }
 
 // vi:ft=php fenc=utf-8 ff=unix ts=4 sts=4 et sw=4 fen fdm=indent fdl=1 tw=120
