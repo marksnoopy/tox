@@ -25,8 +25,6 @@
 
 namespace Tox\Web;
 
-use Tox\Core;
-use Tox\Application;
 use Tox\Data\KV;
 
 class MemcachedHttpSession extends HttpSession
@@ -37,15 +35,17 @@ class MemcachedHttpSession extends HttpSession
     private $cache;
 
     /**
-     * Initializes the application component.
-     * This method overrides the parent implementation by checking if cache is available.
+     * Initializes the memcached config.
+     *
+     * @param array $memecachedconfig memcached config
      */
     public function init($memecachedconfig)
     {
+        $memecachedconfig = $memecachedconfig['config'];
         $this->cache = $this->newMemcache();
         $this->cache->setServers($memecachedconfig);
         $this->cache->init();
-        parent::init();
+        parent::init(array());
     }
 
     public function newMemcache()
@@ -55,7 +55,7 @@ class MemcachedHttpSession extends HttpSession
 
     /**
      * Returns a value indicating whether to use custom session storage.
-     * This method overrides the parent implementation and always returns true.
+     *
      * @return boolean whether to use custom storage.
      */
     public function useMemcachedStoreSession()
@@ -65,8 +65,11 @@ class MemcachedHttpSession extends HttpSession
 
     /**
      * Session read handler.
+     *
      * Do not call this method directly.
-     * @param string $id session ID
+     *
+     * @param  string $id session ID
+     *
      * @return string the session data
      */
     public function readSession($id)
@@ -77,9 +80,11 @@ class MemcachedHttpSession extends HttpSession
 
     /**
      * Session write handler.
+     *
      * Do not call this method directly.
-     * @param string $id session ID
-     * @param string $data session data
+     *
+     * @param  string  $id     session ID
+     * @param  string  $data   session data
      * @return boolean whether session write is successful
      */
     public function writeSession($id, $data)
@@ -89,8 +94,11 @@ class MemcachedHttpSession extends HttpSession
 
     /**
      * Session destroy handler.
+     *
      * Do not call this method directly.
+     *
      * @param string $id session ID
+     *
      * @return boolean whether session is destroyed successfully
      */
     public function destroySession($id)
@@ -100,14 +108,15 @@ class MemcachedHttpSession extends HttpSession
 
     /**
      * Generates a unique key used for storing session data in cache.
+     *
      * @param string $id session variable name
+     *
      * @return string a safe cache key associated with the session variable name
      */
     protected function calculateKey($id)
     {
         return 'memcached' . $id;
     }
-
 }
 
 // vi:se ft=php fenc=utf-8 ff=unix ts=4 sts=4 et sw=4 fen fdm=indent fdl=1 tw=120:

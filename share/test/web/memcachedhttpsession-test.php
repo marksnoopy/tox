@@ -74,7 +74,6 @@ class MemcachedHttpSessionTest extends PHPUnit_Framework_TestCase
      */
     public function testNotExitInHypervariableWhenSet($config)
     {
-
         $o_session = new Tox\Web\MemcachedHttpSession();
         $o_session->init($config);
         $this->assertEmpty($o_session->Export());
@@ -98,7 +97,7 @@ class MemcachedHttpSessionTest extends PHPUnit_Framework_TestCase
                 ->will($this->returnValue(true));
 
         $mocksession = $this->getMockBuilder('Tox\\Web\\MemcachedHttpSession')
-                ->setMethods(array('newMemcache','useMemcachedStoreSession'))
+                ->setMethods(array('newMemcache', 'useMemcachedStoreSession'))
                 ->getMockForAbstractClass();
 
         $mocksession->Expects($this->once())
@@ -112,19 +111,22 @@ class MemcachedHttpSessionTest extends PHPUnit_Framework_TestCase
         $mocksession->init($config);
 
         $mocksession->writeSession(session_id(), array('t' => 'tt'));
-
     }
 
     public function dataProviderMemcachedConfig()
     {
-        return array(array(
+        return array(
+            array(
                 $a_array = array(
-            'useMemcached' => true,
-            'memcached' => array(
-                array(
-                    'host' => '127.0.0.1',
-                    'port' => '11211',
-                ),
+            'storge' => 'memcached',
+            'config' => array(
+                'useMemcached' => true,
+                'memcached' => array(
+                    array(
+                        'host' => '127.0.0.1',
+                        'port' => '11211',
+                    ),
+                )
             )
                 )
             )

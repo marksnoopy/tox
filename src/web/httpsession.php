@@ -26,7 +26,7 @@
 namespace Tox\Web;
 
 use Tox\Core;
-use Tox\Application;
+
 
 class HttpSession extends Core\Assembly implements IHttpSession
 {
@@ -39,7 +39,8 @@ class HttpSession extends Core\Assembly implements IHttpSession
         }
     }
 
-        public function init()
+
+    public function init($config)
     {
         if ($this->useMemcachedStoreSession()) {
             @session_set_save_handler(
@@ -91,7 +92,7 @@ class HttpSession extends Core\Assembly implements IHttpSession
     /**
      * Adds a session variable.
      *
-     * @param mixed $key session variable name
+     * @param mixed $key   session variable name
      *
      * @param mixed $value session variable value
      */
@@ -108,7 +109,7 @@ class HttpSession extends Core\Assembly implements IHttpSession
     /**
      * Removes a session variable.
      *
-     * @param mixed $key the name of the session variable to be removed
+     * @param  mixed $key the name of the session variable to be removed
      *
      * @return mixed the removed value, null if no such session variable.
      */
@@ -165,7 +166,7 @@ class HttpSession extends Core\Assembly implements IHttpSession
     }
 
     /**
-     * @param string $value the current session save path
+     * @param  string     $value the current session save path
      * @throws CException if the path is not a valid directory
      */
     public function setSavePath($value)
@@ -188,8 +189,9 @@ class HttpSession extends Core\Assembly implements IHttpSession
 
     /**
      * Sets the session cookie parameters.
-     * The effect of this method only lasts for the duration of the script.
+     *
      * Call this method before the session starts.
+     *
      * @param array $value cookie parameters, valid keys include: lifetime, path, domain, secure.
      */
     public function setCookieParams($value)
@@ -207,10 +209,13 @@ class HttpSession extends Core\Assembly implements IHttpSession
 
     /**
      * Session open handler.
-     * This method should be overridden if {@link useCustomStorage} is set true.
+     *
      * Do not call this method directly.
+     *
      * @param string $savePath session save path
+     *
      * @param string $sessionName session name
+     *
      * @return boolean whether session is opened successfully
      */
     public function openSession($savePath, $sessionName)
@@ -220,8 +225,10 @@ class HttpSession extends Core\Assembly implements IHttpSession
 
     /**
      * Session close handler.
+     *
      * This method should be overridden if {@link useCustomStorage} is set true.
      * Do not call this method directly.
+     *
      * @return boolean whether session is closed successfully
      */
     public function closeSession()
@@ -231,10 +238,13 @@ class HttpSession extends Core\Assembly implements IHttpSession
 
     /**
      * Session read handler.
+     *
      * This method should be overridden if {@link useCustomStorage} is set true.
+     *
      * Do not call this method directly.
-     * @param string $id session ID
-     * @return string the session data
+     *
+     * @param  string $id session ID
+     * @return string     the session data
      */
     public function readSession($id)
     {
@@ -243,10 +253,15 @@ class HttpSession extends Core\Assembly implements IHttpSession
 
     /**
      * Session write handler.
+     *
      * This method should be overridden if {@link useCustomStorage} is set true.
+     *
      * Do not call this method directly.
-     * @param string $id session ID
+     *
+     * @param string $id   session ID
+     *
      * @param string $data session data
+     *
      * @return boolean whether session write is successful
      */
     public function writeSession($id, $data)
@@ -256,9 +271,13 @@ class HttpSession extends Core\Assembly implements IHttpSession
 
     /**
      * Session destroy handler.
+     *
      * This method should be overridden if {@link useCustomStorage} is set true.
+     *
      * Do not call this method directly.
-     * @param string $id session ID
+     *
+     * @param string   $id  session ID
+     *
      * @return boolean whether session is destroyed successfully
      */
     public function destroySession($id)
@@ -268,9 +287,13 @@ class HttpSession extends Core\Assembly implements IHttpSession
 
     /**
      * Session GC (garbage collection) handler.
+     *
      * This method should be overridden if {@link useCustomStorage} is set true.
+     *
      * Do not call this method directly.
-     * @param integer $maxLifetime the number of seconds after which data will be seen as 'garbage' and cleaned up.
+     *
+     * @param integer  $maxLifetime the number of seconds after which data will be seen as 'garbage' and cleaned up.
+     *
      * @return boolean whether session is GCed successfully
      */
     public function gcSession($maxLifetime)
@@ -323,7 +346,6 @@ class HttpSession extends Core\Assembly implements IHttpSession
     {
         unset($this->sessionData[$offset]);
     }
-
 }
 
 // vi:se ft=php fenc=utf-8 ff=unix ts=4 sts=4 et sw=4 fen fdm=indent fdl=1 tw=120:
