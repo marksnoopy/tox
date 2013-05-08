@@ -60,7 +60,6 @@ class RequestTest extends PHPUnit_Framework_TestCase
             = $_GET[$key] = $_POST[$key] = $_SERVER[$key] = $value;
 
         $this->assertEquals($_COOKIE, array($key=> $value));
-        $this->assertEquals($_ENV, array($key=> $value));
         $this->assertCount($i_env + 1, $_ENV);
         $this->assertEquals($_FILES, array($key=> $value));
         $this->assertEquals($_GET, array($key=> $value));
