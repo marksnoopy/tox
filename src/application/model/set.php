@@ -38,11 +38,6 @@ use Tox\Application;
 abstract class Set extends Core\Assembly implements Application\IModelSet
 {
     /**
-     * Represents the prototype of corresponding model.
-     */
-    const MODEL = 'Tox\\Application\\IModel';
-
-    /**
      * Stores the data access object in use.
      *
      * @var Application\IDao
@@ -106,6 +101,27 @@ abstract class Set extends Core\Assembly implements Application\IModelSet
     protected $parent;
 
     /**
+     * Stores the identifiers of included model entities.
+     *
+     * @var true[]
+     */
+    protected $index;
+
+    /**
+     * Stores the model entities to be appended.
+     *
+     * @var Application\IModel[]
+     */
+    protected $toAppend;
+
+    /**
+     * Stores the model entities to be dropped.
+     *
+     * @var Application\IModel[]
+     */
+    protected $toDrop;
+
+    /**
      * Retrieves the default data access object.
      *
      * @return Application\IDao
@@ -128,6 +144,8 @@ abstract class Set extends Core\Assembly implements Application\IModelSet
         $this->limit = 0;
         $this->length =
         $this->cursor = -1;
+        $this->toAppend =
+        $this->toDrop = array();
     }
 
     /**
@@ -477,15 +495,11 @@ abstract class Set extends Core\Assembly implements Application\IModelSet
     }
 
     /**
-     * Returns a generated model entity.
+     * Retrieves the class name of corresponding model.
      *
-     * @param  mixed[]            $attributes Attributes values.
-     * @return Application\IModel
+     * @return string
      */
-    protected function newModel($attributes)
-    {
-        return call_user_func(array(static::MODEL, 'import'), $attributes);
-    }
+    abstract protected function getModelClass();
 
     /**
      * Rewind the Iterator to the first element.
@@ -495,11 +509,17 @@ abstract class Set extends Core\Assembly implements Application\IModelSet
     public function rewind()
     {
         if (!is_array($this->items)) {
-            $this->items = array();
-            foreach ($this->getDao()->listBy($this->filters, $this->orders, $this->offset, $this->limit) as $ii) {
-                $this->items[] = $this->newModel($ii);
+            if (!$this->isFiltered()) {
+                throw new SetWithoutFiltersException;
             }
+            $this->index = array();
+            $this->items = $this->getDao()->listBy($this->filters, $this->orders, $this->offset, $this->limit);
             $this->length = count($this->items);
+        }
+        $this->cursor = 0;
+        foreach ($this->items as $ii => $jj) {
+            $this->items[$ii] = call_user_func(array($this->getModelClass(), 'import'), $this, $this->getDao());
+            $this->index[$this->items[$ii]->getId()] = $ii;
         }
         $this->cursor = 0;
     }
@@ -610,6 +630,160 @@ abstract class Set extends Core\Assembly implements Application\IModelSet
     final public function hasParent()
     {
         return $this->parent instanceof Application\IModel;
+    }
+
+    /**
+     * {@ineritdoc}
+     *
+     * **THIS METHOD CANNOT BE OVERRIDDEN.**
+     *
+     * @return self
+     */
+    final public function commit()
+    {
+        if (-1 != $this->cursor) {
+            foreach ($this->items as $ii) {
+                $ii->commit();
+            }
+        } elseif (!empty($this->filters) || $this->offset || $this->limit) {
+            $this->rewind();
+        }
+        foreach ($this->toAppend as $ii) {
+            if (array_key_exists($ii->commit()->getId(), $this->index)) {
+                throw new ModelIncludedInSetException;
+            }
+            $this->items[] = $ii;
+            $this->index[$ii->getId()] = $this->length++;
+            if ($this->hasParent()) {
+                $this->getDao()->tie($this->getParent(), $ii);
+            }
+        }
+        foreach ($this->toDrop as $ii) {
+            unset($this->items[$this->index[$ii->getId()]], $this->index[$ii->getId()]);
+            $this->length--;
+        }
+        $this->items = array_values($this->items);
+        $this->index = array();
+        foreach ($this->items as $ii => $jj) {
+            $this->index[$jj->getId()] = $ii;
+        }
+        return $this->reset();
+    }
+
+    /**
+     * {@inheritdoc}
+     *
+     * **THIS METHOD CANNOT BE OVERRIDDEN.**
+     *
+     * @return self
+     */
+    final public function reset()
+    {
+        $this->toAppend =
+        $this->toDrop = array();
+        return $this;
+    }
+
+    /**
+     * {@inheritdoc}
+     *
+     * NOTICE: When trying to append a model entity to an empty set (without any
+     * filters, no offset and no limit), A new
+     *
+     * @param  Application\IModel $entity The model to be appended.
+     * @return self
+     *
+     * @throws IllegalEntityForSetException If appending an illegal model
+     *                                      entity.
+     * @throws ModelIncludedInSetException  If appending an already included
+     *                                      model entity.
+     */
+    public function append(Application\IModel $entity)
+    {
+        if (!is_a($entity, $this->getModelClass())) {
+            throw new IllegalEntityForSetException;
+        }
+        $this->valid();
+        if ($this->has($entity)) {
+            throw new ModelIncludedInSetException;
+        }
+        $this->toAppend[] = $entity;
+        return $this;
+    }
+
+    /**
+     * Removes a model.
+     *
+     * @param  Application\IModel $entity The model to be removed.
+     * @return self
+     *
+     * @throws IllegalEntityForSetException If dropping an illegal model entity.
+     * @throws PreparedModelToDropException If dropping a prepared model entity.
+     */
+    public function drop(Application\IModel $entity)
+    {
+        if (!is_a($entity, $this->getModelClass())) {
+            throw new IllegalEntityForSetException;
+        }
+        $this->valid();
+        if (!$entity->isAlive()) {
+            throw new PreparedModelToDropException;
+        }
+        if (array_key_exists($entity->getId(), $this->index)) {
+            $this->toDrop[] = $entity;
+        }
+        return $this;
+    }
+
+    /**
+     * {@inheritdoc}
+     *
+     * @param  Application\IModel  $entity The model to be checked.
+     * @return bool
+     */
+    public function has(Application\IModel $entity)
+    {
+        return $entity->isAlive() && array_key_exists($entity->getId(), $this->index);
+    }
+
+    /**
+     * Removes every model inside.
+     *
+     * @return self
+     */
+    public function clear()
+    {
+        $this->valid();
+        $this->toAppend =
+        $this->toDrop = array();
+        foreach ($this as $entity) {
+            $this->toDrop[] = $entity;
+        }
+        return $this;
+    }
+
+    /**
+     * Checks whether the set has been filtered.
+     *
+     * **THIS METHOD CANNOT BE OVERRIDDEN.**
+     *
+     * @return bool
+     */
+    final protected function isFiltered()
+    {
+        return !empty($this->filters) || $this->offset || $this->limit;
+    }
+
+    /**
+     * {@inheritdoc}
+     *
+     * **THIS METHOD CANNOT BE OVERRIDDEN.**
+     *
+     * @return bool
+     */
+    final public function isChanged()
+    {
+        return !empty($this->toAppend) || !empty($this->toDrop);
     }
 }
 

@@ -34,6 +34,10 @@ require_once __DIR__ . '/../../../../src/core/exception.php';
 require_once __DIR__ . '/../../../../src/application/model/illegalfilterexception.php';
 require_once __DIR__ . '/../../../../src/application/model/attributefilteredexception.php';
 require_once __DIR__ . '/../../../../src/application/model/attributesortedexception.php';
+require_once __DIR__ . '/../../../../src/application/model/illegalentityforsetexception.php';
+require_once __DIR__ . '/../../../../src/application/model/modelincludedinsetexception.php';
+require_once __DIR__ . '/../../../../src/application/model/preparedmodeltodropexception.php';
+require_once __DIR__ . '/../../../../src/application/model/setwithoutfiltersexception.php';
 
 require_once __DIR__ . '/../../../../src/application/imodel.php';
 require_once __DIR__ . '/../../../../src/core/isingleton.php';
@@ -342,7 +346,7 @@ class SetTest extends PHPUnit_Framework_TestCase
             }
         }
         $i_offset = rand(0, 999);
-        $i_limit = rand(0 ,999);
+        $i_limit = rand(0, 999);
         $i_size = rand(0, 999);
         $o_set = $o_set->crop($i_offset, $i_limit);
         $o_set->expects($this->once())->method('getDefaultDao')
@@ -378,7 +382,7 @@ class SetTest extends PHPUnit_Framework_TestCase
             $a_orders[$s_attr] = $c_order;
         }
         $i_offset = rand(0, 999);
-        $i_limit = rand(0 ,999);
+        $i_limit = rand(0, 999);
         $o_set = $o_set->crop($i_offset, $i_limit);
         $o_set->expects($this->once())->method('getDefaultDao')
             ->will($this->returnValue($this->dao));
@@ -397,27 +401,32 @@ class SetTest extends PHPUnit_Framework_TestCase
 
     /**
      * @depends testLoadDirectlyWithoutCounting
+     * @expectedException Tox\Application\Model\SetWithoutFiltersException
+     */
+    public function testFiltersRequired()
+    {
+        $this->getMockForAbstractClass('Tox\\Application\\Model\\Set')->rewind();
+    }
+
+    /**
+     * @depends testFiltersRequired
      */
     public function testGenerateAllIncludedModelsEntitiesOnInit()
     {
-        $o_set = $this->getMockForAbstractClass(
-            'Tox\\Application\\Model\\Set',
-            array(null, $this->dao),
-            '',
-            true,
-            true,
-            true,
-            array('newModel')
-        );
         $a_rows = array();
-        for ($ii = 0, $jj = rand(1, 9); $ii < $jj; $ii++) {
+        for ($ii = 0, $i_times = rand(1, 9); $ii < $i_times; $ii++) {
             $kk = array('id' => sha1($ii . microtime()));
             $a_rows[] = $kk;
-            $o_set->expects($this->at($ii))->method('newModel')
-                ->with($this->equalTo($kk));
         }
+        $o_set = $this->getMockForAbstractClass('Tox\\Application\\Model\\Set', array(null, $this->dao))->crop(0, 999);
+        $o_mod = $this->getMock('Tox\\Application\\IModel');
+        $o_mod->staticExpects($this->exactly($i_times))->method('import')
+            ->with($this->equalTo($o_set), $this->equalTo($this->dao))
+            ->will($this->returnValue($o_mod));
+        $o_set->expects($this->exactly($i_times))->method('getModelClass')
+            ->will($this->returnValue(get_class($o_mod)));
         $this->dao->expects($this->once())->method('listBy')
-            ->with($this->equalTo(array()), $this->equalTo(array()), $this->equalTo(0), $this->equalTo(0))
+            ->with($this->equalTo(array()), $this->equalTo(array()), $this->equalTo(0), $this->equalTo(999))
             ->will($this->returnValue($a_rows));
         $o_set->rewind();
     }
@@ -427,30 +436,27 @@ class SetTest extends PHPUnit_Framework_TestCase
      */
     public function testIteration()
     {
-        $o_set = $this->getMockForAbstractClass(
-            'Tox\\Application\\Model\\Set',
-            array(null, $this->dao),
-            '',
-            true,
-            true,
-            true,
-            array('newModel')
-        );
         $a_rows = array();
-        $i_size = rand(1, 9);
-        for ($ii = 0; $ii < $i_size; $ii++) {
-            $a_rows[] = array('id' => sha1($ii . microtime()));
+        for ($ii = 0, $i_times = rand(1, 9); $ii < $i_times; $ii++) {
+            $kk = array('id' => sha1($ii . microtime()));
+            $a_rows[] = $kk;
         }
-        $o_set->expects($this->exactly($i_size))->method('newModel')
-            ->will($this->returnArgument(0));
+        $o_set = $this->getMockForAbstractClass('Tox\\Application\\Model\\Set', array(null, $this->dao))->crop(0, 999);
+        $o_mod = $this->getMock('Tox\\Application\\IModel');
+        $o_mod->staticExpects($this->exactly($i_times))->method('import')
+            ->with($this->equalTo($o_set), $this->equalTo($this->dao))
+            ->will($this->returnValue($o_mod));
+        $o_set->expects($this->exactly($i_times))->method('getModelClass')
+            ->will($this->returnValue(get_class($o_mod)));
         $this->dao->expects($this->once())->method('listBy')
-            ->with($this->equalTo(array()), $this->equalTo(array()), $this->equalTo(0), $this->equalTo(0))
+            ->with($this->equalTo(array()), $this->equalTo(array()), $this->equalTo(0), $this->equalTo(999))
             ->will($this->returnValue($a_rows));
         $i_counter = 0;
-        foreach ($o_set as $ii) {
-            $this->assertEquals($a_rows[$i_counter++], $ii);
+        foreach ($o_set as $ii => $jj) {
+            $this->assertSame($o_mod, $jj);
+            $this->assertEquals($i_counter++, $ii);
         }
-        $this->assertEquals($i_size, $i_counter);
+        $this->assertEquals($i_times, $i_counter);
     }
 
     public function testGetParent()
@@ -499,6 +505,208 @@ class SetTest extends PHPUnit_Framework_TestCase
         $this->assertEquals($s_val, $o_set->length);
     }
 
+    /**
+     * @depends testLoadDirectlyWithoutCounting
+     */
+    public function testCommitRecursively()
+    {
+        $a_rows = array(
+            array('id' => microtime())
+        );
+        $o_mod = $this->getMock('Tox\\Application\\IModel');
+        $o_mod->staticExpects($this->once())->method('import')
+            ->will($this->returnValue($o_mod));
+        $o_set = $this->getMockForAbstractClass('Tox\\Application\\Model\\Set', array(null, $this->dao))->crop(0, 999);
+        $o_set->expects($this->once())->method('getModelClass')
+            ->will($this->returnValue(get_class($o_mod)));
+        $this->dao->expects($this->once())->method('listBy')
+            ->will($this->returnValue($a_rows));
+        $o_set->rewind();
+        $o_mod->expects($this->once())->method('commit')
+            ->will($this->returnValue($o_mod));
+        $this->assertSame($o_set, $o_set->commit());
+    }
+
+    /**
+     * @depends testCountDirectlyWithoutLoading
+     */
+    public function testAppendBufferedBeforeCommit()
+    {
+        $o_mod = $this->getMock('Tox\\Application\\IModel');
+        $o_set = $this->getMockForAbstractClass('Tox\\Application\\Model\\Set', array(null, $this->dao))->crop(0, 999);
+        $o_set->expects($this->once())->method('getModelClass')
+            ->will($this->returnValue(get_class($o_mod)));
+        $this->dao->expects($this->once())->method('listBy')
+            ->will($this->returnValue(array()));
+        $this->assertFalse($o_set->isChanged());
+        $this->assertSame($o_set, $o_set->append($o_mod));
+        $this->assertTrue($o_set->isChanged());
+        $this->assertFalse($o_set->has($o_mod));
+        $this->assertEquals(0, count($o_set));
+    }
+
+    /**
+     * @depends testAppendBufferedBeforeCommit
+     * @expectedException Tox\Application\Model\IllegalEntityForSetException
+     */
+    public function testAppendCorrespondingModelsOnly()
+    {
+        $o_mod = $this->getMock('Tox\\Application\\IModel');
+        $o_set = $this->getMockForAbstractClass('Tox\\Application\\Model\\Set')->crop(0, 999);
+        $o_set->expects($this->once())->method('getModelClass')
+            ->will($this->returnValue('Foo'));
+        $o_set->append($o_mod);
+    }
+
+    /**
+     * @depends testAppendBufferedBeforeCommit
+     * @depends testLoadDirectlyWithoutCounting
+     * @expectedException Tox\Application\Model\ModelIncludedInSetException
+     */
+    public function testAppendFailureForIncludedEntity()
+    {
+        $s_id = microtime();
+        $o_mod = $this->getMock('Tox\\Application\\IModel');
+        $o_mod->staticExpects($this->once())->method('import')
+            ->will($this->returnValue($o_mod));
+        $o_mod->expects($this->atLeastOnce())->method('getId')
+            ->will($this->returnValue($s_id));
+        $o_mod->expects($this->once())->method('isAlive')
+            ->will($this->returnValue(true));
+        $o_set = $this->getMockForAbstractClass('Tox\\Application\\Model\\Set', array(null, $this->dao))->crop(0, 999);
+        $o_set->expects($this->atLeastOnce())->method('getModelClass')
+            ->will($this->returnValue(get_class($o_mod)));
+        $this->dao->expects($this->once())->method('listBy')
+            ->will($this->returnValue(array(array('id' => $s_id))));
+        $o_set->append($o_mod);
+    }
+
+    /**
+     * @depends testAppendBufferedBeforeCommit
+     * @depends testLoadDirectlyWithoutCounting
+     */
+    public function testAppendOnCommit()
+    {
+        $o_mod = $this->getMock('Tox\\Application\\IModel');
+        $o_mod->expects($this->once())->method('commit')
+            ->will($this->returnValue($o_mod));
+        $o_mod->expects($this->exactly(2))->method('isAlive')
+            ->will($this->returnValue(true));
+        $o_set = $this->getMockForAbstractClass('Tox\\Application\\Model\\Set', array(null, $this->dao))->crop(0, 999);
+        $o_set->expects($this->once())->method('getModelClass')
+            ->will($this->returnValue(get_class($o_mod)));
+        $this->dao->expects($this->once())->method('listBy')
+            ->will($this->returnValue(array()));
+        $this->assertFalse($o_set->isChanged());
+        $o_set->append($o_mod)->commit();
+        $this->assertFalse($o_set->isChanged());
+        $this->assertTrue($o_set->has($o_mod));
+        $this->assertEquals(1, count($o_set));
+        $this->assertSame($o_mod, $o_set->current());
+    }
+
+    /**
+     * @depends testCountDirectlyWithoutLoading
+     */
+    public function testDropBufferedBeforeCommit()
+    {
+        $o_mod = $this->getMock('Tox\\Application\\IModel');
+        $o_mod->staticExpects($this->once())->method('import')
+            ->will($this->returnValue($o_mod));
+        $o_mod->expects($this->exactly(2))->method('isAlive')
+            ->will($this->returnValue(true));
+        $o_set = $this->getMockForAbstractClass('Tox\\Application\\Model\\Set', array(null, $this->dao))->crop(0, 999);
+        $o_set->expects($this->atLeastOnce())->method('getModelClass')
+            ->will($this->returnValue(get_class($o_mod)));
+        $this->dao->expects($this->once())->method('listBy')
+            ->will($this->returnValue(array(array('id' => microtime()))));
+        $this->assertFalse($o_set->isChanged());
+        $this->assertSame($o_set, $o_set->drop($o_mod));
+        $this->assertTrue($o_set->isChanged());
+        $this->assertTrue($o_set->has($o_mod));
+        $this->assertEquals(1, count($o_set));
+    }
+
+    /**
+     * @depends testDropBufferedBeforeCommit
+     * @expectedException Tox\Application\Model\IllegalEntityForSetException
+     */
+    public function testDropCorrespondingModelsOnly()
+    {
+        $o_mod = $this->getMock('Tox\\Application\\IModel');
+        $o_set = $this->getMockForAbstractClass('Tox\\Application\\Model\\Set')->crop(0, 999);
+        $o_set->expects($this->once())->method('getModelClass')
+            ->will($this->returnValue('Foo'));
+        $o_set->drop($o_mod);
+    }
+
+    /**
+     * @depends testDropBufferedBeforeCommit
+     * @depends testLoadDirectlyWithoutCounting
+     * @expectedException Tox\Application\Model\PreparedModelToDropException
+     */
+    public function testDropFailureForPreparedEntity()
+    {
+        $s_id = microtime();
+        $o_mod = $this->getMock('Tox\\Application\\IModel');
+        $o_mod->expects($this->once())->method('isAlive')
+            ->will($this->returnValue(false));
+        $o_set = $this->getMockForAbstractClass('Tox\\Application\\Model\\Set', array(null, $this->dao))->crop(0, 999);
+        $o_set->expects($this->atLeastOnce())->method('getModelClass')
+            ->will($this->returnValue(get_class($o_mod)));
+        $this->dao->expects($this->once())->method('listBy')
+            ->will($this->returnValue(array()));
+        $o_set->drop($o_mod);
+    }
+
+    /**
+     * @depends testDropBufferedBeforeCommit
+     * @depends testLoadDirectlyWithoutCounting
+     */
+    public function testDropOnCommit()
+    {
+        $s_id = microtime();
+        $o_mod = $this->getMock('Tox\\Application\\IModel');
+        $o_mod->staticExpects($this->once())->method('import')
+            ->will($this->returnValue($o_mod));
+        $o_mod->expects($this->atLeastOnce())->method('getId')
+            ->will($this->returnValue($s_id));
+        $o_mod->expects($this->exactly(2))->method('isAlive')
+            ->will($this->returnValue(true));
+        $o_set = $this->getMockForAbstractClass('Tox\\Application\\Model\\Set', array(null, $this->dao))->crop(0, 999);
+        $o_set->expects($this->atLeastOnce())->method('getModelClass')
+            ->will($this->returnValue(get_class($o_mod)));
+        $this->dao->expects($this->once())->method('listBy')
+            ->will($this->returnValue(array(array('id' => $s_id))));
+        $this->assertFalse($o_set->isChanged());
+        $o_set->drop($o_mod)->commit();
+        $this->assertFalse($o_set->isChanged());
+        $this->assertFalse($o_set->has($o_mod));
+        $this->assertEquals(0, count($o_set));
+    }
+
+    public function testClear()
+    {
+        $s_id = microtime();
+        $o_mod = $this->getMock('Tox\\Application\\IModel');
+        $o_mod->staticExpects($this->atLeastOnce())->method('import')
+            ->will($this->returnValue($o_mod));
+        $o_mod->expects($this->atLeastOnce())->method('getId')
+            ->will($this->returnValue($s_id));
+        $o_set = $this->getMockForAbstractClass('Tox\\Application\\Model\\Set', array(null, $this->dao))->crop(0, 999);
+        $o_set->expects($this->atLeastOnce())->method('getModelClass')
+            ->will($this->returnValue(get_class($o_mod)));
+        $this->dao->expects($this->once())->method('listBy')
+            ->will($this->returnValue(array(array('id' => $s_id))));
+        $this->assertFalse($o_set->isChanged());
+        $this->assertSame($o_set, $o_set->clear());
+        $this->assertTrue($o_set->isChanged());
+        $this->assertEquals(1, count($o_set));
+        $o_set->commit();
+        $this->assertFalse($o_set->isChanged());
+        $this->assertEquals(0, count($o_set));
+    }
+
     public function provideFiltersAndExcludes()
     {
         return array(
@@ -520,6 +728,10 @@ class SetTest extends PHPUnit_Framework_TestCase
             array('excludeLike', 'excludeLike', sha1(microtime()), sha1(microtime()))
         );
     }
+}
+
+abstract class SetDummy extends Set
+{
 }
 
 // vi:ft=php fenc=utf-8 ff=unix ts=4 sts=4 et sw=4 fen fdm=indent fdl=1 tw=120

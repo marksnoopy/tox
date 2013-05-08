@@ -66,6 +66,14 @@ interface IModelSet extends ICommittable, Countable, Iterator
     public function drop(IModel $entity);
 
     /**
+     * Checks whether the model entity included.
+     *
+     * @param  IModel  $entity The model to be checked.
+     * @return bool
+     */
+    public function has(IModel $entity);
+
+    /**
      * Removes every model inside.
      *
      * @return self

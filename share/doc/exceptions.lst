@@ -52,6 +52,7 @@
 0x8002070A = ModelIncludedInSetException
 0x8002070B = PreparedModelToDropException
 0x8002070C = SetPropertyUnreplacableException
+0x8002070D = SetWithoutFiltersException
 
 [Tox\Application\Dao]
 0x80020801 = DataSourceExpectedException
