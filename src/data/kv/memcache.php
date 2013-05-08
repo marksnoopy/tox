@@ -139,7 +139,6 @@ class Memcache extends KV
         $servers = $this->getServers();
         $cache = $this->getMemCache();
 
-
         if (is_array($servers) && count($servers) > 0) {
             foreach ($servers as $server) {
                 if (count($servers)) {
@@ -171,6 +170,8 @@ class Memcache extends KV
                                     if (false === $serverExit) {
                                         $cache->addServer($server->host, $server->port, $server->weight);
                                     }
+                                } else {
+                                    $cache->addServer($server->host, $server->port, $server->weight);
                                 }
                             }
                         } else {
@@ -306,8 +307,8 @@ class Memcache extends KV
      */
     protected function setValue($key, $value, $expire = 0)
     {
-
         if ($expire > 0) {
+
         } elseif (null !== $this->expireTime) {
             $expire = $this->expireTime;
         } else {

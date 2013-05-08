@@ -236,6 +236,23 @@ class ResponseTest extends PHPUnit_Framework_TestCase
         $o_out->setStatus(987);
     }
 
+    public function testSetAndGetCookie()
+    {
+        $o_out = new Response;
+        $this->assertTrue($o_out->setCookie('test', 'testvalue', 0, '/', 'test.dev'));
+        $this->assertTrue($o_out->setCookie('test1', 'testvalue', 10));
+        $this->assertEmpty($o_out->exportCookie());
+        $this->assertEmpty($o_out->getCookie('test'));
+
+        $o_out = $this->getMock('Tox\\Web\\Response\\Response', array('getCookie'));
+        $o_out->expects($this->at(0))
+             ->method('getCookie')
+            ->with($this->equalTo('test1'))
+            ->will($this->returnValue(base64_encode('testvalue')));
+        $this->assertEquals('testvalue', base64_decode($o_out->getCookie('test1')));
+
+    }
+
     public function provideStatus()
     {
         return array(

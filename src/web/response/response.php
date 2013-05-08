@@ -238,6 +238,45 @@ class Response extends Output\Output implements Web\IResponse
         }
         return $this->addHeader('Status', $statuses[$status]);
     }
+
+    /**
+     *
+     * @param  string      $name    cookie field name.
+     * @param  string|int  $value    cookie value.
+     * @param  int     $expire   cookie expire time
+     * @param  string  $path    The path on the server in which the cookie will be available on.
+     * @param  string  $domain    The domain that the cookie is available to.
+     * @param  boolean  $secure    Indicates that the cookie should only be transmitted over a secure                                       HTTPS connection from the client.
+     * @param  boolean  $httponly    When TRUE the cookie will be made accessible only through the HTTP protocol.
+     * @return self
+     */
+    public function  setCookie($name , $value ,$expire = 0 , $path='' , $domain='' ,  $secure = false ,$httponly = false){
+        $name = (string) $name;
+        $value = (string) base64_encode($value);
+        $expire = (int) $expire;
+        if($expire > 0 && $expire < time() ){
+            $expire = time() + $expire;
+        }
+        return setcookie($name , $value ,$expire , $path , $domain ,  $secure ,$httponly);
+    }
+
+    /**
+     *
+     * @param  string      $name    cookie field name.
+     * @return self
+     */
+    public function  getCookie($name)
+    {
+        return isset($_COOKIE[$name]) ? base64_decode($_COOKIE[$name]) : null;
+    }
+
+    /**
+     * @return array
+     */
+    public function  exportCookie()
+    {
+        return $_COOKIE;
+    }
 }
 
 // vi:ft=php fenc=utf-8 ff=unix ts=4 sts=4 et sw=4 fen fdm=indent fdl=1 tw=120
