@@ -23,7 +23,7 @@
 
 namespace Tox\Web;
 
-use Tox\Application;
+use Tox\Application as TApp;
 
 /**
  * Announces the behaviors of pages caching agent tasks for web applications.
@@ -32,7 +32,7 @@ use Tox\Application;
  * @author  Snakevil Zen <zsnakevil@gmail.com>
  * @since   0.1.0-beta1
  */
-interface IPageCacheAgent extends Application\IOutputTask
+interface IPageCacheAgent extends TApp\IOutputTask
 {
     /**
      * Attaches to a page cache object.

@@ -1,6 +1,6 @@
 <?php
 /**
- * Defines the behaviors of HTTP headers processor tasks for web applications.
+ * Defines an exception for aliasing an existant class.
  *
  * This file is part of Tox.
  *
@@ -21,19 +21,34 @@
  * @license   GNU General Public License, version 3
  */
 
-namespace Tox\Web;
+namespace Tox\Web\Request;
 
-use Tox\Application as TApp;
+use Tox\Core;
 
 /**
- * Announces the behaviors of HTTP headers processor tasks for web applications.
+ * the request key is not set.
+ *
+ * **THIS CLASS CANNOT BE INHERITED.**
  *
  * @package tox.web
- * @author  Snakevil Zen <zsnakevil@gmail.com>
+ * @author  Mark Snoopy <marksnoopy@gmail.com>
  * @since   0.1.0-beta1
  */
-interface IHTTPHeadersProcessor extends TApp\IOutputTask
+final class UnknownMetaException extends Core\Exception
 {
+    /**
+     * {@inheritdoc}
+     *
+     * > Defined as `00x80030101`.
+     */
+    const CODE = 0x80030101;
+
+    /**
+     * {@inheritdoc}
+     *
+     * > Defined as `class '%class$s' already exists`.
+     */
+    const MESSAGE = 'class \'%class$s\' already exists';
 }
 
 // vi:ft=php fenc=utf-8 ff=unix ts=4 sts=4 et sw=4 fen fdm=indent fdl=1 tw=120
