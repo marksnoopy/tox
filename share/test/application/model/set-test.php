@@ -707,6 +707,95 @@ class SetTest extends PHPUnit_Framework_TestCase
         $this->assertEquals(0, count($o_set));
     }
 
+    public function testEnableAndDisableAsyncMode()
+    {
+        $o_set = $this->getMockForAbstractClass('Tox\\Application\\Model\\Set');
+        $this->assertTrue($o_set->isAsync());
+        $this->assertSame($o_set, $o_set->disableAsync());
+        $this->assertFalse($o_set->isAsync());
+        $this->assertSame($o_set, $o_set->enableAsync());
+        $this->assertTrue($o_set->isAsync());
+    }
+
+    /**
+     * @depends testAppendOnCommit
+     * @depends testEnableAndDisableAsyncMode
+     */
+    public function testAppendImmediatelyInSyncMode()
+    {
+        $o_mod = $this->getMock('Tox\\Application\\IModel');
+        $o_mod->expects($this->once())->method('commit')
+            ->will($this->returnValue($o_mod));
+        $o_mod->expects($this->exactly(2))->method('isAlive')
+            ->will($this->returnValue(true));
+        $o_set = $this->getMockForAbstractClass('Tox\\Application\\Model\\Set', array(null, $this->dao))
+            ->disableAsync()
+            ->crop(0, 999);
+        $o_set->expects($this->once())->method('getModelClass')
+            ->will($this->returnValue(get_class($o_mod)));
+        $this->dao->expects($this->once())->method('listBy')
+            ->will($this->returnValue(array()));
+        $this->assertFalse($o_set->isChanged());
+        $o_set->append($o_mod);
+        $this->assertFalse($o_set->isChanged());
+        $this->assertTrue($o_set->has($o_mod));
+        $this->assertEquals(1, count($o_set));
+        $this->assertSame($o_mod, $o_set->current());
+    }
+
+    /**
+     * @depends testDropOnCommit
+     * @depends testEnableAndDisableAsyncMode
+     */
+    public function testDropImmediatelyInSyncMode()
+    {
+        $s_id = microtime();
+        $o_mod = $this->getMock('Tox\\Application\\IModel');
+        $o_mod->staticExpects($this->once())->method('import')
+            ->will($this->returnValue($o_mod));
+        $o_mod->expects($this->atLeastOnce())->method('getId')
+            ->will($this->returnValue($s_id));
+        $o_mod->expects($this->exactly(2))->method('isAlive')
+            ->will($this->returnValue(true));
+        $o_set = $this->getMockForAbstractClass('Tox\\Application\\Model\\Set', array(null, $this->dao))
+            ->disableAsync()
+            ->crop(0, 999);
+        $o_set->expects($this->atLeastOnce())->method('getModelClass')
+            ->will($this->returnValue(get_class($o_mod)));
+        $this->dao->expects($this->once())->method('listBy')
+            ->will($this->returnValue(array(array('id' => $s_id))));
+        $this->assertFalse($o_set->isChanged());
+        $o_set->drop($o_mod);
+        $this->assertFalse($o_set->isChanged());
+        $this->assertFalse($o_set->has($o_mod));
+        $this->assertEquals(0, count($o_set));
+    }
+
+    /**
+     * @depends testClear
+     * @depends testEnableAndDisableAsyncMode
+     */
+    public function testClearImmediatelyInSyncMode()
+    {
+        $s_id = microtime();
+        $o_mod = $this->getMock('Tox\\Application\\IModel');
+        $o_mod->staticExpects($this->atLeastOnce())->method('import')
+            ->will($this->returnValue($o_mod));
+        $o_mod->expects($this->atLeastOnce())->method('getId')
+            ->will($this->returnValue($s_id));
+        $o_set = $this->getMockForAbstractClass('Tox\\Application\\Model\\Set', array(null, $this->dao))
+            ->disableAsync()
+            ->crop(0, 999);
+        $o_set->expects($this->atLeastOnce())->method('getModelClass')
+            ->will($this->returnValue(get_class($o_mod)));
+        $this->dao->expects($this->once())->method('listBy')
+            ->will($this->returnValue(array(array('id' => $s_id))));
+        $this->assertFalse($o_set->isChanged());
+        $this->assertSame($o_set, $o_set->clear());
+        $this->assertFalse($o_set->isChanged());
+        $this->assertEquals(0, count($o_set));
+    }
+
     public function provideFiltersAndExcludes()
     {
         return array(

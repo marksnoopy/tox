@@ -112,14 +112,21 @@ abstract class Set extends Core\Assembly implements Application\IModelSet
      *
      * @var Application\IModel[]
      */
-    protected $toAppend;
+    protected $toxAppend;
 
     /**
      * Stores the model entities to be dropped.
      *
      * @var Application\IModel[]
      */
-    protected $toDrop;
+    protected $toxDrop;
+
+    /**
+     * Stores whether in async mode.
+     *
+     * @var bool
+     */
+    protected $toxAsync;
 
     /**
      * Retrieves the default data access object.
@@ -144,8 +151,9 @@ abstract class Set extends Core\Assembly implements Application\IModelSet
         $this->limit = 0;
         $this->length =
         $this->cursor = -1;
-        $this->toAppend =
-        $this->toDrop = array();
+        $this->toxAppend =
+        $this->toxDrop = array();
+        $this->toxAsync = true;
     }
 
     /**
@@ -645,10 +653,9 @@ abstract class Set extends Core\Assembly implements Application\IModelSet
             foreach ($this->items as $ii) {
                 $ii->commit();
             }
-        } elseif (!empty($this->filters) || $this->offset || $this->limit) {
-            $this->rewind();
         }
-        foreach ($this->toAppend as $ii) {
+        $this->valid();
+        foreach ($this->toxAppend as $ii) {
             if (array_key_exists($ii->commit()->getId(), $this->index)) {
                 throw new ModelIncludedInSetException;
             }
@@ -658,7 +665,7 @@ abstract class Set extends Core\Assembly implements Application\IModelSet
                 $this->getDao()->tie($this->getParent(), $ii);
             }
         }
-        foreach ($this->toDrop as $ii) {
+        foreach ($this->toxDrop as $ii) {
             unset($this->items[$this->index[$ii->getId()]], $this->index[$ii->getId()]);
             $this->length--;
         }
@@ -679,8 +686,8 @@ abstract class Set extends Core\Assembly implements Application\IModelSet
      */
     final public function reset()
     {
-        $this->toAppend =
-        $this->toDrop = array();
+        $this->toxAppend =
+        $this->toxDrop = array();
         return $this;
     }
 
@@ -707,8 +714,8 @@ abstract class Set extends Core\Assembly implements Application\IModelSet
         if ($this->has($entity)) {
             throw new ModelIncludedInSetException;
         }
-        $this->toAppend[] = $entity;
-        return $this;
+        $this->toxAppend[] = $entity;
+        return $this->toxAsync ? $this : $this->commit();
     }
 
     /**
@@ -718,7 +725,7 @@ abstract class Set extends Core\Assembly implements Application\IModelSet
      * @return self
      *
      * @throws IllegalEntityForSetException If dropping an illegal model entity.
-     * @throws PreparedModelToDropException If dropping a prepared model entity.
+     * @throws PreparedModeltoxDropException If dropping a prepared model entity.
      */
     public function drop(Application\IModel $entity)
     {
@@ -730,9 +737,9 @@ abstract class Set extends Core\Assembly implements Application\IModelSet
             throw new PreparedModelToDropException;
         }
         if (array_key_exists($entity->getId(), $this->index)) {
-            $this->toDrop[] = $entity;
+            $this->toxDrop[] = $entity;
         }
-        return $this;
+        return $this->toxAsync ? $this : $this->commit();
     }
 
     /**
@@ -754,12 +761,12 @@ abstract class Set extends Core\Assembly implements Application\IModelSet
     public function clear()
     {
         $this->valid();
-        $this->toAppend =
-        $this->toDrop = array();
+        $this->toxAppend =
+        $this->toxDrop = array();
         foreach ($this as $entity) {
-            $this->toDrop[] = $entity;
+            $this->toxDrop[] = $entity;
         }
-        return $this;
+        return $this->toxAsync ? $this : $this->commit();
     }
 
     /**
@@ -783,7 +790,41 @@ abstract class Set extends Core\Assembly implements Application\IModelSet
      */
     final public function isChanged()
     {
-        return !empty($this->toAppend) || !empty($this->toDrop);
+        return !empty($this->toxAppend) || !empty($this->toxDrop);
+    }
+
+    /**
+     * {@inheritdoc}
+     *
+     * **THIS METHOD CANNOT BE OVERRIDDEN.**
+     *
+     * @return bool
+     */
+    final public function isAsync()
+    {
+        return $this->toxAsync;
+    }
+
+    /**
+     * {@inhertdoc}
+     *
+     * @return self
+     */
+    public function enableAsync()
+    {
+        $this->toxAsync = true;
+        return $this;
+    }
+
+    /**
+     * {@inhertdoc}
+     *
+     * @return self
+     */
+    public function disableAsync()
+    {
+        $this->toxAsync = false;
+        return $this;
     }
 }
 
