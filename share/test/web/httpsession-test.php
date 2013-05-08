@@ -70,11 +70,11 @@ class HttpSessionTest extends PHPUnit_Framework_TestCase
     public function testSetAndGetSessionSavePath()
     {
         $o_session = new Tox\Web\HttpSession();
-        $o_session->setSavePath('/home/fu/www/log');
+        $o_session->setSavePath('/tmp');
         $o_session->init(array());
         $o_session->setSession('foo', 'value');
         $this->assertFalse(isset($_SESSION['foo']));
-        $this->assertEquals('/home/fu/www/log', $o_session->getSavePath());
+        $this->assertEquals('/tmp', $o_session->getSavePath());
     }
 
     public function testSetAndGetSessionTimeout()
