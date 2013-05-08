@@ -30,7 +30,7 @@ require_once __DIR__ . '/../../../../src/application/itoken.php';
 require_once __DIR__ . '/../../../../src/application/router/token.php';
 
 require_once __DIR__ . '/../../../../src/core/exception.php';
-require_once __DIR__ . '/../../../../src/application/router/@exception/tokenoptionsalreadyassigned.php';
+require_once __DIR__ . '/../../../../src/application/router/tokenoptionsalreadyassignedexception.php';
 
 /**
  * Tests Tox\Application\Router\Token.

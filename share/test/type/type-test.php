@@ -30,7 +30,7 @@ require_once __DIR__ . '/../../../src/type/iboxable.php';
 require_once __DIR__ . '/../../../src/type/type.php';
 
 require_once __DIR__ . '/../../../src/core/exception.php';
-require_once __DIR__ . '/../../../src/type/@exception/variablereteeing.php';
+require_once __DIR__ . '/../../../src/type/variablereteeingexception.php';
 
 require_once __DIR__ . '/../../../src/type/ivarbase.php';
 require_once __DIR__ . '/../../../src/type/varbase.php';

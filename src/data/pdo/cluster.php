@@ -431,6 +431,8 @@ class Cluster extends Core\Assembly implements ICluster
      *
      * @param  Data\IPdo $master Data object to be used as master.
      * @return self
+     *
+     * @codeCoverageIgnore
      */
     protected static function newCluster(Data\IPdo $master)
     {
@@ -447,6 +449,8 @@ class Cluster extends Core\Assembly implements ICluster
      *                               source.
      * @param  array  $driverOptions OPTIONAL. Connection options.
      * @return Pdo
+     *
+     * @codeCoverageIgnore
      */
     protected static function newPdo($dsn, $username = '', $password = '', $driverOptions = array())
     {

@@ -1,5 +1,7 @@
 <?php
 /**
+ * Defines the models.
+ *
  * This file is part of Tox.
  *
  * Tox is free software: you can redistribute it and/or modify
@@ -15,8 +17,8 @@
  * You should have received a copy of the GNU General Public License
  * along with Tox.  If not, see <http://www.gnu.org/licenses/>.
  *
- * @copyright © 2012-2013 szen.in
- * @license   GNU Public License
+ * @copyright © 2012-2013 PHP-Tox.org
+ * @license   GNU General Public License, version 3
  */
 
 namespace Tox\Application\Model;
@@ -24,686 +26,491 @@ namespace Tox\Application\Model;
 use Tox\Core;
 use Tox\Application;
 
+use Exception as PHPException;
+
 /**
- * Represents as an entity.
+ * Represents as a model.
  *
- * Entities related to any others should have levels.
+ * **THIS CLASS CANNOT BE INSTANTIATED.**
  *
- * Once to retrieve an single entity as an attribute of another, the retrieved
- * entity MUST be the up-level to the other.
+ * __*ALIAS*__ as `Tox\Application\Model`.
  *
- * Once to retrieve an entity inside some collection as an attribute of another,
- * the retrieved entity MUST be the down-level to the other.
- *
- * Extra operations to modify the relationships SHOULD be contained in the
- * down-level entities, rather than up-levels.
- *
- * For compatible and secure reasons, changements of entities would NOT be
- * affected until a commit. For example,
- *
- * <code>
- * Model::setUp('foo')->name; // Foo
- * Model::setUp('foo')->name = 'Bar';
- * Model::setUp('foo')->name; // Foo
- * Model::setUp('foo')->commit()->name; // Bar
- * </code>
- *
- * The following are several examples to guide that HOWTO work on this
- * mechanism:
- *
- * - To create a new entity:
- *
- * <code>
- * Model::prepare(array(
- *     'id' => 'foo',
- *     'upLevel' => Model::prepare(array(
- *         'id' => 'bar',
- *         'title' => 'blah...'
- *     ))
- * ))->commit();
- * </code>
- *
- * Entity 'foo' and related up-level entity 'bar' would be committed to the
- * data source.
- *
- * - To modify an existant entity:
- *
- * <code>
- * Model::setUp('foo')->upLevel->title = 'new blah...';
- * Model::setUp('foo')->commit();
- * // Model::setUp('foo')->upLevel->commit();
- * </code>
- *
- * The committings from each entity which related to the entity 'bar' would
- * affect the changement.
- *
- * - To relace a related up-level entity to another:
- *
- * <code>
- * Model::setUp('foo')->upLevel = Model::prepare(array(
- *  'id' => 'new-bar',
- *  'title' => 'new blah...';
- * ));
- * Model::setup('foo')->upLevel->commit();
- * </code>
- *
- * For this behavior, Model::__setUpLevel() method COULD be defined in need:
- *
- * <code>
- * protected function __setUpLevel(Model $upLevel)
- * {
- *     // extra operations to modify the relationship are put here.
- * }
- * </code>
- *
- * NOTICE: The relationships dropped from the old up-level entity and created
- * to the new up-level SHOULD be implemented in the corresponding data
- * accessor.
- *
- * - To break the relationship to an up-level entity:
- *
- * WARNING: This purpose is CONFLICT to the relationship mechanism. Custom
- * methods RECOMMENDED.
- *
- * Or a dirty Model::__setUpLevel() method is REQUIRED like:
- *
- * <code>
- * protected function __setUpLevel(Model $upLevel = NULL)
- * {
- *     // extra operatoins here.
- * }
- * </code>
- *
- * In this way, the up-level entity could be avoid:
- *
- * <code>
- * Model::setUp('foo')->upLevel = NULL; // BREAK the relationship
- * </code>
- *
- * - To terminate an entity:
- *
- * As default, ALL down-level entities SHOULD be terminated too on terminating
- * their up-level entity.
- *
- * However, this stragety is NOT always ensured, such as any 'm:n' relationship.
- * So the terminating of down-level entities have to been added manually in
- * Model::onTermination() method.
- *
- * <code>
- * protected function onTermination()
- * {
- *     // terminates all down-level entities here.
- * }
- * </code>
- *
- * @package Tox\Application
+ * @package tox.application.model
  * @author  Snakevil Zen <zsnakevil@gmail.com>
  * @since   0.1.0-beta1
  */
-abstract class Model extends Core\Assembly implements IEntity
+abstract class Model extends Core\Assembly implements Application\IModel
 {
     /**
-     * Maps the names of properties as up-level attributes to the names of
-     * properties as down-level collections attributes of the corresponding
-     * up-level elements.
-     *
-     * Why this property is REQUIRED? For example, the following map announced:
-     *
-     * <code>
-     * protected static $attributesMap = array(
-     *     'upLevel' => 'downLevels'
-     * );
-     * </code>
-     *
-     * And then, entity 'foo' set entity 'bar' as its upLevel attribute.
-     *
-     * <code>
-     * Model::prepare(array(
-     *     'id' => 'foo'
-     * ))->upLevel = Model::prepare(array(
-     *     'id' => 'bar'
-     * ));
-     * </code>
-     *
-     * That means entity 'foo' SHOULD be able to retrieve as a down-level
-     * element from entity 'bar' after committing.
-     *
-     * <code>
-     * Model::setUp('bar')->downLevels->current() == Model::setUp('bar');
-     * </code>
-     *
-     * That works for the following internal logic would be executed on the
-     * setting process:
-     *
-     * <code>
-     * Model::prepare(array(
-     *     'id' => 'bar'
-     * ))->downLevels->append(Model::prepare(array(
-     *         'id' => 'foo'
-     *     )));
-     * </code>
-     *
-     * @var string[]
-     */
-    protected static $attributesMap = array();
-
-    /**
-     * Stores the committing status.
-     *
-     * @internal
-     *
-     * @var bool
-     */
-    protected $_committing;
-
-    /**
-     * Stores the data accessor.
-     *
-     * @internal
-     *
-     * @var IDao
-     */
-    protected $_dao;
-
-    /**
-     * Stores the indentifier.
-     *
-     * @internal
+     * Retrieves the unique indentifier.
      *
      * @var string
      */
     protected $id;
 
     /**
-     * Stores the instances for loaded entities.
-     *
-     * @var Model[]
-     */
-    protected static $_instances;
-
-    /**
-     * Stores the changements of attributes.
-     *
-     * @internal
+     * Stores the loaded model entities.
      *
      * @var array
      */
-    protected $_stack;
+    protected static $instances = array();
 
     /**
-     * Stores the names of properties as attributes which are related to
-     * up-level entities.
+     * Stores the data access object in use.
      *
-     * Elements SHOULD obey the following syntax:
-     *
-     * <code>
-     * string ENTITY-ID => string PROPERTY-NAME,
-     * </code>
-     *
-     * @internal
-     *
-     * @var string[]
+     * @var Application\IDao
      */
-    protected $_upLevels;
+    protected $dao;
 
     /**
-     * Marks the changement of the property.
+     * Stores changed attributes values.
      *
-     * @internal
-     *
-     * @param  string $prop
-     * @param  mixed  $value
-     * @return self
+     * @var mixed[]
      */
-    protected function addChangement($prop, $value)
+    protected $toxStash;
+
+    /**
+     * Stores the original attributes values.
+     *
+     * @var mixed[]
+     */
+    protected $toxOriginal;
+
+    /**
+     * Stores whether in async mode.
+     *
+     * @var bool
+     */
+    protected $toxAsync;
+
+    /**
+     * Retrieves the default data access object.
+     *
+     * @return Application\IDao
+     */
+    abstract protected function getDefaultDao();
+
+    /**
+     * CONSTRUCT FUNCTION
+     */
+    protected function __construct()
     {
-        $b_changed = !$this->isChanged();
-        $this->_stack[(string) $prop] = $value;
-        if ($b_changed)
-        {
-            $this->notifyChangingToUpLevels();
-        }
-        return $this;
+        $this->toxStash =
+        $this->toxOriginal = array();
+        $this->toxAsync = true;
     }
 
     /**
-     * Prepares a duplicate entity.
-     */
-    public function __clone()
-    {
-        $this->_committing = FALSE;
-        $this->id = '';
-        $this->_stack =
-        $this->_upLevels = array();
-    }
-
-    /**
-     * Commits all the changements.
-     *
-     * @return self
-     */
-    public function commit()
-    {
-        if (!$this->isChanged() || $this->_committing)
-        {
-            return $this;
-        }
-        $this->_committing = TRUE;
-        $a_fields = $a_dlvls = array();
-        reset($this->_stack);
-        for ($ii = 0, $jj = count($this->_stack); $ii < $jj; $ii++)
-        {
-            list($s_attr) = each($this->_stack);
-            if (NULL !== $this->$s_attr && $this->__get($s_attr) instanceof Set)
-            {
-                if (NULL === $this->_stack[$s_attr])
-                {
-                    $this->$s_attr->clear();
-                }
-                if ($this->_stack[$s_attr] instanceof self)
-                {
-                    $this->$s_attr->clear()->append($this->_stack[$s_attr]);
-                }
-                if ($this->_stack[$s_attr] instanceof Set)
-                {
-                    $this->$s_attr->replace($this->_stack[$s_attr]);
-                }
-                $a_dlvls[] = $this->$s_attr;
-                continue;
-            }
-            if (NULL !== $this->$s_attr && $this->__get($s_attr) instanceof self || $this->_stack[$s_attr] instanceof self)
-            {
-                if (strlen($this->id) && NULL !== $this->$s_attr)
-                {
-                    if (isset(static::$attributesMap[$s_attr]))
-                    {
-                        $this->$s_attr->{static::$attributesMap[$s_attr]}->drop($this);
-                    }
-                    $this->$s_attr->commit();
-                }
-                if (NULL !== $this->_stack[$s_attr])
-                {
-                    if (isset(static::$attributesMap[$s_attr]))
-                    {
-                        $this->_stack[$s_attr]->{static::$attributesMap[$s_attr]}->append($this);
-                    }
-                    $this->_stack[$s_attr]->commit();
-                }
-                $this->$s_attr = $this->_stack[$s_attr];
-            }
-            $a_fields[$s_attr] = (string) $this->_stack[$s_attr];
-        }
-        if (strlen($this->id))
-        {
-            $this->_dao->update($this->id, $a_fields);
-        }
-        else
-        {
-            $this->id = $this->_dao->create($a_fields);
-        }
-
-        foreach ($a_fields as $k=>$v) {
-            if (!($v  instanceof self)) {
-                $this->$k = $v;
-            }
-        }
-        for ($ii = 0, $jj = count($a_dlvls); $ii < $jj; $ii++)
-        {
-            $a_dlvls[$ii]->commit();
-        }
-        $this->_committing = FALSE;
-        $this->_stack = array();
-        return $this;
-    }
-
-    protected function __construct(Application\IDao $dao)
-    {
-        $this->_committing = FALSE;
-        $this->_dao = $dao;
-        $this->id = '';
-        $this->_stack =
-        $this->_upLevels = array();
-    }
-
-    /**
-     * Retrieves the value of a magic readable property.
-     *
-     * @internal
-     *
-     * @param  string $prop
-     * @return mixed
-     */
-    public function __get($prop)
-    {
-        $prop = (string) $prop;
-        $m_ret = parent::__get($prop);
-        if ($m_ret instanceof self && isset(static::$attributesMap[$prop]) && !isset($this->_upLevels[$prop]))
-        {
-            $this->_upLevels[$prop] = $m_ret;
-        }
-        if ($m_ret instanceof IModel && isset($this->_stack[$prop]))
-        {
-            $m_ret = $this->_stack[$prop];
-        }
-        return $m_ret;
-    }
-
-    /**
-     * Retrieves the default data accessor.
-     *
-     * @return IDao
-     */
-    abstract protected static function getDefaultDao();
-
-    /**
-     * Retrieves the identifier.
-     *
-     * @internal
+     * {@inheritdoc}
      *
      * @return string
      */
-    protected function __getId()
+    public function getId()
     {
         return $this->id;
     }
 
     /**
-     * Loads an entity from a collection.
+     * Sets the identitifer
      *
-     * @param  ICollection $set
-     * @param  IDao              $dao OPTIONAL. Data accessor used. NULL
-     *                                defaults.
-     * @return self
-     */
-    public static function import(ICollection $set, Application\IDao $dao = NULL)
-    {
-        if ($set->export() instanceof self)
-        {
-            return $set->export();
-        }
-        $o_entity = static::manufactor((array) $set->export(), $dao);
-        return $o_entity;
-    }
-
-    /**
-     * Checks whether changed.
-     *
-     * @return bool
-     */
-    public function isChanged()
-    {
-        return !empty($this->_stack);
-    }
-
-    /**
-     * Sets up an entity through attributes.
-     *
-     * @internal
-     *
-     * @param  array $attributes
-     * @param  IDao  $dao        OPTIONAL. Data accessor used. NULL defaults.
-     * @return self
-     */
-    protected static function manufactor($attributes, Application\IDao $dao = NULL)
-    {
-        $attributes = (array) $attributes;
-        if (NULL === $dao)
-        {
-            $dao = static::getDefaultDao();
-        }
-        $o_entity = new static($dao);
-		$a_props = $o_entity->_tox_getMagicProps();
-        $b_prepared = !isset($attributes['id']);
-        reset($attributes);
-        for ($ii = 0, $jj = count($attributes); $ii < $jj; $ii++)
-        {
-            list($s_prop) = each($attributes);
-            if (isset($a_props[$s_prop]))
-            {
-                if ($b_prepared)
-                {
-                    $o_entity->_stack[$s_prop] = $attributes[$s_prop];
-                }
-                else
-                {
-                    $o_entity->$s_prop = $attributes[$s_prop];
-                }
-            }
-        }
-        if (!$b_prepared)
-        {
-            if (NULL === static::$_instances)
-            {
-                static::$_instances = array();
-            }
-            if (!isset(static::$_instances[get_called_class()]))
-            {
-                static::$_instances[get_called_class()] = array();
-            }
-            static::$_instances[get_called_class()][$attributes['id']] = $o_entity;
-        }
-        return $o_entity;
-    }
-
-    /**
-     * Notifies first changement to all up-level entities.
-     *
-     * @internal
-     *
-     * @return self
-     */
-    protected function notifyChangingToUpLevels()
-    {
-        reset($this->_upLevels);
-        for ($ii = 0, $jj = count($this->_upLevels); $ii < $jj; $ii++)
-        {
-            list($s_prop, $o_ulvl) = each($this->_upLevels);
-            $o_ulvl->receiveChanging($this, static::$attributesMap[$s_prop]);
-        }
-    }
-
-    /**
-     * Notifies the resuming changement to all up-level entities.
-     *
-     * @internal
-     *
-     * @return self
-     */
-    protected function notifyResumingToUpLevels()
-    {
-        reset($this->_upLevels);
-        for ($ii = 0, $jj = count($this->_upLevels); $ii < $jj; $ii++)
-        {
-            list($s_prop, $o_ulvl) = each($this->_upLevels);
-            $o_ulvl->receiveResuming($this, static::$attributesMap[$s_prop]);
-        }
-    }
-
-    /**
-     * Prepares an entity.
-     *
-     * @param  mixed[] $attributes
-     * @param  IDao    $dao        OPTIONAL. Data accessor used. NULL defaults.
-     * @return self
-     */
-    public static function prepare($attributes, Application\IDao $dao = NULL)
-    {
-        $attributes = (array) $attributes;
-        $s_id = '';
-        if (isset($attributes['id']))
-        {
-            $s_id = $attributes['id'];
-            unset($attributes['id']);
-        }
-        $o_entity = static::manufactor((array) $attributes, $dao);
-        if (strlen($s_id))
-        {
-            $o_entity->_stack['id'] = $s_id;
-        }
-        return $o_entity;
-    }
-
-    /**
-     * Receives the changement of an entity in a down-level collection.
-     *
-     * @param  self   $entity
-     * @param  string $collection
-     * @return self
-     */
-    public function receiveChanging(IEntity $entity, $collection)
-    {
-        $collection = (string) $collection;
-        list($a_props) = $this->__getProperties();
-        if (isset($a_props[$collection]))
-        {
-            $this->$collection->receiveChanging($entity);
-            $this->addChangement($collection, $this->$collection);
-        }
-        return $this;
-    }
-
-    /**
-     * Receives the resuming changement of an entity in a down-level collection.
-     *
-     * @param  self   $entity
-     * @param  string $collection
-     * @return self
-     */
-    public function receiveResuming(IEntity $entity, $collection)
-    {
-        $collection = (string) $collection;
-        list($a_props) = $this->__getProperties();
-        if (isset($a_props[$collection]))
-        {
-            $this->$collection->receiveResuming($entity);
-            if (!$this->$collection->isChanged())
-            {
-                $this->removeChangement($collection);
-            }
-        }
-        return $this;
-    }
-
-    public function relateTo()
-    {
-    }
-
-    /**
-     * Ignores the changement of a property.
-     *
-     * @internal
-     *
-     * @param  string $prop
-     * @return self
-     */
-    protected function removeChangement($prop)
-    {
-        unset($this->_stack[$prop]);
-        if (!$this->isChanged())
-        {
-            $this->notifyResumingToUpLevels();
-        }
-        return $this;
-    }
-
-    /**
-     * Resets all changements.
-     *
-     * @return self
-     */
-    public function reset()
-    {
-        if (!strlen($this->id))
-        {
-            return $this;
-        }
-        if ($this->isChanged())
-        {
-            $this->_stack = array();
-            $this->notifyResumingToUpLevels();
-        }
-        return $this;
-    }
-
-    /**
-     * Sets the value of a magical writable property.
-     *
-     * @internal
-     *
-     * @param  string $prop
-     * @param  mixed  $value
+     * @param  mixed $value New identifier.
      * @return void
+     *
+     * @throws IdentifierReadOnlyException If changing the indentifier of an
+     *                                     existant model entity.
      */
-    public function __set($prop, $value)
+    public function setId($value)
     {
-        $prop = (string) $prop;
-        if ($this->_tox_isMagicPropWritable($prop))
-        {
-            $m_old = $this->$prop;
+        if ($this->isAlive() || isset($this->toxOriginal['id'])) {
+            throw new IdentifierReadOnlyException(array('id' => $this->id));
         }
-        parent::__set($prop, $value);
-        $m_new = $this->$prop;
-        $this->$prop = $m_old;
-        if ($m_old === $m_new)
-        {
-            $this->removeChangement($prop);
-            return;
-        }
-        $this->addChangement($prop, $m_new);
+        $this->toxStash['id'] = (string) $value;
     }
 
     /**
-     * Sets the identifier.
+     * Be invoked on retrieving the identifier.
+     *
+     * **THIS METHOD CANNOT BE OVERRIDDEN.**
      *
      * @internal
      *
-     * @param  string $value
+     * @return string
+     */
+    final protected function toxGetId()
+    {
+        return $this->getId();
+    }
+
+    /**
+     * Be invoked on setting the identifier.
+     *
+     * **THIS METHOD CANNOT BE OVERRIDDEN.**
+     *
+     * @internal
+     *
+     * @param  mixed $value New identifier.
      * @return void
      *
      * @throws IdentifierReadOnlyException
      */
-    protected function __setId($value)
+    final protected function toxSetId($value)
     {
-        throw new IdentifierReadOnlyException(array('object' => $this));
+        $this->setId($value);
     }
 
     /**
-     * Loads an entity from the data source.
+     * Retrieves the data access object in use.
      *
-     * @param  string $id
-     * @param  IDao   $dao OPTIONAL. Data accessor used. NULL defaults.
-     * @return self
+     * **THIS METHOD CANNOT BE OVERRIDDEN.**
+     *
+     * @return Application\IDao
      */
-    public static function setUp($id, Application\IDao $dao = NULL)
+    final protected function getDao()
+    {
+        if (!$this->dao instanceof Application\IDao) {
+            $this->dao = $this->getDefaultDao();
+        }
+        return $this->dao;
+    }
+
+    /**
+     * {@inheritdoc}
+     *
+     * **THIS METHOD CANNOT BE OVERRIDDEN.**
+     *
+     * @param  string $id  The unique identifier of the model entity.
+     * @param  IDao   $dao OPTIONAL. Data access object in use.
+     * @return self
+     *
+     * @throws NonExistantEntityException If the model entity does not exist.
+     */
+    final public static function load($id, Application\IDao $dao = null)
     {
         $s_type = get_called_class();
         $id = (string) $id;
-        if (isset(static::$_instances[$s_type][$id]))
-        {
-            return static::$_instances[$s_type][$id];
+        if (!isset(self::$instances[$s_type])) {
+            self::$instances[$s_type] = array();
+        } elseif (isset(self::$instances[$s_type][$id])) {
+            return self::$instances[$s_type][$id];
         }
-        if (NULL === $dao)
-        {
-            $dao = static::getDefaultDao();
+        $o_mod = static::newModel();
+        $o_mod->id = $id;
+        $o_mod->dao = $dao;
+        try {
+            $a_fields = $o_mod->getDao()->read($id);
+            if (empty($a_fields)) {
+                throw new PHPException;
+            }
+        } catch (PHPException $ex) {
+            throw new NonExistantEntityException(array('id' => $id));
         }
-        $a_props = $dao->read($id);
-        if (!is_array($a_props))
-        {
-            throw new NonExistantEntityException(array('id' => $id, 'type' => $s_type));
-        }
-        $o_entity = static::manufactor($a_props, $dao);
-        return $o_entity;
+        self::$instances[$s_type][$id] = $o_mod->assign($a_fields);
+        return $o_mod;
     }
 
     /**
-     * Retrieves the indentifer on string casting.
+     * {@inheritdoc}
+     *
+     * @deprecated Remained for forward compatibility. Would be removed in some
+     *             future version.
+     *
+     * @param  string $id  The unique identifier of the model entity.
+     * @param  IDao   $dao OPTIONAL. Data access object in use.
+     * @return self
+     */
+    final public static function setUp($id, Application\IDao $dao = null)
+    {
+        return static::load($id, $dao);
+    }
+
+    /**
+     * Creates a new model object.
+     *
+     * @return self
+     *
+     * @codeCoverageIgnore
+     */
+    protected static function newModel()
+    {
+        return new static;
+    }
+
+    /**
+     * Assigns attributes.
+     *
+     * **THIS METHOD CANNOT BE OVERRIDDEN.**
+     *
+     * @param  mixed[] $attributes Attributes values.
+     * @return self
+     */
+    final protected function assign($attributes)
+    {
+        $a_props = $this->toxGetMagicProps();
+        foreach ($attributes as $ii => $jj) {
+            if (!isset($a_props[$ii]) || self::TOX_PROPERTY_DENIED == $a_props[$ii] || 'dao' == $ii) {
+                continue;
+            } elseif ($this->isAlive()) {
+                $this->$ii = $jj;
+                $this->toxOriginal[$ii] = $jj;
+            } else {
+                if ($jj instanceof Application\ICommittable) {
+                    $this->$ii = $jj;
+                }
+                $this->toxStash[$ii] = $jj;
+            }
+        }
+        return $this;
+    }
+
+    /**
+     * {@inheritdoc}
+     *
+     * **THIS METHOD CANNOT BE OVERRIDDEN.**
+     *
+     * @return bool
+     */
+    final public function isAlive()
+    {
+        return !is_null($this->id);
+    }
+
+    /**
+     * {@inheritdoc}
+     *
+     * **THIS METHOD CANNOT BE OVERRIDDEN.**
+     *
+     * @return bool
+     */
+    final public function isChanged()
+    {
+        return !empty($this->toxStash);
+    }
+
+    /**
+     * {@inheritdoc}
+     *
+     * **THIS METHOD CANNOT BE OVERRIDDEN.**
+     *
+     * @internal
+     *
+     * @param  string $prop  Set attribute.
+     * @param  mixed  $value New value.
+     * @return mixed
+     */
+    final protected function toxPreSet($prop, $value)
+    {
+        $prop = (string) $prop;
+        if ($this->$prop instanceof Application\IModelSet) {
+            throw new SetPropertyUnreplacableException;
+        }
+        return $value;
+    }
+
+    /**
+     * {@inheritdoc}
+     *
+     * **THIS METHOD CANNOT BE OVERRIDDEN.**
+     *
+     * @internal
+     *
+     * @param  string $prop Set attribute.
+     * @return void
+     */
+    final protected function toxPostSet($prop)
+    {
+        $prop = (string) $prop;
+        if ('id' == $prop ||
+            !isset($this->toxOriginal[$prop]) ||
+            $this->$prop == $this->toxOriginal[$prop]
+        ) {
+            return;
+        }
+        $this->toxStash[$prop] = $this->$prop;
+        $this->$prop = $this->toxOriginal[$prop];
+        if (!$this->toxAsync) {
+            $this->commit();
+        }
+    }
+
+    /**
+     * {@inheritdoc}
+     *
+     * **THIS METHOD CANNOT BE OVERRIDDEN.**
+     *
+     * @param  mixed[]          $attributes Attributes of the new model entity.
+     * @param  Application\IDao $dao        OPTIONAL. Data access object in use.
+     * @return self
+     */
+    final public static function prepare($attributes, Application\IDao $dao = null)
+    {
+        $o_mod = static::newModel();
+        $o_mod->dao = $dao;
+        return $o_mod->assign($attributes);
+    }
+
+    /**
+     * {@inheritdoc}
+     *
+     * **THIS METHOD CANNOT BE OVERRIDDEN.**
+     *
+     * @return self
+     */
+    final public function terminate()
+    {
+        $this->toxStash = array('id' => null);
+        return $this->toxAsync ? $this : $this->commit();
+    }
+
+    /**
+     * {@inheritdoc}
+     *
+     * **THIS METHOD CANNOT BE OVERRIDDEN.**
+     *
+     * @return self
+     *
+     * @throws DuplicateIdentifierException If the identifier already in use.
+     */
+    final public function commit()
+    {
+        if (!$this->isChanged()) {
+            return $this;
+        }
+        if ($this->isAlive()) {
+            if (array_key_exists('id', $this->toxStash) && is_null($this->toxStash['id'])) {
+                $this->getDao()->delete($this->id);
+                $this->id = null;
+            } else {
+                $this->getDao()->update($this->id, $this->toxStash);
+                $this->assign($this->toxStash);
+            }
+            return $this->reset();
+        }
+        $this->id = $this->toxOriginal['id'] = $this->getDao()->create($this->toxStash);
+        $s_type = get_class($this);
+        if (isset(self::$instances[$s_type][$this->id])) {
+            throw new DuplicateIdentifierException(array('prototype' => $s_type, 'id' => $this->id));
+        }
+        self::$instances[$s_type][$this->id] = $this;
+        unset($this->toxStash['id']);
+        return $this->assign($this->toxStash)->reset();
+    }
+
+    /**
+     * {@inheritdoc}
+     *
+     * **THIS METHOD CANNOT BE OVERRIDDEN.**
+     *
+     * @return self
+     *
+     * @throws PreparationCanNotResetException If on resetting a prepared model
+     *                                         entity.
+     */
+    final public function reset()
+    {
+        if (!$this->isAlive() && !array_key_exists('id', $this->toxOriginal)) {
+            throw new PreparationCanNotResetException;
+        }
+        $this->toxStash = array();
+        return $this;
+    }
+
+    /**
+     * {@inheritdoc}
+     *
+     * **THIS METHOD CANNOT BE OVERRIDDEN.**
      *
      * @return string
      */
-    public function __toString()
+    final public function __toString()
     {
-        return $this->id;
+        return (string) $this->id;
+    }
+
+    /**
+     * {@inheritdoc}
+     *
+     * @return void
+     */
+    public function __clone()
+    {
+        $this->toxOriginal = array();
+        foreach ($this->toxGetMagicProps() as $ii => $jj) {
+            if ('dao' == $ii || self::TOX_PROPERTY_DENIED == $jj) {
+                continue;
+            }
+            if (!is_null($this->$ii)) {
+                $this->toxStash[$ii] = $this->$ii;
+                $this->$ii = null;
+            }
+        }
+        $this->toxStash['id'] = null;
+    }
+
+    /**
+     * {@inheritdoc}
+     *
+     * **THIS METHOD CANNOT BE OVERRIDDEN.**
+     *
+     * @return bool
+     */
+    final public function isAsync()
+    {
+        return $this->toxAsync;
+    }
+
+    /**
+     * {@inhertdoc}
+     *
+     * @return self
+     */
+    public function enableAsync()
+    {
+        $this->toxAsync = true;
+        return $this;
+    }
+
+    /**
+     * {@inhertdoc}
+     *
+     * @return self
+     */
+    public function disableAsync()
+    {
+        $this->toxAsync = false;
+        return $this;
+    }
+
+    /**
+     * {@inheritdoc}
+     *
+     * **THIS METHOD CANNOT BE OVERRIDDEN.**
+     *
+     * @param  Application\IModelSet $set The container models set.
+     * @param  Application\IDao      $dao Data access object to use.
+     * @return self
+     */
+    final public static function import(Application\IModelSet $set, Application\IDao $dao)
+    {
+        $m_cur = $set->current();
+        if ($m_cur instanceof Application\IModel) {
+            return $m_cur;
+        } elseif (!isset($m_cur['id'])) {
+            throw new IllegalSetElementException;
+        }
+        $s_type = get_called_class();
+        if (!isset(self::$instances[$s_type])) {
+            self::$instances[$s_type] = array();
+        }
+        if (isset(self::$instances[$s_type][$m_cur['id']])) {
+            $o_mod = self::$instances[$s_type][$m_cur['id']];
+        } else {
+            $o_mod = static::newModel();
+            $o_mod->id = $m_cur['id'];
+            $o_mod->dao = $dao;
+            self::$instances[$s_type][$m_cur['id']] = $o_mod;
+        }
+        return $o_mod->assign($m_cur);
     }
 }
 
-// vi:se ft=php fenc=utf-8 ff=unix ts=4 sts=4 et sw=4 fen fdm=indent fdl=1 tw=120:
+// vi:ft=php fenc=utf-8 ff=unix ts=4 sts=4 et sw=4 fen fdm=indent fdl=1 tw=120

@@ -399,6 +399,8 @@ abstract class Statement extends Core\Assembly implements Data\IPdoStatement
      * @param  Data\IPdo $pdo Hosting data object.
      * @param  string    $sql Raw statement SQL.
      * @return Prepare
+     *
+     * @codeCoverageIgnore
      */
     protected static function newPrepare(Data\IPdo $pdo, $sql)
     {
@@ -411,6 +413,8 @@ abstract class Statement extends Core\Assembly implements Data\IPdoStatement
      * @param  Data\IPdo $pdo Hosting data object.
      * @param  string    $sql Raw statement SQL.
      * @return Query
+     *
+     * @codeCoverageIgnore
      */
     protected static function newQuery(Data\IPdo $pdo, $sql)
     {

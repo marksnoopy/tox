@@ -34,10 +34,10 @@ require_once __DIR__ . '/../../../../src/data/kv/memcacheserverconfiguration.php
 
 
 require_once __DIR__ . '/../../../../src/core/exception.php';
-require_once __DIR__ . '/../../../../src/data/kv/@exception/memcachevaluenotstring.php';
-require_once __DIR__ . '/../../../../src/data/kv/@exception/memcachekeytoolong.php';
-require_once __DIR__ . '/../../../../src/data/kv/@exception/emptyhost.php';
-require_once __DIR__ . '/../../../../src/data/kv/@exception/memcacheconfignotarray.php';
+require_once __DIR__ . '/../../../../src/data/kv/memcachevaluenotstringexception.php';
+require_once __DIR__ . '/../../../../src/data/kv/memcachekeytoolongexception.php';
+require_once __DIR__ . '/../../../../src/data/kv/emptyhostexception.php';
+require_once __DIR__ . '/../../../../src/data/kv/memcacheconfignotarrayexception.php';
 require_once __DIR__ . '/../../../../src/data/kv/memcache.php';
 
 use Tox\Data\KV;

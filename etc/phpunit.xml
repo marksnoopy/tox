@@ -27,12 +27,6 @@
     <testsuite name="tox.data">
       <directory suffix="-test.php">../share/test/data</directory>
     </testsuite>
-    <testsuite name="tox.data.pdo">
-      <directory suffix="-test.php">../share/test/data/pdo</directory>
-    </testsuite>
-    <testsuite name="tox.data.kv">
-      <directory suffix="-test.php">../share/test/data/kv</directory>
-    </testsuite>
     <testsuite name="tox.type">
       <directory suffix="-test.php">../share/test/type</directory>
     </testsuite>

@@ -31,7 +31,7 @@ require_once __DIR__ . '/../../../../src/web/ipagecacheagent.php';
 require_once __DIR__ . '/../../../../src/web/response/pagecacheagent.php';
 
 require_once __DIR__ . '/../../../../src/core/exception.php';
-require_once __DIR__ . '/../../../../src/web/response/@exception/responserequired.php';
+require_once __DIR__ . '/../../../../src/web/response/responserequiredexception.php';
 
 require_once __DIR__ . '/../../../../src/application/ioutput.php';
 require_once __DIR__ . '/../../../../src/application/output/output.php';

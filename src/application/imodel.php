@@ -1,6 +1,6 @@
 <?php
 /**
- * Provides essential behaviors to all derived models and model collections.
+ * Defines the essential behaviors of model entities.
  *
  * This file is part of Tox.
  *
@@ -17,21 +17,98 @@
  * You should have received a copy of the GNU General Public License
  * along with Tox.  If not, see <http://www.gnu.org/licenses/>.
  *
- * @package   Tox\Application
- * @author    Snakevil Zen <zsnakevil@gmail.com>
  * @copyright © 2012-2013 PHP-Tox.org
- * @license   http://www.gnu.org/licenses/gpl.html
+ * @license   GNU General Public License, version 3
  */
 
 namespace Tox\Application;
 
-interface IModel
+/**
+ * Announces the essential behaviors of model entities.
+ *
+ * @package tox.application
+ * @author  Snakevil Zen <zsnakevil@gmail.com>
+ * @since   0.1.0-beta1
+ */
+interface IModel extends ICommittable
 {
-    public function commit();
+    /**
+     * Prepares a new model entity.
+     *
+     * The new model entity WOULD be created in SYNC mode.
+     *
+     * @param  mixed[] $attributes Attributes of the new model entity.
+     * @param  IDao    $dao        OPTIONAL. Data access object in use.
+     * @return self
+     */
+    public static function prepare($attributes, IDao $dao = null);
 
-    public function isChanged();
+    /**
+     * Alias of `load()'.
+     *
+     * @deprecated Remained for forward compatibility. Would be removed in some
+     *             future version.
+     *
+     * @param  string $id  The unique identifier of the model entity.
+     * @param  IDao   $dao OPTIONAL. Data access object in use.
+     * @return self
+     */
+    public static function setUp($id, IDao $dao = null);
 
-    public function reset();
+    /**
+     * Loads an existant model entity.
+     *
+     * @param  string $id  The unique identifier of the model entity.
+     * @param  IDao   $dao OPTIONAL. Data access object in use.
+     * @return self
+     *
+     * @throws NonExistantEntityException If the model entity does not exist.
+     */
+    public static function load($id, IDao $dao = null);
+
+    /**
+     * Retrieves the unique identifier.
+     *
+     * @return string
+     */
+    public function getId();
+
+    /**
+     * Destroys the model entity.
+     *
+     * @return self
+     */
+    public function terminate();
+
+    /**
+     * Returns the unique indentifier on string casting.
+     *
+     * @return string
+     */
+    public function __toString();
+
+    /**
+     * Checks whether the model entity alive.
+     *
+     * @return bool
+     */
+    public function isAlive();
+
+    /**
+     * Duplicates a prepared model entity.
+     *
+     * @return void
+     */
+    public function __clone();
+
+    /**
+     * Imports a model entity from a models set.
+     *
+     * @param  IModelSet $set The container models set.
+     * @param  IDao      $dao Data access object to use.
+     * @return self
+     */
+    public static function import(IModelSet $set, IDao $dao);
 }
 
-// vi:se ft=php fenc=utf-8 ff=unix ts=4 sts=4 et sw=4 fen fdm=indent fdl=1 tw=120:
+// vi:ft=php fenc=utf-8 ff=unix ts=4 sts=4 et sw=4 fen fdm=indent fdl=1 tw=120

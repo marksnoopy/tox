@@ -168,6 +168,8 @@ class Pdo extends Core\Assembly implements Data\IPdo
      * Generates a real PHP data object.
      *
      * @return PHPPdo
+     *
+     * @codeCoverageIgnore
      */
     protected function newPHPPdo()
     {
@@ -402,6 +404,8 @@ class Pdo extends Core\Assembly implements Data\IPdo
      * @param  string    $sql  SQL statement.
      * @param  const     $type Statement type.
      * @return Statement
+     *
+     * @codeCoverageIgnore
      */
     protected function newStatement($sql, $type)
     {

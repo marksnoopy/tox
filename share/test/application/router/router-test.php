@@ -30,7 +30,7 @@ require_once __DIR__ . '/../../../../src/application/irouter.php';
 require_once __DIR__ . '/../../../../src/application/router/router.php';
 
 require_once __DIR__ . '/../../../../src/core/exception.php';
-require_once __DIR__ . '/../../../../src/application/router/@exception/unknownapplicationsituation.php';
+require_once __DIR__ . '/../../../../src/application/router/unknownapplicationsituationexception.php';
 
 require_once __DIR__ . '/../../../../src/application/iinput.php';
 require_once __DIR__ . '/../../../../src/application/itoken.php';

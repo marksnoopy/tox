@@ -1,6 +1,6 @@
 <?php
 /**
- * Represents as an entity model.
+ * Defines an exception for iterating an empty set.
  *
  * This file is part of Tox.
  *
@@ -17,27 +17,38 @@
  * You should have received a copy of the GNU General Public License
  * along with Tox.  If not, see <http://www.gnu.org/licenses/>.
  *
- * @package   Tox\Application
- * @author    Snakevil Zen <zsnakevil@gmail.com>
  * @copyright © 2012-2013 PHP-Tox.org
- * @license   http://www.gnu.org/licenses/gpl.html
+ * @license   GNU General Public License, version 3
  */
 
 namespace Tox\Application\Model;
 
-use Tox\Application;
+use Tox\Core;
 
-interface IEntity extends Application\IModel
+/**
+ * Be raised on iterating an empty set.
+ *
+ * **THIS CLASS CANNOT BE INHERITED.**
+ *
+ * @package tox.application.model
+ * @author  Snakevil Zen <zsnakevil@gmail.com>
+ * @since   0.2.0
+ */
+final class SetWithoutFiltersException extends Core\Exception
 {
-    public static function import(ICollection $set, Application\IDao $dao = NULL);
+    /**
+     * {@inheritdoc}
+     *
+     * > Defined as `0x8002070D`.
+     */
+    const CODE = 0x8002070D;
 
-    public static function prepare($meta, Application\IDao $dao = NULL);
-
-    public function receiveChanging(IEntity $entity, $collection);
-
-    public function receiveResuming(IEntity $entity, $collection);
-
-    public static function setUp($id, Application\IDao $dao = NULL);
+    /**
+     * {@inheritdoc}
+     *
+     * > Defined as `set without filters cannot be iterated`.
+     */
+    const MESSAGE = 'set without filters cannot be iterated';
 }
 
-// vi:se ft=php fenc=utf-8 ff=unix ts=4 sts=4 et sw=4 fen fdm=indent fdl=1 tw=120:
+// vi:ft=php fenc=utf-8 ff=unix ts=4 sts=4 et sw=4 fen fdm=indent fdl=1 tw=120

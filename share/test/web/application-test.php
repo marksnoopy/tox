@@ -31,11 +31,11 @@ require_once __DIR__ . '/../../../src/application/application.php';
 require_once __DIR__ . '/../../../src/web/application.php';
 
 require_once __DIR__ . '/../../../src/core/exception.php';
-require_once __DIR__ . '/../../../src/application/@exception/invalidconfiguredfallbacktype.php';
-require_once __DIR__ . '/../../../src/application/@exception/invalidconfiguredinputtype.php';
-require_once __DIR__ . '/../../../src/application/@exception/invalidconfiguredoutputtype.php';
-require_once __DIR__ . '/../../../src/application/@exception/invalidconfiguredroutertype.php';
-require_once __DIR__ . '/../../../src/application/@exception/multipleapplicationruntime.php';
+require_once __DIR__ . '/../../../src/application/invalidconfiguredfallbacktypeexception.php';
+require_once __DIR__ . '/../../../src/application/invalidconfiguredinputtypeexception.php';
+require_once __DIR__ . '/../../../src/application/invalidconfiguredoutputtypeexception.php';
+require_once __DIR__ . '/../../../src/application/invalidconfiguredroutertypeexception.php';
+require_once __DIR__ . '/../../../src/application/multipleapplicationruntimeexception.php';
 require_once __DIR__ . '/../../../src/web/@exception/invalidconfiguredsessiontype.php';
 
 require_once __DIR__ . '/../../../src/application/iinput.php';
