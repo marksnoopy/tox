@@ -36,6 +36,7 @@ require_once __DIR__ . '/../../../../src/application/model/nonexistantentityexce
 require_once __DIR__ . '/../../../../src/application/model/preparationcannotresetexception.php';
 require_once __DIR__ . '/../../../../src/application/model/duplicateidentifierexception.php';
 require_once __DIR__ . '/../../../../src/application/model/illegalsetelementexception.php';
+require_once __DIR__ . '/../../../../src/application/model/setpropertyunreplacableexception.php';
 
 require_once __DIR__ . '/../../../../src/application/imodelset.php';
 require_once __DIR__ . '/../../../../src/core/isingleton.php';
@@ -615,6 +616,35 @@ class ModelTest extends PHPUnit_Framework_TestCase
         $o_mod3 = $o_mod1::import($o_set, $this->dao);
         $this->assertSame($o_mod2, $o_mod3);
         $this->assertEquals($a_rows[1]['foo'], $o_mod3->foo);
+    }
+
+    /**
+     * @depends testPrepareWouldNotCreateBeforeCommit
+     */
+    public function testCommittablePropertiesReadableImmediately()
+    {
+        $o_mod1 = $this->getMockForAbstractClass('Tox\\Application\\Model\\ModelDummy', array(), '', false);
+        $o_mod2 = $this->getMock('Tox\\Application\\IModel');
+        $o_mod3 = $o_mod1::prepare(array('id' => microtime(), 'foo' => $o_mod2), $this->dao);
+        $this->assertSame($o_mod2, $o_mod3->foo);
+        $o_mod4 = $this->getMock('Tox\\Application\\IModel');
+        $o_mod3->foo = $o_mod4;
+        $this->assertSame($o_mod4, $o_mod3->foo);
+        $o_set1 = $this->getMock('Tox\\Application\\IModelSet');
+        $o_mod5 = $o_mod1::prepare(array('id' => microtime(), 'foo' => $o_set1), $this->dao);
+        $this->assertSame($o_set1, $o_mod5->foo);
+    }
+
+    /**
+     * @depends testCommittablePropertiesReadableImmediately
+     * @expectedException Tox\Application\Model\SetPropertyUnreplacableException
+     */
+    public function testSetPropertiesUnreplacable()
+    {
+        $o_mod1 = $this->getMockForAbstractClass('Tox\\Application\\Model\\ModelDummy', array(), '', false);
+        $o_set1 = $this->getMock('Tox\\Application\\IModelSet');
+        $o_mod2 = $o_mod1::prepare(array('id' => microtime(), 'foo' => $o_set1), $this->dao);
+        $o_mod2->foo = $this->getMock('Tox\\Application\\IModelSet');
     }
 }
 

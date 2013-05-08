@@ -48,6 +48,10 @@
 0x80020706 = AttributeFilteredException
 0x80020707 = AttributeSortedException
 0x80020708 = IllegalSetElementException
+0x80020709 = IllegalEntityForSetException
+0x8002070A = ModelIncludedInSetException
+0x8002070B = PreparedModelToDropException
+0x8002070C = SetPropertyUnreplacableException
 
 [Tox\Application\Dao]
 0x80020801 = DataSourceExpectedException

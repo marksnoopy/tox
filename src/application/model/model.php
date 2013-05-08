@@ -253,6 +253,9 @@ abstract class Model extends Core\Assembly implements Application\IModel
                 $this->$ii = $jj;
                 $this->toxOriginal[$ii] = $jj;
             } else {
+                if ($jj instanceof Application\ICommittable) {
+                    $this->$ii = $jj;
+                }
                 $this->toxStash[$ii] = $jj;
             }
         }
@@ -290,6 +293,26 @@ abstract class Model extends Core\Assembly implements Application\IModel
      *
      * @internal
      *
+     * @param  string $prop  Set attribute.
+     * @param  mixed  $value New value.
+     * @return mixed
+     */
+    final protected function toxPreSet($prop, $value)
+    {
+        $prop = (string) $prop;
+        if ($this->$prop instanceof Application\IModelSet) {
+            throw new SetPropertyUnreplacableException;
+        }
+        return $value;
+    }
+
+    /**
+     * {@inheritdoc}
+     *
+     * **THIS METHOD CANNOT BE OVERRIDDEN.**
+     *
+     * @internal
+     *
      * @param  string $prop Set attribute.
      * @return void
      */
@@ -297,7 +320,6 @@ abstract class Model extends Core\Assembly implements Application\IModel
     {
         $prop = (string) $prop;
         if ('id' == $prop ||
-            !$this->toxIsMagicPropWritable($prop) ||
             !isset($this->toxOriginal[$prop]) ||
             $this->$prop == $this->toxOriginal[$prop]
         ) {
@@ -350,11 +372,14 @@ abstract class Model extends Core\Assembly implements Application\IModel
      */
     final public function commit()
     {
+        if (!$this->isChanged()) {
+            return $this;
+        }
         if ($this->isAlive()) {
             if (array_key_exists('id', $this->toxStash) && is_null($this->toxStash['id'])) {
                 $this->getDao()->delete($this->id);
                 $this->id = null;
-            } elseif ($this->isChanged()) {
+            } else {
                 $this->getDao()->update($this->id, $this->toxStash);
                 $this->assign($this->toxStash);
             }
