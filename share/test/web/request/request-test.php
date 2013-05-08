@@ -55,11 +55,13 @@ class RequestTest extends PHPUnit_Framework_TestCase
     public function testResetVariable($key, $value)
     {
         $i_server = count($_SERVER);
+        $i_env = count($_ENV);
         $_COOKIE[$key] = $_ENV[$key] = $_FILES[$key]
             = $_GET[$key] = $_POST[$key] = $_SERVER[$key] = $value;
 
         $this->assertEquals($_COOKIE, array($key=> $value));
-        //$this->assertEquals($_ENV, array($key=> $value));
+        $this->assertEquals($_ENV, array($key=> $value));
+        $this->assertCount($i_env + 1, $_ENV);
         $this->assertEquals($_FILES, array($key=> $value));
         $this->assertEquals($_GET, array($key=> $value));
         $this->assertEquals($_POST, array($key=> $value));
